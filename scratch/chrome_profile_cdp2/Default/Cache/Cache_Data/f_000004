@@ -1,0 +1,682 @@
+/* ═══════════════════════════════════════════════════════════════════
+   HER LITTLE UNIVERSE — LUXURY BACKGROUND ART DIRECTION
+   Handmade Paper • Botanical Illustrations • Champagne Lighting •
+   Architectural Drafting • Vintage Postal Details • Editorial Textures
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ────────────────────────────────────────────────────────────────
+   1. UNIVERSAL SECTION BACKGROUND INFRASTRUCTURE
+──────────────────────────────────────────────────────────────── */
+.section-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Universal Cotton Rag / Handmade Paper Texture Overlay */
+.section-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='paper-grain'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='280' height='280' filter='url(%23paper-grain)' opacity='0.048'/%3E%3C/svg%3E");
+  pointer-events: none;
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+
+/* Universal Delicate Linen Weave Cross-Hatch */
+.section-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(90deg, rgba(140, 98, 66, 0.018) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(140, 98, 66, 0.018) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Content layer elevation across sections */
+#intro > *:not(.section-bg):not(canvas),
+#hero > *:not(.section-bg),
+#universe > *:not(.section-bg):not(canvas),
+#gallery > *:not(.section-bg),
+#scrapbook > *:not(.section-bg),
+#mosaic > *:not(.section-bg),
+#secret > *:not(.section-bg):not(canvas),
+#letter-section > *:not(.section-bg),
+#final-scene > *:not(.section-bg):not(canvas) {
+  position: relative;
+  z-index: 2;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   2. HOMEPAGE BACKGROUND (#hero)
+   Warm ivory with soft sunlight effects, subtle paper texture,
+   and delicate ornamental corner details.
+──────────────────────────────────────────────────────────────── */
+#hero {
+  position: relative;
+  background: linear-gradient(165deg, #FDF9F3 0%, #F8F1E7 40%, #F3E7D6 100%);
+  overflow: hidden;
+}
+
+.section-bg--hero {
+  background:
+    radial-gradient(ellipse 75% 65% at 20% 25%, rgba(248, 241, 231, 0.9) 0%, rgba(243, 231, 214, 0.6) 50%, transparent 85%),
+    radial-gradient(ellipse 60% 50% at 85% 75%, rgba(223, 194, 157, 0.28) 0%, transparent 70%);
+}
+
+/* Soft Dappled Sunlight Beam (Hardware-Accelerated Radial Feathering) */
+.hero-sunbeam {
+  position: absolute;
+  top: -15%;
+  left: 10%;
+  width: 70vw;
+  height: 85vh;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 40% 40%,
+    rgba(255, 252, 245, 0.45) 0%,
+    rgba(223, 194, 157, 0.20) 35%,
+    rgba(243, 231, 214, 0.08) 55%,
+    transparent 72%
+  );
+  pointer-events: none;
+  animation: hero-sunbeam-drift 24s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes hero-sunbeam-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1) rotate(0deg); opacity: 0.85; }
+  50%  { transform: translate3d(3vw, 2vh, 0) scale(1.06) rotate(2deg); opacity: 1; }
+  100% { transform: translate3d(-2vw, 4vh, 0) scale(0.96) rotate(-1.5deg); opacity: 0.9; }
+}
+
+/* Botanical Corner Spray — Top Left */
+.hero-botanical-tl {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 140px;
+  height: 140px;
+  opacity: 0.16;
+  color: #8C6242;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+/* Botanical Corner Spray — Bottom Right */
+.hero-botanical-br {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  width: 160px;
+  height: 160px;
+  opacity: 0.14;
+  color: #8C6242;
+  pointer-events: none;
+  transform: rotate(180deg);
+}
+
+/* Vintage Editorial Watermark Medallion */
+.hero-editorial-watermark {
+  position: absolute;
+  top: 42%;
+  left: 8%;
+  transform: translateY(-50%);
+  width: 380px;
+  height: 380px;
+  opacity: 0.075;
+  color: #704D35;
+  pointer-events: none;
+  animation: watermark-slow-spin 180s linear infinite;
+}
+
+@keyframes watermark-slow-spin {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to   { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   3. UNIVERSE BACKGROUND (#universe)
+   Rich champagne-beige atmosphere with fine constellation paths,
+   elegant orbital illustrations, and subtle glowing particles.
+──────────────────────────────────────────────────────────────── */
+#universe {
+  position: relative;
+  background: radial-gradient(ellipse at 45% 45%,
+    #EFE3D3 0%,
+    #E8D6BF 38%,
+    #DEC5A6 72%,
+    #D1B28E 100%
+  );
+  overflow: hidden;
+}
+
+.section-bg--universe {
+  background:
+    radial-gradient(circle at 50% 50%, rgba(248, 241, 231, 0.45) 0%, transparent 60%),
+    radial-gradient(ellipse 80% 60% at 75% 20%, rgba(216, 185, 144, 0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 70% at 20% 80%, rgba(189, 149, 107, 0.22) 0%, transparent 60%);
+}
+
+/* Grand Armillary Sphere Engraving */
+.universe-armillary-svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(880px, 92vw);
+  height: min(880px, 92vw);
+  opacity: 0.15;
+  color: #704D35;
+  pointer-events: none;
+  animation: armillary-breathe 40s ease-in-out infinite alternate;
+}
+
+@keyframes armillary-breathe {
+  0%   { transform: translate(-50%, -50%) rotate(0deg) scale(0.98); }
+  50%  { transform: translate(-50%, -50%) rotate(4deg) scale(1.02); }
+  100% { transform: translate(-50%, -50%) rotate(-3deg) scale(1); }
+}
+
+/* Constellation Star Chart Overlay */
+.universe-chart-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.13;
+  color: #8C6242;
+  pointer-events: none;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   4. GALLERY BACKGROUND (#gallery)
+   Sophisticated ivory editorial background with faint geometric
+   patterns, subtle grain, and delicate decorative framing.
+──────────────────────────────────────────────────────────────── */
+#gallery {
+  position: relative;
+  background: linear-gradient(175deg, #FEFAF4 0%, #F8F1E7 48%, #F2E5D3 100%);
+  overflow: hidden;
+}
+
+.section-bg--gallery {
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 30%, rgba(255, 253, 248, 0.8) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 75% 65%, rgba(223, 194, 157, 0.22) 0%, transparent 65%);
+}
+
+/* Neoclassical Gallery Double Arches */
+.gallery-arch-svg {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  opacity: 0.11;
+  color: #8C6242;
+  pointer-events: none;
+}
+
+/* Editorial French Rule Grid */
+.gallery-french-rule-grid {
+  position: absolute;
+  inset: 24px 32px;
+  border: 1px solid rgba(189, 149, 107, 0.14);
+  pointer-events: none;
+}
+
+.gallery-french-rule-grid::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border: 1px dashed rgba(189, 149, 107, 0.10);
+}
+
+/* Editorial Bleed Margin Annotations */
+.gallery-margin-annotation {
+  position: absolute;
+  font-family: var(--font-nav);
+  font-size: 0.44rem;
+  letter-spacing: 0.28em;
+  color: #8C6242;
+  opacity: 0.26;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.gallery-margin-annotation--tl { top: 38px; left: 48px; }
+.gallery-margin-annotation--br { bottom: 38px; right: 48px; }
+
+/* ────────────────────────────────────────────────────────────────
+   5. SCRAPBOOK BACKGROUND (#scrapbook)
+   Vintage parchment texture, subtle paper fibres, faint botanical
+   sketches, and handmade journal details.
+──────────────────────────────────────────────────────────────── */
+#scrapbook {
+  position: relative;
+  background: linear-gradient(160deg,
+    #EBDBC6 0%,
+    #E2CCB0 35%,
+    #EBD9C2 70%,
+    #DEC4A4 100%
+  );
+  overflow: hidden;
+}
+
+.section-bg--scrapbook {
+  background:
+    radial-gradient(ellipse 55% 45% at 20% 20%, rgba(250, 242, 230, 0.45) 0%, transparent 65%),
+    radial-gradient(ellipse 65% 55% at 80% 70%, rgba(216, 185, 144, 0.35) 0%, transparent 70%),
+    radial-gradient(circle at 50% 50%, rgba(235, 219, 198, 0.3) 0%, transparent 75%);
+}
+
+/* Herbarium Pressed Fern Illustration (Left) */
+.scrapbook-herbarium-left {
+  position: absolute;
+  top: 12%;
+  left: 2%;
+  width: 220px;
+  height: 480px;
+  opacity: 0.13;
+  color: #654832;
+  pointer-events: none;
+  transform: rotate(-4deg);
+}
+
+/* Herbarium Wild Rose Botanical (Right) */
+.scrapbook-herbarium-right {
+  position: absolute;
+  bottom: 8%;
+  right: 2%;
+  width: 240px;
+  height: 460px;
+  opacity: 0.13;
+  color: #654832;
+  pointer-events: none;
+  transform: rotate(6deg);
+}
+
+/* Vintage French Postal Postmark Cancellation */
+.scrapbook-postal-mark {
+  position: absolute;
+  top: 22%;
+  right: 8%;
+  width: 140px;
+  height: 140px;
+  opacity: 0.11;
+  color: #704D35;
+  pointer-events: none;
+  transform: rotate(-12deg);
+}
+
+.scrapbook-postal-mark--alt {
+  top: 68%;
+  left: 6%;
+  width: 125px;
+  height: 125px;
+  opacity: 0.095;
+  transform: rotate(15deg);
+}
+
+/* ────────────────────────────────────────────────────────────────
+   6. PHOTO MOSAIC BACKGROUND (#mosaic)
+   Warm cream background with refined architectural lines and
+   subtle layered shapes.
+──────────────────────────────────────────────────────────────── */
+#mosaic {
+  position: relative;
+  background: linear-gradient(180deg, #EBD8C0 0%, #F5EBDB 45%, #FAF4E9 100%);
+  overflow: hidden;
+}
+
+.section-bg--mosaic {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 25%, rgba(255, 252, 245, 0.65) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 60% at 20% 75%, rgba(216, 185, 144, 0.25) 0%, transparent 65%);
+}
+
+/* Refined Architectural Drafting Compass & Golden Spiral */
+.mosaic-architectural-svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(920px, 94vw);
+  height: min(920px, 94vw);
+  opacity: 0.12;
+  color: #8C6242;
+  pointer-events: none;
+}
+
+/* Layered Organic Parchment Silhouettes */
+.mosaic-organic-blob-1 {
+  position: absolute;
+  top: 15%;
+  left: -8%;
+  width: 38vw;
+  height: 42vw;
+  border-radius: 50%;
+  background: radial-gradient(circle at 45% 45%, rgba(235, 216, 192, 0.35) 0%, rgba(216, 185, 144, 0.12) 45%, transparent 70%);
+  pointer-events: none;
+  animation: organic-drift-1 26s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.mosaic-organic-blob-2 {
+  position: absolute;
+  bottom: 10%;
+  right: -6%;
+  width: 42vw;
+  height: 38vw;
+  border-radius: 50%;
+  background: radial-gradient(circle at 55% 55%, rgba(223, 194, 157, 0.30) 0%, rgba(243, 231, 214, 0.12) 45%, transparent 70%);
+  pointer-events: none;
+  animation: organic-drift-2 30s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes organic-drift-1 {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  100% { transform: translate3d(4vw, 3vh, 0) rotate(8deg); }
+}
+
+@keyframes organic-drift-2 {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  100% { transform: translate3d(-3vw, -4vh, 0) rotate(-6deg); }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   7. SURPRISE / SECRET BACKGROUND (#secret)
+   Champagne parchment atmosphere with delicate postal-inspired
+   patterns and ornamental details.
+──────────────────────────────────────────────────────────────── */
+#secret {
+  position: relative;
+  background: radial-gradient(ellipse at 50% 50%,
+    #F5EAD8 0%,
+    #EBD6BC 45%,
+    #E0C4A4 80%,
+    #D4B18A 100%
+  );
+  overflow: hidden;
+}
+
+.section-bg--secret {
+  background:
+    radial-gradient(circle at 50% 48%, rgba(255, 252, 245, 0.7) 0%, rgba(223, 194, 157, 0.35) 38%, transparent 70%),
+    radial-gradient(ellipse 80% 60% at 50% 100%, rgba(189, 149, 107, 0.3) 0%, transparent 65%);
+}
+
+/* Secret Envelope Radial Light Aura */
+.secret-ambient-aura {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 520px;
+  height: 440px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    rgba(255, 250, 238, 0.65) 0%,
+    rgba(223, 194, 157, 0.32) 35%,
+    rgba(216, 185, 144, 0.10) 58%,
+    transparent 72%
+  );
+  pointer-events: none;
+  animation: secret-aura-breathe 8s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes secret-aura-breathe {
+  0%   { transform: translate(-50%, -50%) scale(0.95); opacity: 0.82; }
+  100% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+
+/* Postal Chevron Border Frame */
+.secret-postal-chevrons {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(189, 149, 107, 0.25) 0px,
+    rgba(189, 149, 107, 0.25) 12px,
+    transparent 12px,
+    transparent 20px,
+    rgba(140, 98, 66, 0.18) 20px,
+    rgba(140, 98, 66, 0.18) 32px,
+    transparent 32px,
+    transparent 40px
+  );
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.secret-postal-chevrons--bottom {
+  top: auto;
+  bottom: 0;
+  transform: scaleY(-1);
+}
+
+/* Heraldic Secret Seal Watermark */
+.secret-seal-watermark-svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 440px;
+  height: 440px;
+  opacity: 0.085;
+  color: #654832;
+  pointer-events: none;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   8. LETTER BACKGROUND (#letter-section)
+   Premium stationery-inspired background with beautiful paper
+   textures, subtle embossed patterns, and elegant corner flourishes.
+──────────────────────────────────────────────────────────────── */
+#letter-section {
+  position: relative;
+  background: linear-gradient(160deg,
+    #FAF4E9 0%,
+    #F3E7D6 40%,
+    #EBDEC9 75%,
+    #E2CEB5 100%
+  );
+  overflow: hidden;
+}
+
+.section-bg--letter {
+  background:
+    radial-gradient(ellipse 65% 55% at 50% 48%, rgba(255, 253, 248, 0.75) 0%, rgba(223, 194, 157, 0.32) 45%, transparent 75%),
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(248, 241, 231, 0.6) 0%, transparent 60%);
+}
+
+/* Grand Blind-Embossed Stationery Crest Watermark */
+.letter-stationery-crest-svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(580px, 90vw);
+  height: min(580px, 90vw);
+  opacity: 0.095;
+  color: #704D35;
+  pointer-events: none;
+}
+
+/* Elegant Acanthus Corner Flourishes */
+.letter-corner-flourish {
+  position: absolute;
+  width: 130px;
+  height: 130px;
+  opacity: 0.13;
+  color: #8C6242;
+  pointer-events: none;
+}
+.letter-corner-flourish--tl { top: 24px; left: 24px; }
+.letter-corner-flourish--tr { top: 24px; right: 24px; transform: scaleX(-1); }
+.letter-corner-flourish--bl { bottom: 24px; left: 24px; transform: scaleY(-1); }
+.letter-corner-flourish--br { bottom: 24px; right: 24px; transform: scale(-1); }
+
+/* Warm Writing-Desk Candlelight Glow */
+.letter-desk-light {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 680px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    rgba(255, 252, 244, 0.55) 0%,
+    rgba(223, 194, 157, 0.20) 42%,
+    rgba(216, 185, 144, 0.06) 62%,
+    transparent 74%
+  );
+  pointer-events: none;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   9. FINAL SCENE BACKGROUND (#final-scene)
+   Soft ivory atmosphere with warm golden lighting, subtle organic
+   patterns, and an elegant cinematic vignette.
+──────────────────────────────────────────────────────────────── */
+#final-scene {
+  position: relative;
+  background: radial-gradient(ellipse at 50% 42%,
+    #FFFDF9 0%,
+    #F7EFE3 35%,
+    #EBDBC6 70%,
+    #DECAAF 100%
+  );
+  overflow: hidden;
+}
+
+.section-bg--final {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 252, 242, 0.85) 0%, rgba(223, 194, 157, 0.42) 35%, transparent 72%),
+    radial-gradient(ellipse 90% 70% at 50% 50%, transparent 60%, rgba(73, 50, 36, 0.12) 100%);
+}
+
+/* Cinematic Golden Spotlight */
+.final-cinematic-halo {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(720px, 92vw);
+  height: min(720px, 92vw);
+  border-radius: 50%;
+  background: radial-gradient(circle at center,
+    rgba(255, 250, 238, 0.75) 0%,
+    rgba(223, 194, 157, 0.38) 28%,
+    rgba(216, 185, 144, 0.12) 50%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: final-halo-glow 9s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+@keyframes final-halo-glow {
+  0%   { transform: translate(-50%, -50%) scale(0.96); opacity: 0.88; }
+  100% { transform: translate(-50%, -50%) scale(1.06); opacity: 1; }
+}
+
+/* Celestial Starlight Ring */
+.final-starlight-ring-svg {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(620px, 86vw);
+  height: min(620px, 86vw);
+  opacity: 0.13;
+  color: #704D35;
+  pointer-events: none;
+  animation: starlight-spin 120s linear infinite;
+}
+
+@keyframes starlight-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   10. SEAMLESS SECTION DIVIDERS & CONNECTED TRANSITIONS
+──────────────────────────────────────────────────────────────── */
+.section-transition-divider {
+  position: relative;
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 3;
+  margin-top: -24px;
+  margin-bottom: -24px;
+}
+
+.transition-rule-line {
+  flex: 1;
+  max-width: 320px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(189, 149, 107, 0.42), transparent);
+}
+
+.transition-glyph {
+  margin: 0 1.2rem;
+  font-size: 0.72rem;
+  color: var(--soft-caramel);
+  opacity: 0.75;
+  text-shadow: 0 0 10px rgba(216, 185, 144, 0.5);
+  animation: glyph-soft-pulse 4s ease-in-out infinite;
+}
+
+@keyframes glyph-soft-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50%      { transform: scale(1.15); opacity: 0.95; }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   11. REDUCED MOTION SUPPORT
+──────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-sunbeam,
+  .hero-editorial-watermark,
+  .universe-armillary-svg,
+  .mosaic-organic-blob-1,
+  .mosaic-organic-blob-2,
+  .secret-ambient-aura,
+  .final-cinematic-halo,
+  .final-starlight-ring-svg,
+  .transition-glyph {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   12. MOBILE REFINEMENTS
+──────────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .hero-botanical-tl { width: 90px; height: 90px; top: 10px; left: 10px; }
+  .hero-botanical-br { width: 90px; height: 90px; bottom: 12px; right: 12px; }
+  .hero-editorial-watermark { width: 260px; height: 260px; }
+  .scrapbook-herbarium-left { width: 140px; height: 320px; left: -2%; }
+  .scrapbook-herbarium-right { width: 150px; height: 300px; right: -2%; }
+  .letter-corner-flourish { width: 80px; height: 80px; }
+}

@@ -1,0 +1,2155 @@
+/* ═══════════════════════════════════════════════════════════════════
+   HER LITTLE UNIVERSE — Main Application Engine v4 Premium
+   Luxury Editorial × Cinematic × Interactive
+   ═══════════════════════════════════════════════════════════════════ */
+
+'use strict';
+
+/* ────────────────────────────────────────────────────────────────
+   STARFIELD CANVAS ENGINE
+──────────────────────────────────────────────────────────────── */
+class StarField {
+  constructor(canvas, opts = {}) {
+    this.canvas = canvas;
+    this.ctx    = canvas.getContext('2d');
+    this.stars  = [];
+    this.raf    = null;
+    this.isRunning = false;
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const requestedCount = opts.count || 140;
+    this.opts   = {
+      count:   isMobile ? Math.min(requestedCount, 30) : Math.min(requestedCount, 65),
+      minSize: opts.minSize || 0.4,
+      maxSize: opts.maxSize || 2.0,
+      color:   opts.color   || '#8C6242',
+      speed:   opts.speed   || 0.016,
+      ...opts,
+    };
+    this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this._resizeObserver = null;
+    this._init();
+  }
+
+  _init() {
+    this._resize();
+    if (window.ResizeObserver) {
+      this._resizeObserver = new ResizeObserver(() => this._resize());
+      this._resizeObserver.observe(this.canvas.parentElement || document.body);
+    } else {
+      window.addEventListener('resize', () => this._resize(), { passive: true });
+    }
+    this.stars = Array.from({ length: this.opts.count }, () => this._makeStar());
+    if (this.reduced) {
+      this._drawStatic();
+    } else {
+      this.play();
+    }
+  }
+
+  play() {
+    if (this.isRunning || this.reduced) return;
+    this.isRunning = true;
+    this._tick();
+  }
+
+  pause() {
+    this.isRunning = false;
+    if (this.raf) {
+      cancelAnimationFrame(this.raf);
+      this.raf = null;
+    }
+  }
+
+  _resize() {
+    const parent = this.canvas.parentElement;
+    if (parent) {
+      this.canvas.width  = parent.offsetWidth;
+      this.canvas.height = parent.offsetHeight;
+    } else {
+      this.canvas.width  = window.innerWidth;
+      this.canvas.height = window.innerHeight;
+    }
+    if (this.reduced) this._drawStatic();
+  }
+
+  _makeStar() {
+    const w = this.canvas.width  || window.innerWidth;
+    const h = this.canvas.height || window.innerHeight;
+    return {
+      x:     Math.random() * w,
+      y:     Math.random() * h,
+      size:  this.opts.minSize + Math.random() * (this.opts.maxSize - this.opts.minSize),
+      alpha: 0.12 + Math.random() * 0.7,
+      vx:    (Math.random() - 0.5) * 0.08,
+      vy:    (Math.random() - 0.5) * 0.04,
+      phase: Math.random() * Math.PI * 2,
+      speed: this.opts.speed * (0.4 + Math.random() * 0.8),
+    };
+  }
+
+  _rgba(alpha) {
+    const c = this.opts.color;
+    const r = parseInt(c.slice(1, 3), 16);
+    const g = parseInt(c.slice(3, 5), 16);
+    const b = parseInt(c.slice(5, 7), 16);
+    return `rgba(${r},${g},${b},${Math.min(1, alpha).toFixed(3)})`;
+  }
+
+  _drawStatic() {
+    const { ctx, canvas, stars } = this;
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fillStyle = this._rgba(s.alpha * 0.5);
+      ctx.fill();
+    });
+  }
+
+  _tick() {
+    if (!this.isRunning) return;
+    const { ctx, canvas, stars } = this;
+    if (!ctx) return;
+    const t = performance.now() / 1000;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < stars.length; i++) {
+      const s = stars[i];
+      const flicker = 0.5 + 0.5 * Math.sin(t * s.speed * 3.5 + s.phase);
+      const a = s.alpha * (0.22 + 0.78 * flicker);
+
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+      ctx.fillStyle = this._rgba(a);
+      ctx.fill();
+
+      s.x += s.vx;
+      s.y += s.vy;
+      if (s.x < -4) s.x = canvas.width  + 4;
+      if (s.x > canvas.width  + 4) s.x = -4;
+      if (s.y < -4) s.y = canvas.height + 4;
+      if (s.y > canvas.height + 4) s.y = -4;
+    }
+    this.raf = requestAnimationFrame(() => this._tick());
+  }
+
+  destroy() {
+    this.pause();
+    if (this._resizeObserver) this._resizeObserver.disconnect();
+    if (this.ctx && this.canvas) {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    this.stars = [];
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   PARTICLE BURST
+──────────────────────────────────────────────────────────────── */
+function particleBurst(x, y, color = '#AE8157', count = 10) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const numParticles = Math.min(count, isMobile ? 8 : 12);
+  const frag = document.createDocumentFragment();
+  const elements = [];
+
+  for (let i = 0; i < numParticles; i++) {
+    const el    = document.createElement('div');
+    const angle = (i / numParticles) * 360;
+    const dist  = 35 + Math.random() * 45;
+    const px    = Math.cos(angle * Math.PI / 180) * dist;
+    const py    = Math.sin(angle * Math.PI / 180) * dist;
+    const size  = 1.5 + Math.random() * 2.5;
+    Object.assign(el.style, {
+      position: 'fixed', left: '0px', top: '0px',
+      transform: `translate3d(${x}px, ${y}px, 0)`,
+      width: `${size}px`, height: `${size}px`,
+      background: color, borderRadius: '50%',
+      pointerEvents: 'none', zIndex: '9998',
+      '--px': `${px}px`, '--py': `${py}px`,
+      animation: 'particle-burst 0.65s cubic-bezier(0.22,1,0.36,1) forwards',
+    });
+    frag.appendChild(el);
+    elements.push(el);
+  }
+  document.body.appendChild(frag);
+  setTimeout(() => {
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].remove();
+    }
+  }, 750);
+}
+
+/* ────────────────────────────────────────────────────────────────
+   CUSTOM CURSOR
+──────────────────────────────────────────────────────────────── */
+class CustomCursor {
+  constructor() {
+    this.dot  = document.getElementById('cursor-dot');
+    this.ring = document.getElementById('cursor-ring');
+    if (!this.dot || !this.ring) return;
+    if (window.matchMedia('(pointer: coarse)').matches) {
+      [this.dot, this.ring].forEach(el => el.style.display = 'none');
+      return;
+    }
+    this.mx = 0; this.my = 0;
+    this.rx = 0; this.ry = 0;
+    this.raf = null;
+    let scheduled = false;
+
+    document.addEventListener('mousemove', e => {
+      this.mx = e.clientX;
+      this.my = e.clientY;
+      if (!scheduled) {
+        scheduled = true;
+        requestAnimationFrame(() => {
+          this.dot.style.transform = `translate3d(${this.mx}px, ${this.my}px, 0) translate(-50%, -50%)`;
+          scheduled = false;
+        });
+      }
+    }, { passive: true });
+
+    const targets = 'button,a,[data-hover],input,label,.gallery-item,.scrap-card,.mosaic-tile,.universe-orb';
+    document.addEventListener('mouseover', e => {
+      if (e.target.closest(targets)) this._hover(true);
+    });
+    document.addEventListener('mouseout', e => {
+      if (e.target.closest(targets)) this._hover(false);
+    });
+
+    this._loop();
+  }
+
+  _hover(on) {
+    this.dot.classList.toggle('hovering', on);
+    this.ring.classList.toggle('hovering', on);
+  }
+
+  _loop() {
+    this.rx += (this.mx - this.rx) * 0.12;
+    this.ry += (this.my - this.ry) * 0.12;
+    this.ring.style.transform = `translate3d(${this.rx}px, ${this.ry}px, 0) translate(-50%, -50%)`;
+    this.raf = requestAnimationFrame(() => this._loop());
+  }
+
+  destroy() { if (this.raf) cancelAnimationFrame(this.raf); }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   MAGNETIC BUTTONS
+──────────────────────────────────────────────────────────────── */
+function initMagneticButtons() {
+  if (window.matchMedia('(pointer: coarse)').matches) return;
+  document.querySelectorAll('.btn').forEach(btn => {
+    let r = null;
+    btn.addEventListener('mouseenter', () => {
+      r = btn.getBoundingClientRect();
+    }, { passive: true });
+    btn.addEventListener('mousemove', e => {
+      if (!r) r = btn.getBoundingClientRect();
+      const cx  = r.left + r.width  / 2;
+      const cy  = r.top  + r.height / 2;
+      const dx  = (e.clientX - cx) * 0.32;
+      const dy  = (e.clientY - cy) * 0.32;
+      btn.style.transform = `translate3d(${dx}px, ${dy - 2}px, 0)`;
+    }, { passive: true });
+    btn.addEventListener('mouseleave', () => {
+      r = null;
+      btn.style.transform = '';
+    });
+  });
+}
+
+/* ────────────────────────────────────────────────────────────────
+   SCROLL REVEAL OBSERVER
+──────────────────────────────────────────────────────────────── */
+function initRevealObserver() {
+  const els = document.querySelectorAll('.reveal-up, .reveal-left, .reveal-right, .reveal-scale, .section-num');
+  if (!els.length) return;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el    = entry.target;
+      const delay = parseInt(el.dataset.delay || '0', 10);
+      el.style.setProperty('--reveal-delay', `${delay}ms`);
+      setTimeout(() => el.classList.add('is-visible'), delay);
+      obs.unobserve(el);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  els.forEach(el => obs.observe(el));
+}
+
+/* ────────────────────────────────────────────────────────────────
+   ACTIVE NAV SECTION TRACKER
+──────────────────────────────────────────────────────────────── */
+function initSectionTracker() {
+  const sections = ['hero','universe','gallery','scrapbook','mosaic','secret','letter-section','final-scene'];
+  const navLinks = document.querySelectorAll('.nav-links a[data-section]');
+  if (!navLinks.length) return;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id;
+      navLinks.forEach(a => {
+        a.classList.toggle('active', a.dataset.section === id);
+      });
+    });
+  }, { threshold: 0.35 });
+
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) obs.observe(el);
+  });
+}
+
+/* ────────────────────────────────────────────────────────────────
+   NAVIGATION
+──────────────────────────────────────────────────────────────── */
+function initNav() {
+  const nav     = document.getElementById('nav');
+  const logo    = document.querySelector('.nav-logo');
+  const links   = document.querySelector('.nav-links');
+  const menuBtn = document.querySelector('.nav-menu-btn');
+  if (!nav) return;
+
+  let lastY   = 0;
+  let ticking = false;
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        nav.classList.toggle('scrolled', y > 50);
+        if (logo) logo.classList.toggle('visible', y > 80);
+        nav.style.transform = (y > lastY + 8 && y > 200) ? 'translateY(-100%)' : 'translateY(0)';
+        lastY   = y;
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  if (menuBtn && links) {
+    menuBtn.addEventListener('click', () => {
+      const open = menuBtn.classList.toggle('open');
+      links.classList.toggle('open', open);
+      menuBtn.setAttribute('aria-expanded', String(open));
+    });
+    links.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => {
+        menuBtn.classList.remove('open');
+        links.classList.remove('open');
+        menuBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+}
+
+/* ────────────────────────────────────────────────────────────────
+   INTRO SCREEN
+──────────────────────────────────────────────────────────────── */
+function initIntro() {
+  const intro    = document.getElementById('intro');
+  const main     = document.getElementById('main-content');
+  const enterBtn = document.getElementById('enter-btn');
+  if (!intro || !enterBtn || !main) return;
+
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!reduced) {
+    const lines   = intro.querySelectorAll('.intro-line');
+    const btnWrap = intro.querySelector('.intro-btn-wrap');
+
+    lines.forEach((line, i) => {
+      line.style.cssText = 'opacity:0; transform:translateY(22px);';
+      setTimeout(() => {
+        line.style.cssText = 'transition:opacity 1.1s cubic-bezier(0.22,1,0.36,1),transform 1.1s cubic-bezier(0.22,1,0.36,1); opacity:1; transform:none;';
+        line.classList.add('visible');
+      }, 600 + i * 700);
+    });
+
+    if (btnWrap) {
+      btnWrap.style.cssText = 'opacity:0; transform:translateY(18px);';
+      setTimeout(() => {
+        btnWrap.style.cssText = 'transition:opacity 0.9s ease,transform 0.9s cubic-bezier(0.22,1,0.36,1); opacity:1; transform:none;';
+        btnWrap.classList.add('visible');
+      }, 600 + 2 * 700 + 350);
+    }
+  }
+
+  const doEnter = () => {
+    const r = enterBtn.getBoundingClientRect();
+    particleBurst(r.left + r.width / 2, r.top + r.height / 2, '#AE8157', 18);
+
+    if (!reduced) {
+      intro.style.transition = 'opacity 1.0s cubic-bezier(0.22,1,0.36,1), transform 1.0s cubic-bezier(0.22,1,0.36,1)';
+      intro.style.opacity    = '0';
+      intro.style.transform  = 'scale(1.04)';
+      setTimeout(() => {
+        window._destroyIntroSF?.();
+        intro.style.display  = 'none';
+        document.body.style.overflow = '';
+        main.classList.remove('hidden');
+        main.style.opacity = '0';
+        requestAnimationFrame(() => {
+          main.style.transition = 'opacity 0.8s ease';
+          main.style.opacity    = '1';
+        });
+        setTimeout(() => {
+          initRevealObserver();
+          initMagneticButtons();
+          initSectionTracker();
+        }, 120);
+      }, 900);
+    } else {
+      window._destroyIntroSF?.();
+      intro.style.display = 'none';
+      main.classList.remove('hidden');
+      document.body.style.overflow = '';
+      initRevealObserver();
+    }
+  };
+
+  enterBtn.addEventListener('click', doEnter);
+  setTimeout(() => { if (intro.style.display !== 'none') doEnter(); }, 14000);
+}
+
+/* ────────────────────────────────────────────────────────────────
+   LIGHTBOX
+──────────────────────────────────────────────────────────────── */
+class Lightbox {
+  constructor() {
+    this.lb      = document.getElementById('lightbox');
+    this.lbImg   = document.getElementById('lb-img');
+    this.lbCap   = document.getElementById('lb-caption');
+    this.lbCount = document.getElementById('lb-counter');
+    this.prev    = document.getElementById('lb-prev');
+    this.next    = document.getElementById('lb-next');
+    this.close   = document.getElementById('lb-close');
+    this.photos  = [];
+    this.idx     = 0;
+    this.scrollY = 0;
+    if (!this.lb) return;
+    this._bind();
+  }
+
+  open(photos, idx = 0) {
+    this.photos  = photos;
+    this.idx     = idx;
+    this.scrollY = window.scrollY;
+    this.lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    this._show(idx);
+    this.lb.focus();
+  }
+
+  _close() {
+    this.lb.classList.remove('open');
+    document.body.style.overflow = '';
+    window.scrollTo({ top: this.scrollY, behavior: 'instant' });
+  }
+
+  _show(idx) {
+    const p = this.photos[idx];
+    if (!p) return;
+    this.lbImg.classList.remove('loaded');
+    this.lbImg.style.opacity = '0';
+    this.lbImg.src = p.src || '';
+    this.lbImg.alt = p.alt || 'Photograph';
+    this.lbImg.onload  = () => { this.lbImg.style.opacity = '1'; this.lbImg.classList.add('loaded'); };
+    this.lbImg.onerror = () => {
+      if (this.lbImg.src && this.lbImg.src.endsWith('.webp')) {
+        this.lbImg.src = this.lbImg.src.replace(/\.webp$/i, '.png');
+      } else {
+        this.lbImg.style.opacity = '0.2';
+      }
+    };
+    if (this.lbCap)   this.lbCap.textContent  = p.caption || p.title || '';
+    if (this.lbCount) this.lbCount.textContent = `${idx + 1} / ${this.photos.length}`;
+    const atStart = idx === 0;
+    const atEnd   = idx === this.photos.length - 1;
+    this.prev.disabled      = atStart;
+    this.prev.style.opacity = atStart ? '0.25' : '1';
+    this.next.disabled      = atEnd;
+    this.next.style.opacity = atEnd   ? '0.25' : '1';
+  }
+
+  _prev() { if (this.idx > 0)                   { this.idx--; this._show(this.idx); } }
+  _next() { if (this.idx < this.photos.length-1) { this.idx++; this._show(this.idx); } }
+
+  _bind() {
+    this.close?.addEventListener('click', () => this._close());
+    this.prev?.addEventListener('click',  () => this._prev());
+    this.next?.addEventListener('click',  () => this._next());
+    this.lb.addEventListener('click', e => { if (e.target === this.lb) this._close(); });
+    document.addEventListener('keydown', e => {
+      if (!this.lb?.classList.contains('open')) return;
+      if (e.key === 'Escape')     { e.preventDefault(); this._close(); }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); this._prev(); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); this._next(); }
+    });
+    let touchStartX = 0;
+    this.lb.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    this.lb.addEventListener('touchend',   e => {
+      const dx = e.changedTouches[0].screenX - touchStartX;
+      if (Math.abs(dx) > 50) { dx < 0 ? this._next() : this._prev(); }
+    }, { passive: true });
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   PHOTO ELEMENT BUILDER
+──────────────────────────────────────────────────────────────── */
+function buildPhotoEl(photo, context) {
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'position:absolute; inset:0; overflow:hidden;';
+
+  const ph = document.createElement('div');
+  ph.className = `photo-placeholder${context === 'scrap' ? ' warm' : ''}`;
+  ph.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="2"/>
+      <circle cx="8.5" cy="8.5" r="1.5"/>
+      <polyline points="21 15 16 10 5 21"/>
+    </svg>
+    <span>${context === 'scrap' ? 'Photo' : 'Your photo'}</span>
+  `;
+
+  const img = document.createElement('img');
+  img.className = 'img-cover';
+  img.alt       = photo.alt || 'Personal photograph';
+  img.loading   = 'lazy';
+  img.decoding  = 'async';
+  img.style.cssText = 'position:absolute; inset:0; opacity:0; transition:opacity 0.9s ease;';
+  img.onload  = () => { img.style.opacity = '1'; ph.style.display = 'none'; };
+  img.onerror = () => {
+    if (img.src && img.src.endsWith('.webp')) {
+      img.src = img.src.replace(/\.webp$/i, '.png');
+    } else {
+      img.style.display = 'none';
+    }
+  };
+  img.src = photo.src;
+
+  wrapper.appendChild(ph);
+  wrapper.appendChild(img);
+  return wrapper;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   GALLERY — Luxury Photography Exhibition
+──────────────────────────────────────────────────────────────── */
+function initGallery(lb, photos) {
+  const grid = document.getElementById('gallery-grid');
+  if (!grid) return;
+
+  const gPhotos = photos.filter(p => p.section === 'gallery');
+  if (!gPhotos.length) return;
+
+  /* Layout cycles through varied sizes for editorial feel */
+  const layouts = [
+    'gallery-item--featured',  /* spans 6 cols × 2 rows — hero image */
+    'gallery-item--medium',    /* spans 4 cols × 1 row */
+    'gallery-item--small',     /* spans 4 cols × 1 row */
+    'gallery-item--wide',      /* spans 8 cols × 1 row */
+    'gallery-item--tall',      /* spans 4 cols × 2 rows */
+    'gallery-item--medium',
+  ];
+
+  gPhotos.forEach((photo, i) => {
+    const item = document.createElement('div');
+    item.className = `gallery-item ${layouts[i % layouts.length]}`;
+    item.setAttribute('role', 'listitem');
+    item.setAttribute('data-hover', '1');
+    item.tabIndex = 0;
+    item.setAttribute('aria-label', `View photo: ${photo.title || photo.alt}`);
+
+    item.appendChild(buildPhotoEl(photo, 'gallery'));
+
+    const num = document.createElement('span');
+    num.className   = 'gallery-num';
+    num.textContent = String(i + 1).padStart(2, '0');
+    item.appendChild(num);
+
+    const cap = document.createElement('div');
+    cap.className = 'gallery-caption';
+    cap.innerHTML = `<p class="t-caption">${photo.caption || ''}</p>`;
+    item.appendChild(cap);
+
+    item.addEventListener('click', e => { particleBurst(e.clientX, e.clientY, '#AE8157', 8); lb.open(gPhotos, i); });
+    item.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); lb.open(gPhotos, i); }
+    });
+
+    grid.appendChild(item);
+  });
+}
+
+/* ────────────────────────────────────────────────────────────────
+   SCRAPBOOK — Vintage Journal with Varied Sizes
+──────────────────────────────────────────────────────────────── */
+function initScrapbook(lb, photos) {
+  const grid = document.getElementById('scrapbook-grid');
+  if (!grid) return;
+
+  const sPhotos = photos.filter(p => p.section === 'scrapbook');
+  if (!sPhotos.length) return;
+
+  /* Size rotation: large → small → wide → medium → ... */
+  const sizes = ['scrap-card--large', 'scrap-card--small', 'scrap-card--wide', 'scrap-card--medium'];
+  /* Rotation: subtle alternating tilts */
+  const rotations = ['-2.2deg', '1.8deg', '-1.0deg', '2.4deg', '-1.5deg'];
+  /* Photo aspect ratios per size */
+  const aspects   = ['4/3', '3/4', '16/9', '4/3'];
+
+  sPhotos.forEach((photo, i) => {
+    const card = document.createElement('div');
+    const size = sizes[i % sizes.length];
+    card.className = `scrap-card ${size}`;
+    card.style.setProperty('--rotate', rotations[i % rotations.length]);
+    card.setAttribute('role', 'listitem');
+    card.tabIndex = 0;
+    card.setAttribute('aria-label', `Open photo: ${photo.title || photo.alt}`);
+
+    /* Photo area */
+    const photoWrap = document.createElement('div');
+    photoWrap.className = 'photo-area';
+    const aspect = aspects[i % aspects.length];
+    photoWrap.style.cssText = `position:relative; width:100%; aspect-ratio:${aspect}; overflow:hidden;`;
+    photoWrap.appendChild(buildPhotoEl(photo, 'scrap'));
+    card.appendChild(photoWrap);
+
+    /* Caption */
+    const label = document.createElement('p');
+    label.className   = 'scrap-label';
+    label.textContent = photo.caption || photo.title || '';
+    card.appendChild(label);
+
+    /* Handwritten annotation (first card only) */
+    if (i === 0) {
+      const note = document.createElement('span');
+      note.className   = 'deco-annotation';
+      note.textContent = '✦ a little memory';
+      note.style.cssText = 'position:absolute; bottom:-14px; right:8px; font-size:0.78rem; transform:rotate(-3deg);';
+      note.setAttribute('aria-hidden', 'true');
+      card.appendChild(note);
+    }
+
+    card.addEventListener('click', e => { particleBurst(e.clientX, e.clientY, '#AE8157', 8); lb.open(sPhotos, i); });
+    card.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); lb.open(sPhotos, i); }
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+/* ────────────────────────────────────────────────────────────────
+   MOSAIC — Interactive Exhibition Wall
+──────────────────────────────────────────────────────────────── */
+function initMosaic(lb, photos) {
+  const grid = document.getElementById('mosaic-grid');
+  if (!grid) return;
+
+  const mPhotos = photos.filter(p => p.section === 'mosaic' || p.section === 'gallery');
+  if (!mPhotos.length) return;
+
+  const tileClasses = [
+    'mosaic-tile--large',
+    'mosaic-tile',
+    'mosaic-tile--tall',
+    'mosaic-tile',
+    'mosaic-tile--wide',
+    'mosaic-tile',
+    'mosaic-tile',
+  ];
+
+  mPhotos.forEach((photo, i) => {
+    const tile = document.createElement('div');
+    tile.className = `mosaic-tile ${tileClasses[i % tileClasses.length]}`;
+    tile.setAttribute('role', 'listitem');
+    tile.tabIndex = 0;
+    tile.setAttribute('aria-label', `View photo: ${photo.title || photo.alt}`);
+
+    tile.appendChild(buildPhotoEl(photo, 'mosaic'));
+
+    const label = document.createElement('span');
+    label.className   = 'mosaic-hover-label';
+    label.textContent = photo.title || '';
+    tile.appendChild(label);
+
+    tile.addEventListener('click', e => { particleBurst(e.clientX, e.clientY, '#AE8157', 8); lb.open(mPhotos, i); });
+    tile.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); lb.open(mPhotos, i); }
+    });
+
+    grid.appendChild(tile);
+  });
+}
+
+/* ────────────────────────────────────────────────────────────────
+   REALISTIC 3D PLANETARY UNIVERSE — ASTRONOMICAL EXPLORATION
+   Luxury Astronomical Solar System Visualization (Three.js WebGL)
+──────────────────────────────────────────────────────────────── */
+function initUniverse() {
+  const canvas = document.getElementById('universe-3d-canvas');
+  const section = document.getElementById('universe');
+  if (!canvas || !section) return;
+
+  if (typeof THREE === 'undefined') {
+    console.warn('Three.js not found, skipping 3D planetary rendering');
+    return;
+  }
+
+  // 1. Scene, Camera, Renderer
+  const scene = new THREE.Scene();
+  const width = section.offsetWidth || window.innerWidth;
+  const height = section.offsetHeight || window.innerHeight;
+
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+  camera.position.set(0, 0, 18);
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: true,
+    powerPreference: 'high-performance',
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(width, height);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+
+  // 2. Space Lighting
+  // Directional Sun Light (creates natural terminator boundary across all planets)
+  const sunLight = new THREE.DirectionalLight(0xfff6ea, 2.5);
+  sunLight.position.set(-12, 8, 14);
+  scene.add(sunLight);
+
+  // Warm champagne/mocha ambient light (ensures shadowed hemisphere retains subtle detail)
+  const ambientLight = new THREE.AmbientLight(0x72543c, 0.45);
+  scene.add(ambientLight);
+
+  // Delicate atmospheric rim light
+  const rimLight = new THREE.DirectionalLight(0xdfc29d, 0.9);
+  rimLight.position.set(10, -6, -8);
+  scene.add(rimLight);
+
+  // 3. Texture Loading
+  const loader = new THREE.TextureLoader();
+  const textures = {
+    earth: loader.load('public/textures/planets/earth.webp'),
+    earthClouds: loader.load('public/textures/planets/earth_clouds.webp'),
+    mars: loader.load('public/textures/planets/mars.webp'),
+    jupiter: loader.load('public/textures/planets/jupiter.webp'),
+    moon: loader.load('public/textures/planets/moon.webp'),
+    saturn: loader.load('public/textures/planets/saturn.webp'),
+    saturnRing: loader.load('public/textures/planets/saturn_ring_topdown.png'),
+  };
+
+  // Helper: Atmospheric Rim Glow Mesh
+  function createAtmosphereGlow(radius, colorRgb) {
+    const geo = new THREE.SphereGeometry(radius * 1.045, 48, 48);
+    const mat = new THREE.ShaderMaterial({
+      vertexShader: `
+        varying vec3 vNormal;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vNormal;
+        uniform vec3 uColor;
+        uniform float uGlow;
+        void main() {
+          float intensity = pow(clamp(1.0 - abs(vNormal.z), 0.0, 1.0), 2.5);
+          gl_FragColor = vec4(uColor, 1.0) * intensity * uGlow;
+        }
+      `,
+      uniforms: {
+        uColor: { value: new THREE.Vector3(colorRgb[0], colorRgb[1], colorRgb[2]) },
+        uGlow: { value: 0.85 },
+      },
+      blending: THREE.AdditiveBlending,
+      side: THREE.BackSide,
+      transparent: true,
+      depthWrite: false,
+    });
+    return new THREE.Mesh(geo, mat);
+  }
+
+  // 4. Planets Definitions
+  const planetConfigs = [
+    {
+      id: 'earth',
+      name: 'THE GALLERY',
+      href: '#gallery',
+      radius: 1.25,
+      pos: { x: -5.8, y: 2.3, z: 0 },
+      rotSpeed: 0.0035,
+      tiltZ: 23.4 * (Math.PI / 180),
+      tiltX: 0.08,
+      build(group) {
+        // Earth Base Sphere
+        const geo = new THREE.SphereGeometry(1.25, 64, 64);
+        const mat = new THREE.MeshStandardMaterial({
+          map: textures.earth,
+          roughness: 0.62,
+          metalness: 0.1,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        group.add(mesh);
+
+        // Independent Rotating Clouds Layer
+        const cloudGeo = new THREE.SphereGeometry(1.275, 64, 64);
+        const cloudMat = new THREE.MeshStandardMaterial({
+          map: textures.earthClouds,
+          transparent: true,
+          opacity: 0.72,
+          blending: THREE.NormalBlending,
+          depthWrite: false,
+        });
+        const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+        group.add(cloudMesh);
+        group.userData.cloudMesh = cloudMesh;
+
+        // Rayleigh Cyan-Blue Atmosphere Glow
+        const atmos = createAtmosphereGlow(1.25, [0.38, 0.68, 0.95]);
+        group.add(atmos);
+        group.userData.atmos = atmos;
+      },
+    },
+    {
+      id: 'mars',
+      name: 'LITTLE MOMENTS',
+      href: '#scrapbook',
+      radius: 0.88,
+      pos: { x: 5.5, y: 2.7, z: 0.4 },
+      rotSpeed: 0.0030,
+      tiltZ: 25.2 * (Math.PI / 180),
+      tiltX: 0.06,
+      build(group) {
+        // Mars Cratered Terrain Sphere
+        const geo = new THREE.SphereGeometry(0.88, 64, 64);
+        const mat = new THREE.MeshStandardMaterial({
+          map: textures.mars,
+          roughness: 0.88,
+          metalness: 0.04,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        group.add(mesh);
+
+        // Terracotta Atmosphere Rim
+        const atmos = createAtmosphereGlow(0.88, [0.92, 0.45, 0.28]);
+        group.add(atmos);
+        group.userData.atmos = atmos;
+      },
+    },
+    {
+      id: 'jupiter',
+      name: 'PHOTO MOSAIC',
+      href: '#mosaic',
+      radius: 1.68,
+      pos: { x: 6.4, y: -2.1, z: -0.4 },
+      rotSpeed: 0.0062,
+      tiltZ: 3.1 * (Math.PI / 180),
+      tiltX: 0.02,
+      build(group) {
+        // Jupiter Swirling Atmospheric Bands Sphere
+        const geo = new THREE.SphereGeometry(1.68, 64, 64);
+        const mat = new THREE.MeshStandardMaterial({
+          map: textures.jupiter,
+          roughness: 0.68,
+          metalness: 0.02,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        group.add(mesh);
+
+        // Warm Amber Atmosphere Rim
+        const atmos = createAtmosphereGlow(1.68, [0.88, 0.72, 0.48]);
+        group.add(atmos);
+        group.userData.atmos = atmos;
+      },
+    },
+    {
+      id: 'moon',
+      name: 'A LITTLE SECRET',
+      href: '#secret',
+      radius: 0.76,
+      pos: { x: -5.6, y: -2.7, z: 0.7 },
+      rotSpeed: 0.0020,
+      tiltZ: 1.5 * (Math.PI / 180),
+      tiltX: 0.02,
+      build(group) {
+        // Moon Cratered Basalt Surface (Sharp Shadows, No Atmosphere)
+        const geo = new THREE.SphereGeometry(0.76, 64, 64);
+        const mat = new THREE.MeshStandardMaterial({
+          map: textures.moon,
+          roughness: 0.96,
+          metalness: 0.0,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        group.add(mesh);
+      },
+    },
+    {
+      id: 'saturn',
+      name: 'ONE LAST THING',
+      href: '#letter-section',
+      radius: 1.32,
+      pos: { x: 0.2, y: -4.1, z: 0.1 },
+      rotSpeed: 0.0042,
+      tiltZ: 26.7 * (Math.PI / 180),
+      tiltX: 0.32,
+      build(group) {
+        // Saturn Gas Giant Sphere
+        const geo = new THREE.SphereGeometry(1.32, 64, 64);
+        const mat = new THREE.MeshStandardMaterial({
+          map: textures.saturn,
+          roughness: 0.72,
+          metalness: 0.03,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        group.add(mesh);
+
+        // Authentic 3D Tilted Ring System with Cassini Division
+        const ringGeo = new THREE.PlaneGeometry(6.6, 6.6, 32, 32);
+        const ringMat = new THREE.MeshStandardMaterial({
+          map: textures.saturnRing,
+          transparent: true,
+          side: THREE.DoubleSide,
+          opacity: 0.94,
+          roughness: 0.55,
+          metalness: 0.05,
+          depthWrite: false,
+        });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        ringMesh.rotation.x = Math.PI / 2.2;
+        group.add(ringMesh);
+
+        // Butterscotch Atmosphere Rim
+        const atmos = createAtmosphereGlow(1.32, [0.92, 0.82, 0.62]);
+        group.add(atmos);
+        group.userData.atmos = atmos;
+      },
+    },
+  ];
+
+  // 5. Instantiate Planets & Hit Volumes
+  const planets = [];
+  const hitObjects = [];
+
+  const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Responsive Celestial Coordinate Calculator
+  function getPlanetCoordinates(w, h, idx) {
+    const isPortrait = h > w;
+    if (w <= 600) {
+      // Mobile vertical alignment
+      const mobX = [-1.3, 1.3, -1.4, 1.3, 0.0];
+      const mobY = [4.2, 2.1, 0.0, -2.1, -4.3];
+      return { x: mobX[idx], y: mobY[idx], z: 0 };
+    }
+    if (isPortrait && w <= 960) {
+      // Tablet Portrait (768x1024, 820x1180, iPad Mini, iPad Air, iPad Pro)
+      // Intentional vertical oval constellation with clean perimeter framing
+      const tabPortX = [-2.8, 2.8, 3.1, -2.9, 0.0];
+      const tabPortY = [3.2, 3.6, -1.6, -2.2, -5.2];
+      return { x: tabPortX[idx], y: tabPortY[idx], z: 0.1 };
+    }
+    if (w <= 1100) {
+      // Tablet Landscape (1024x768)
+      const tabLandX = [-5.0, 4.8, 5.4, -4.8, 0.2];
+      const tabLandY = [2.0, 2.4, -1.9, -2.2, -3.8];
+      return { x: tabLandX[idx], y: tabLandY[idx], z: 0.1 };
+    }
+    // Desktop (> 1100px)
+    return { x: planetConfigs[idx].pos.x, y: planetConfigs[idx].pos.y, z: planetConfigs[idx].pos.z };
+  }
+
+  function getCameraZ(w, h) {
+    const aspect = w / h;
+    if (w <= 600) return 22;
+    if (aspect < 1.0) {
+      // Portrait tablet: dynamically scale Z so horizontal extent comfortably fits +-3.2 units
+      return Math.max(19, Math.min(23, Math.round(14.2 / aspect)));
+    }
+    if (w <= 1100) return 17;
+    return 18;
+  }
+
+  const initialW = section.offsetWidth || window.innerWidth;
+  const initialH = section.offsetHeight || window.innerHeight;
+  camera.position.z = getCameraZ(initialW, initialH);
+
+  planetConfigs.forEach((cfg, idx) => {
+    const group = new THREE.Group();
+    const coords = getPlanetCoordinates(initialW, initialH, idx);
+    let px = coords.x;
+    let py = coords.y;
+    let pz = coords.z;
+
+    group.position.set(px, py, pz);
+    group.rotation.z = cfg.tiltZ;
+    group.rotation.x = cfg.tiltX;
+
+    cfg.build(group);
+    scene.add(group);
+
+    // Invisible Hit Volume for effortless clicking and hover
+    const hitGeo = new THREE.SphereGeometry(cfg.radius * 1.35, 16, 16);
+    const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+    const hitMesh = new THREE.Mesh(hitGeo, hitMat);
+    hitMesh.position.set(px, py, pz);
+    hitMesh.userData = { planetId: cfg.id, config: cfg, group };
+    scene.add(hitMesh);
+    hitObjects.push(hitMesh);
+
+    const planetItem = {
+      id: cfg.id,
+      group,
+      hitMesh,
+      baseX: px,
+      baseY: py,
+      baseZ: pz,
+      rotSpeed: cfg.rotSpeed,
+      scale: 1.0,
+      targetScale: 1.0,
+      config: cfg,
+      card: document.getElementById(`planet-card-${cfg.id}`),
+    };
+
+    planets.push(planetItem);
+  });
+
+  // 6. Interactive Raycasting & Hover / Click Handlers
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2(-9999, -9999);
+  let hoveredPlanet = null;
+  let targetCamX = 0;
+  let targetCamY = 0;
+
+  function updateHover(planetItem) {
+    if (hoveredPlanet === planetItem) return;
+
+    // Unhover previous
+    if (hoveredPlanet) {
+      hoveredPlanet.targetScale = 1.0;
+      if (hoveredPlanet.group.userData.atmos) {
+        hoveredPlanet.group.userData.atmos.material.uniforms.uGlow.value = 0.85;
+      }
+      hoveredPlanet.card?.classList.remove('is-hovered');
+    }
+
+    hoveredPlanet = planetItem;
+
+    // Hover new
+    if (hoveredPlanet) {
+      hoveredPlanet.targetScale = 1.18;
+      if (hoveredPlanet.group.userData.atmos) {
+        hoveredPlanet.group.userData.atmos.material.uniforms.uGlow.value = 1.65;
+      }
+      hoveredPlanet.card?.classList.add('is-hovered');
+      canvas.style.cursor = 'pointer';
+    } else {
+      canvas.style.cursor = 'grab';
+    }
+  }
+
+  function handlePlanetClick(planetItem, clientX, clientY) {
+    if (!planetItem) return;
+    const cfg = planetItem.config;
+
+    // Spawn celestial particle burst
+    particleBurst(clientX, clientY, '#DFC29D', 18);
+
+    // Smooth foreground camera move
+    gsap.to(planetItem.group.scale, {
+      x: 1.45, y: 1.45, z: 1.45,
+      duration: 0.65,
+      ease: 'power3.out',
+      onComplete() {
+        gsap.to(planetItem.group.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 0.5, ease: 'power2.inOut' });
+      }
+    });
+
+    // Smooth scroll to target destination & highlight arrival badge
+    setTimeout(() => {
+      const tgt = document.querySelector(cfg.href);
+      if (tgt) {
+        tgt.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const originBadge = tgt.querySelector('.section-planet-origin');
+        if (originBadge) {
+          originBadge.classList.remove('arrival-highlight');
+          void originBadge.offsetWidth; // trigger reflow for clean re-animation
+          originBadge.classList.add('arrival-highlight');
+        }
+      }
+    }, 280);
+  }
+
+  // Canvas Mousemove Raycasting
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+
+    // Subtle 3D camera parallax
+    targetCamX = mouse.x * 0.75;
+    targetCamY = mouse.y * 0.5;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(hitObjects);
+
+    if (intersects.length > 0) {
+      const hitId = intersects[0].object.userData.planetId;
+      const found = planets.find(p => p.id === hitId);
+      updateHover(found);
+    } else {
+      updateHover(null);
+    }
+  }, { passive: true });
+
+  canvas.addEventListener('mouseleave', () => {
+    mouse.set(-9999, -9999);
+    targetCamX = 0;
+    targetCamY = 0;
+    updateHover(null);
+  });
+
+  // Canvas Click
+  canvas.addEventListener('click', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(hitObjects);
+
+    if (intersects.length > 0) {
+      const hitId = intersects[0].object.userData.planetId;
+      const found = planets.find(p => p.id === hitId);
+      handlePlanetClick(found, e.clientX, e.clientY);
+    }
+  });
+
+  // Card Hover & Click Handlers
+  planets.forEach(p => {
+    if (!p.card) return;
+
+    p.card.addEventListener('mouseenter', () => updateHover(p));
+    p.card.addEventListener('mouseleave', () => updateHover(null));
+
+    p.card.addEventListener('click', e => {
+      e.preventDefault();
+      const rect = p.card.getBoundingClientRect();
+      handlePlanetClick(p, rect.left + rect.width / 2, rect.top + rect.height / 2);
+    });
+  });
+
+  // 7. Animation Loop with Viewport Culling
+  let isRunning = false;
+  let rafId = null;
+
+  function tick() {
+    if (!isRunning) return;
+
+    const time = performance.now() * 0.001;
+
+    // Slow planetary axial rotation
+    planets.forEach((p, i) => {
+      if (!isReduced) {
+        p.group.rotation.y += p.rotSpeed;
+
+        // Earth clouds independent atmospheric rotation
+        if (p.group.userData.cloudMesh) {
+          p.group.userData.cloudMesh.rotation.y += 0.0016;
+        }
+
+        // Harmonic spatial floating drift
+        const phase = i * 1.35;
+        p.group.position.y = p.baseY + Math.sin(time * 0.85 + phase) * 0.12;
+        p.hitMesh.position.y = p.group.position.y;
+      }
+
+      // Smooth hover scale interpolation
+      p.scale += (p.targetScale - p.scale) * 0.12;
+      p.group.scale.set(p.scale, p.scale, p.scale);
+    });
+
+    // Camera parallax tilt
+    if (!isReduced) {
+      camera.position.x += (targetCamX - camera.position.x) * 0.05;
+      camera.position.y += (targetCamY - camera.position.y) * 0.05;
+      camera.lookAt(0, 0, 0);
+    }
+
+    renderer.render(scene, camera);
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function start() {
+    if (isRunning) return;
+    isRunning = true;
+    tick();
+  }
+
+  function stop() {
+    isRunning = false;
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+  }
+
+  // 8. IntersectionObserver (0% GPU when section is not visible)
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        start();
+      } else {
+        stop();
+      }
+    });
+  }, { threshold: 0.01, rootMargin: '100px 0px 100px 0px' });
+
+  obs.observe(section);
+
+  // 9. Resize Handling (Tablet & Desktop Dynamic Repositioning)
+  function onResize() {
+    const w = section.offsetWidth || window.innerWidth;
+    const h = section.offsetHeight || window.innerHeight;
+    camera.aspect = w / h;
+    camera.position.z = getCameraZ(w, h);
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+
+    // Dynamically glide planets to their responsive compositions
+    planets.forEach((p, idx) => {
+      const coords = getPlanetCoordinates(w, h, idx);
+      p.baseX = coords.x;
+      p.baseY = coords.y;
+      p.baseZ = coords.z;
+      p.group.position.x = coords.x;
+      p.group.position.z = coords.z;
+      p.hitMesh.position.x = coords.x;
+      p.hitMesh.position.z = coords.z;
+    });
+  }
+
+  window.addEventListener('resize', onResize, { passive: true });
+
+  // 10. Easter Egg Star Button
+  const easterBtn = document.createElement('button');
+  easterBtn.id = 'easter-star';
+  easterBtn.setAttribute('aria-label', 'A tiny hidden surprise');
+  easterBtn.addEventListener('click', e => {
+    const msg = document.getElementById('easter-msg');
+    if (msg) {
+      particleBurst(e.clientX, e.clientY, '#AE8157', 16);
+      msg.classList.toggle('hidden');
+    }
+  });
+  section.appendChild(easterBtn);
+}
+
+function hexToRgb(hex) {
+  const r = parseInt(hex.slice(1,3), 16);
+  const g = parseInt(hex.slice(3,5), 16);
+  const b = parseInt(hex.slice(5,7), 16);
+  return `${r},${g},${b}`;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   SECRET SECTION — HANDCRAFTED 3D SURPRISE ENVELOPE
+──────────────────────────────────────────────────────────────── */
+function initSecret(content) {
+  const revealBtn = document.getElementById('secret-reveal-btn');
+  const envOuter  = document.getElementById('secret-envelope');
+  const flap      = document.getElementById('secret-flap');
+  const seal      = document.getElementById('secret-seal');
+  const card      = document.getElementById('secret-card');
+  const closeBtn  = document.getElementById('secret-close-btn');
+
+  // Hindi Shayari & Ornament Elements
+  const floralEl         = document.getElementById('secret-floral');
+  const monogramEl       = card ? card.querySelector('.secret-card-monogram') : null;
+  const dividerEl        = document.getElementById('secret-divider');
+  const line1            = document.getElementById('shayari-line-1');
+  const line2            = document.getElementById('shayari-line-2');
+  const line3            = document.getElementById('shayari-line-3');
+  const line4            = document.getElementById('shayari-line-4');
+  const highlightCouplet = card ? card.querySelector('.shayari-couplet--highlight') : null;
+  const flourishEl       = document.getElementById('secret-flourish');
+
+  if (!envOuter || !card) return;
+
+  // Populate shayari lines if custom content passed
+  if (content?.secret?.shayari && Array.isArray(content.secret.shayari)) {
+    const lines = [line1, line2, line3, line4];
+    content.secret.shayari.forEach((txt, i) => {
+      if (lines[i] && txt) lines[i].textContent = txt;
+    });
+  }
+
+  let isOpen = false;
+  let isAnim = false;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resetShayari() {
+    if (typeof gsap === 'undefined') return;
+    if (floralEl) gsap.set(floralEl, { opacity: 0, y: 10 });
+    if (monogramEl) gsap.set(monogramEl, { opacity: 0, y: 8 });
+    if (dividerEl) gsap.set(dividerEl, { opacity: 0, scaleX: 0.4, transformOrigin: 'center center' });
+    [line1, line2, line3, line4].forEach(l => {
+      if (l) gsap.set(l, { opacity: 0, y: 16, textShadow: 'none', color: '#442E20' });
+    });
+    if (highlightCouplet) {
+      highlightCouplet.classList.remove('is-highlighted');
+      gsap.set(highlightCouplet, { backgroundColor: 'transparent', boxShadow: 'none' });
+    }
+    if (flourishEl) gsap.set(flourishEl, { opacity: 0, y: 10, scale: 0.88, transformOrigin: 'center center' });
+  }
+
+  // Ensure initial pristine hidden state before envelope opens
+  resetShayari();
+
+  if (seal && typeof gsap !== 'undefined') {
+    gsap.set(seal, { xPercent: -50, yPercent: -50, transformOrigin: 'center center' });
+  }
+
+  function openSecret(e) {
+    if (isOpen || isAnim) return;
+    isAnim = true;
+
+    if (seal) seal.style.transition = 'none';
+
+    if (e && e.clientX) {
+      particleBurst(e.clientX, e.clientY, '#D8B990', 16);
+    } else if (seal) {
+      const rect = seal.getBoundingClientRect();
+      particleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, '#D8B990', 16);
+    }
+
+    const isMobile = window.innerWidth <= 768;
+    const riseDist = isMobile ? -145 : -190;
+
+    if (typeof gsap !== 'undefined' && !reduced) {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          isOpen = true;
+          isAnim = false;
+          card.classList.add('is-active');
+          if (revealBtn) {
+            revealBtn.innerHTML = 'Fold &amp; Close <span aria-hidden="true">✦</span>';
+          }
+        }
+      });
+
+      // Step 1: Wax seal compression and pop
+      if (seal) {
+        tl.to(seal, { scale: 0.9, duration: 0.14, ease: 'power2.in' })
+          .to(seal, { scale: 1.15, opacity: 0, duration: 0.3, ease: 'power2.out', pointerEvents: 'none' }, '+=0.02');
+      }
+
+      // Step 2: 3D flap opens completely backward around top crease (0 -> -180deg)
+      if (flap) {
+        tl.to(flap, {
+          rotateX: -180,
+          duration: 0.88,
+          ease: 'power2.inOut',
+          onUpdate: function() {
+            if (this.progress() >= 0.5) {
+              flap.style.zIndex = '2';
+            } else {
+              flap.style.zIndex = '30';
+            }
+          }
+        }, '-=0.2');
+      }
+
+      // Step 3: Letter emerges cleanly in front of pocket (zIndex: 50) and slides out smoothly
+      tl.set(card, { zIndex: 50 }, '-=0.4')
+        .fromTo(card,
+          { y: 0, scale: 0.96, opacity: 0 },
+          {
+            y: riseDist,
+            scale: 1,
+            opacity: 1,
+            duration: 0.92,
+            ease: 'power3.out',
+            boxShadow: '0 24px 60px rgba(73, 50, 36, 0.22), 0 4px 14px rgba(73, 50, 36, 0.1)'
+          },
+          '-=0.4'
+        );
+
+      // Step 4: Tiny floral illustration & monogram reveal
+      if (floralEl) {
+        tl.to(floralEl, { opacity: 1, y: 0, duration: 0.55, ease: 'power2.out' }, '+=0.08');
+      }
+      if (monogramEl) {
+        tl.to(monogramEl, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }, '-=0.25');
+      }
+
+      // Step 5: Introduce the small ornamental divider
+      if (dividerEl) {
+        tl.to(dividerEl, { opacity: 1, scaleX: 1, duration: 0.58, ease: 'power2.out' }, '-=0.15');
+      }
+
+      // Step 6: Reveal the shayari one line at a time with gentle upward movement & opacity
+      if (line1) {
+        tl.to(line1, { opacity: 1, y: 0, duration: 0.72, ease: 'power2.out' }, '+=0.12');
+      }
+      if (line2) {
+        tl.to(line2, { opacity: 1, y: 0, duration: 0.72, ease: 'power2.out' }, '+=0.2');
+      }
+
+      // Poetic breathing pause between couplets
+      tl.to({}, { duration: 0.32 });
+
+      if (line3) {
+        tl.to(line3, { opacity: 1, y: 0, duration: 0.72, ease: 'power2.out' });
+      }
+      if (line4) {
+        tl.to(line4, { opacity: 1, y: 0, duration: 0.72, ease: 'power2.out' }, '+=0.2');
+      }
+
+      // Step 7: Highlight the final two lines subtly
+      if (highlightCouplet) {
+        tl.to(highlightCouplet, {
+          backgroundColor: 'rgba(216, 185, 144, 0.14)',
+          boxShadow: '0 0 28px rgba(216, 185, 144, 0.25)',
+          duration: 0.8,
+          ease: 'power2.out',
+          onStart: () => { highlightCouplet.classList.add('is-highlighted'); }
+        }, '+=0.15');
+      }
+      if (line3 && line4) {
+        tl.to([line3, line4], {
+          color: '#2E190E',
+          textShadow: '0 0 16px rgba(216, 185, 144, 0.42), 0 1px 1px rgba(255, 255, 255, 0.6)',
+          duration: 0.8,
+          ease: 'power2.out'
+        }, '<');
+      }
+
+      // Step 8: Finish with a delicate decorative flourish
+      if (flourishEl) {
+        tl.to(flourishEl, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.65,
+          ease: 'back.out(1.7)'
+        }, '+=0.12');
+      }
+
+    } else {
+      // Graceful fallback for reduced motion
+      if (flap) { flap.style.transform = 'rotateX(-180deg)'; flap.style.zIndex = '2'; }
+      if (seal) { seal.style.opacity = '0'; seal.style.pointerEvents = 'none'; }
+      card.style.transform = `translate3d(0, ${riseDist}px, 0) scale(1)`;
+      card.style.opacity = '1';
+      card.style.zIndex = '50';
+      card.classList.add('is-active');
+
+      if (floralEl) { floralEl.style.opacity = '1'; floralEl.style.transform = 'none'; }
+      if (monogramEl) { monogramEl.style.opacity = '1'; monogramEl.style.transform = 'none'; }
+      if (dividerEl) { dividerEl.style.opacity = '1'; dividerEl.style.transform = 'none'; }
+      [line1, line2, line3, line4].forEach(l => {
+        if (l) { l.style.opacity = '1'; l.style.transform = 'none'; }
+      });
+      if (highlightCouplet) {
+        highlightCouplet.classList.add('is-highlighted');
+      }
+      if (flourishEl) { flourishEl.style.opacity = '1'; flourishEl.style.transform = 'none'; }
+
+      isOpen = true;
+      isAnim = false;
+      if (revealBtn) revealBtn.innerHTML = 'Fold &amp; Close <span aria-hidden="true">✦</span>';
+    }
+  }
+
+  function closeSecret() {
+    if (!isOpen || isAnim) return;
+    isAnim = true;
+
+    card.classList.remove('is-active');
+
+    if (typeof gsap !== 'undefined' && !reduced) {
+      const closeTl = gsap.timeline({
+        onComplete: () => {
+          isOpen = false;
+          isAnim = false;
+          if (revealBtn) {
+            revealBtn.innerHTML = 'Take a Look <span aria-hidden="true">✦</span>';
+          }
+          if (seal) seal.style.transition = '';
+          gsap.set(card, { y: 0, scale: 0.96, opacity: 0, zIndex: 10 });
+          gsap.set(envOuter, { y: 0 });
+          if (flap) gsap.set(flap, { rotateX: 0, zIndex: 30 });
+          if (seal) gsap.set(seal, { scale: 1, opacity: 1, xPercent: -50, yPercent: -50, pointerEvents: 'auto' });
+          resetShayari();
+        }
+      });
+
+      // Quick graceful fade out of shayari elements
+      const elementsToFade = [floralEl, monogramEl, dividerEl, line1, line2, line3, line4, highlightCouplet, flourishEl].filter(Boolean);
+      if (elementsToFade.length) {
+        closeTl.to(elementsToFade, {
+          opacity: 0,
+          duration: 0.22,
+          ease: 'power2.in'
+        });
+      }
+
+      // 1. Card slides back into pocket
+      closeTl.to(card, {
+        y: 0,
+        scale: 0.96,
+        opacity: 0,
+        duration: 0.55,
+        ease: 'power3.in',
+        onComplete: () => { card.style.zIndex = '10'; }
+      }, '-=0.08')
+
+      // 2. Flap folds back down
+      .to(flap, {
+        rotateX: 0,
+        duration: 0.7,
+        ease: 'power2.inOut',
+        onUpdate: function() {
+          if (this.progress() >= 0.5) {
+            flap.style.zIndex = '30';
+          } else {
+            flap.style.zIndex = '2';
+          }
+        }
+      }, '-=0.18')
+
+      // 3. Wax seal returns
+      .to(seal, {
+        scale: 1,
+        opacity: 1,
+        pointerEvents: 'auto',
+        duration: 0.35,
+        ease: 'back.out(1.8)'
+      }, '-=0.15');
+
+    } else {
+      // Fallback
+      card.style.transform = 'translate3d(0, 0, 0) scale(0.96)';
+      card.style.opacity = '0';
+      card.style.zIndex = '10';
+      envOuter.style.transform = 'none';
+      if (flap) { flap.style.transform = 'rotateX(0deg)'; flap.style.zIndex = '30'; }
+      if (seal) { seal.style.opacity = '1'; seal.style.pointerEvents = 'auto'; }
+      resetShayari();
+      isOpen = false;
+      isAnim = false;
+      if (revealBtn) revealBtn.innerHTML = 'Take a Look <span aria-hidden="true">✦</span>';
+    }
+  }
+
+  // Event handlers
+  if (seal) {
+    seal.addEventListener('click', openSecret);
+    seal.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openSecret(e);
+      }
+    });
+  }
+
+  if (revealBtn) {
+    revealBtn.addEventListener('click', e => {
+      if (!isOpen) {
+        openSecret(e);
+      } else {
+        closeSecret();
+      }
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      closeSecret();
+    });
+  }
+
+  envOuter.addEventListener('click', e => {
+    if (!isOpen && !isAnim && !e.target.closest('#secret-close-btn') && !e.target.closest('#secret-card')) {
+      openSecret(e);
+    }
+  });
+}
+
+/* ────────────────────────────────────────────────────────────────
+   LETTER SECTION — HANDCRAFTED 3D ENVELOPE & VINTAGE STATIONERY
+──────────────────────────────────────────────────────────────── */
+function initLetter(content) {
+  const openBtn     = document.getElementById('letter-open-btn');
+  const envOuter    = document.getElementById('letter-env');
+  const flap        = document.getElementById('letter-flap');
+  const seal        = document.getElementById('letter-seal');
+  const letterCard  = document.getElementById('letter-card');
+  const closeBtn    = document.getElementById('letter-close-btn');
+  const headingEl   = document.getElementById('letter-heading');
+  const container   = document.getElementById('letter-paragraphs-container');
+  const bodyEl      = document.getElementById('letter-body');
+  const sigEl       = document.getElementById('letter-signature');
+  const sigWrap     = document.getElementById('letter-signature-wrap');
+
+  if (!envOuter || !letterCard) return;
+
+  // 1. Populate Typography & Content
+  if (headingEl && content?.letter?.heading) {
+    headingEl.textContent = content.letter.heading;
+  }
+
+  const sigText = content?.closing?.signature || content?.letter?.signature || '— Aadi ✦';
+  if (sigEl) {
+    sigEl.textContent = sigText;
+  }
+
+  let paragraphs = [];
+  const letterBodyText = content?.letter?.body || (bodyEl ? bodyEl.textContent : '');
+
+  if (container && letterBodyText) {
+    container.innerHTML = '';
+    const rawParas = letterBodyText
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(Boolean);
+
+    rawParas.forEach((pText, i) => {
+      const p = document.createElement('p');
+      p.className = `letter-para ${i === 0 ? 'letter-para--greeting' : ''}`;
+      if (i === 0) p.id = 'letter-body';
+      p.textContent = pText;
+      container.appendChild(p);
+      paragraphs.push(p);
+    });
+  } else if (bodyEl) {
+    paragraphs = [bodyEl];
+  }
+
+  let isOpen = false;
+  let isAnim = false;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (seal && typeof gsap !== 'undefined') {
+    gsap.set(seal, { xPercent: -50, yPercent: -50, transformOrigin: 'center center' });
+  }
+
+  function openLetter(e) {
+    if (isOpen || isAnim) return;
+    isAnim = true;
+
+    if (seal) seal.style.transition = 'none';
+
+    if (e && e.clientX) {
+      particleBurst(e.clientX, e.clientY, '#D8B990', 16);
+    } else if (seal) {
+      const rect = seal.getBoundingClientRect();
+      particleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, '#D8B990', 16);
+    }
+
+    const isMobile = window.innerWidth <= 768;
+    const riseDistance = isMobile ? -170 : -230;
+
+    if (typeof gsap !== 'undefined' && !reduced) {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          isOpen = true;
+          isAnim = false;
+          letterCard.classList.add('is-active');
+          if (openBtn) {
+            openBtn.innerHTML = 'Fold &amp; Close Note <span aria-hidden="true">✦</span>';
+            openBtn.disabled = false;
+            openBtn.style.opacity = '1';
+          }
+        }
+      });
+
+      // Step 2: Wax seal responds to click (press then pop)
+      if (seal) {
+        tl.to(seal, { scale: 0.9, duration: 0.14, ease: 'power2.in' })
+          .to(seal, {
+            scale: 1.15,
+            opacity: 0,
+            duration: 0.32,
+            ease: 'power2.out',
+            pointerEvents: 'none'
+          }, '+=0.03');
+      }
+
+      // Step 3: Flap opens realistically in 3D around top crease (0 -> -180deg)
+      if (flap) {
+        tl.to(flap, {
+          rotateX: -180,
+          duration: 0.95,
+          ease: 'power2.inOut',
+          onUpdate: function() {
+            if (this.progress() >= 0.5) {
+              flap.style.zIndex = '2';
+            } else {
+              flap.style.zIndex = '30';
+            }
+          }
+        }, '-=0.22');
+      }
+
+      // Step 4: Letter emerges cleanly in front of pocket (zIndex: 50) and slides out smoothly
+      tl.set(letterCard, { zIndex: 50 }, '-=0.4')
+        .fromTo(letterCard,
+          { y: 0, scale: 0.96, opacity: 0 },
+          {
+            y: riseDistance,
+            scale: 1,
+            opacity: 1,
+            duration: 0.95,
+            ease: 'power3.out',
+            boxShadow: '0 26px 64px rgba(73, 50, 36, 0.22), 0 6px 18px rgba(73, 50, 36, 0.1)'
+          },
+          '-=0.4'
+        )
+
+      // Step 6: Heading reveals itself
+      .fromTo(headingEl,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.52, ease: 'power2.out' },
+        '-=0.15'
+      )
+
+      // Step 7: Paragraphs appear sequentially
+      .fromTo(paragraphs,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, stagger: 0.16, duration: 0.62, ease: 'power2.out' },
+        '-=0.22'
+      )
+
+      // Step 8: Signature appears last
+      .fromTo(sigWrap || sigEl,
+        { opacity: 0, scale: 0.92, y: 10 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.72, ease: 'back.out(1.4)' },
+        '-=0.15'
+      );
+
+    } else {
+      // Graceful fallback for reduced motion or fallback
+      if (flap) {
+        flap.style.transform = 'rotateX(-180deg)';
+        flap.style.zIndex = '2';
+      }
+      if (seal) {
+        seal.style.opacity = '0';
+        seal.style.pointerEvents = 'none';
+      }
+      if (letterCard) {
+        letterCard.style.transform = `translate3d(0, ${riseDistance}px, 0) scale(1)`;
+        letterCard.style.opacity = '1';
+        letterCard.style.zIndex = '50';
+        letterCard.classList.add('is-active');
+      }
+      if (headingEl) headingEl.style.opacity = '1';
+      paragraphs.forEach(p => p.style.opacity = '1');
+      if (sigWrap) sigWrap.style.opacity = '1';
+      if (sigEl) sigEl.style.opacity = '1';
+      isOpen = true;
+      isAnim = false;
+      if (openBtn) {
+        openBtn.innerHTML = 'Fold &amp; Close Note <span aria-hidden="true">✦</span>';
+        openBtn.disabled = false;
+        openBtn.style.opacity = '1';
+      }
+    }
+  }
+
+  function closeLetter() {
+    if (!isOpen || isAnim) return;
+    isAnim = true;
+
+    letterCard.classList.remove('is-active');
+
+    if (typeof gsap !== 'undefined' && !reduced) {
+      const closeTl = gsap.timeline({
+        onComplete: () => {
+          isOpen = false;
+          isAnim = false;
+          if (openBtn) {
+            openBtn.innerHTML = 'Open the Note <span aria-hidden="true">✉</span>';
+            openBtn.style.opacity = '1';
+            openBtn.disabled = false;
+          }
+          if (seal) seal.style.transition = '';
+          // Reset pristine state
+          gsap.set(letterCard, { y: 0, scale: 0.96, opacity: 0, zIndex: 10 });
+          gsap.set(envOuter, { y: 0 });
+          if (flap) gsap.set(flap, { rotateX: 0, zIndex: 30 });
+          if (seal) gsap.set(seal, { scale: 1, opacity: 1, xPercent: -50, yPercent: -50, pointerEvents: 'auto' });
+          gsap.set([headingEl, ...paragraphs, sigWrap || sigEl], { opacity: 0, y: 0 });
+        }
+      });
+
+      // 1. Text elements fade out gracefully
+      closeTl.to([sigWrap || sigEl, ...paragraphs.slice().reverse(), headingEl], {
+        opacity: 0,
+        y: 8,
+        duration: 0.28,
+        stagger: 0.04,
+        ease: 'power2.in'
+      })
+
+      // 2. Letter slides back down inside envelope pocket
+      .to(letterCard, {
+        y: 0,
+        scale: 0.96,
+        opacity: 0,
+        duration: 0.65,
+        ease: 'power3.in',
+        onComplete: () => {
+          letterCard.style.zIndex = '10';
+        }
+      }, '-=0.08')
+
+      // 3. Flap folds back down in 3D (rotateX: -180 -> 0deg)
+      .to(flap, {
+        rotateX: 0,
+        duration: 0.78,
+        ease: 'power2.inOut',
+        onUpdate: function() {
+          if (this.progress() >= 0.5) {
+            flap.style.zIndex = '30';
+          } else {
+            flap.style.zIndex = '2';
+          }
+        }
+      }, '-=0.22')
+
+      // 4. Wax seal returns and locks back into place
+      .to(seal, {
+        scale: 1,
+        opacity: 1,
+        pointerEvents: 'auto',
+        duration: 0.42,
+        ease: 'back.out(1.8)'
+      }, '-=0.18');
+
+    } else {
+      // Graceful fallback
+      if (letterCard) {
+        letterCard.style.transform = 'translate3d(0, 0, 0) scale(0.96)';
+        letterCard.style.opacity = '0';
+        letterCard.style.zIndex = '10';
+      }
+      envOuter.style.transform = 'none';
+      if (flap) {
+        flap.style.transform = 'rotateX(0deg)';
+        flap.style.zIndex = '30';
+      }
+      if (seal) {
+        seal.style.opacity = '1';
+        seal.style.pointerEvents = 'auto';
+        seal.style.transition = '';
+      }
+      isOpen = false;
+      isAnim = false;
+      if (openBtn) {
+        openBtn.innerHTML = 'Open the Note <span aria-hidden="true">✉</span>';
+        openBtn.style.opacity = '1';
+        openBtn.disabled = false;
+      }
+    }
+  }
+
+  // Event Listeners
+  if (seal) {
+    seal.addEventListener('click', openLetter);
+    seal.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openLetter(e);
+      }
+    });
+  }
+
+  if (openBtn) {
+    openBtn.addEventListener('click', () => {
+      if (!isOpen) {
+        openLetter();
+      } else {
+        closeLetter();
+      }
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      closeLetter();
+    });
+  }
+
+  // Clicking closed envelope triggers opening
+  envOuter.addEventListener('click', e => {
+    if (!isOpen && !isAnim && !e.target.closest('#letter-close-btn') && !e.target.closest('#letter-card')) {
+      openLetter(e);
+    }
+  });
+}
+
+/* ────────────────────────────────────────────────────────────────
+   FINAL SCENE
+──────────────────────────────────────────────────────────────── */
+function initFinalScene(lb, content, photos) {
+  const finalPhoto = document.getElementById('final-photo');
+  const finalPh    = document.getElementById('final-photo-placeholder');
+  const replayBtn  = document.getElementById('explore-again-btn');
+
+  const finalPhotos = photos.filter(p => p.section === 'final');
+  if (finalPhotos.length && finalPhoto) {
+    const fp = finalPhotos[0];
+    finalPhoto.src = fp.src;
+    finalPhoto.alt = fp.alt || 'Closing photograph';
+    finalPhoto.onload  = () => { finalPhoto.style.opacity = '1'; if (finalPh) finalPh.style.opacity = '0'; };
+    finalPhoto.onerror = () => {
+      if (finalPhoto.src && finalPhoto.src.endsWith('.webp')) {
+        finalPhoto.src = finalPhoto.src.replace(/\.webp$/i, '.png');
+      } else if (finalPh) {
+        finalPh.style.display = 'flex';
+      }
+    };
+  }
+
+  if (replayBtn) {
+    replayBtn.addEventListener('click', e => {
+      particleBurst(e.clientX, e.clientY, '#AE8157', 12);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   AUDIO TOGGLE
+──────────────────────────────────────────────────────────────── */
+function initAudio() {
+  const audioEl  = document.getElementById('bg-audio');
+  const audioBtn = document.getElementById('audio-btn');
+  if (!audioEl || !audioBtn) return;
+  let playing = false;
+  let synthTimer = null;
+  let audioCtx = null;
+
+  function playSynthChime() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const notes = [261.63, 329.63, 392.00, 523.25, 659.25]; // Warm C-major pentatonic
+      const freq = notes[Math.floor(Math.random() * notes.length)];
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.06, audioCtx.currentTime + 1.2);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 4.5);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 4.6);
+    } catch (_) {}
+  }
+
+  audioBtn.addEventListener('click', () => {
+    if (playing) {
+      if (audioEl) audioEl.pause();
+      if (synthTimer) { clearInterval(synthTimer); synthTimer = null; }
+      audioBtn.textContent = '♪';
+      audioBtn.setAttribute('aria-label', 'Play ambient music');
+      audioBtn.classList.remove('playing');
+    } else {
+      audioBtn.textContent = '⏸';
+      audioBtn.setAttribute('aria-label', 'Pause ambient music');
+      audioBtn.classList.add('playing');
+      const p = audioEl ? audioEl.play() : Promise.reject();
+      p.catch(() => {
+        playSynthChime();
+        if (!synthTimer) {
+          synthTimer = setInterval(playSynthChime, 3200);
+        }
+      });
+    }
+    playing = !playing;
+  });
+}
+
+/* ────────────────────────────────────────────────────────────────
+   STARFIELD LAZY INIT — section canvases with active IntersectionObserver
+──────────────────────────────────────────────────────────────── */
+function initSectionCanvases() {
+  const introCanvas    = document.getElementById('intro-canvas');
+  const universeCanvas = document.getElementById('universe-canvas');
+  const secretCanvas   = document.getElementById('secret-canvas');
+  const finalCanvas    = document.getElementById('final-canvas');
+
+  /* Intro starfield — visible immediately */
+  let introSF = introCanvas
+    ? new StarField(introCanvas, { count: 45, color: '#9E7248', maxSize: 1.8, speed: 0.014 })
+    : null;
+
+  window._destroyIntroSF = () => {
+    if (introSF) {
+      introSF.destroy();
+      introSF = null;
+    }
+  };
+
+  const sectionCanvasMap = [
+    { id: 'universe',    canvas: universeCanvas, color: '#7A5030', count: 55, minSize: 0.5, maxSize: 2.0, speed: 0.016, instance: null },
+    { id: 'secret',      canvas: secretCanvas,   color: '#8C6238', count: 35, minSize: 0.4, maxSize: 1.6, speed: 0.012, instance: null },
+    { id: 'final-scene', canvas: finalCanvas,    color: '#966840', count: 45, minSize: 0.4, maxSize: 1.8, speed: 0.015, instance: null },
+  ];
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const map = sectionCanvasMap.find(m => m.id === entry.target.id);
+      if (!map || !map.canvas) return;
+
+      if (entry.isIntersecting) {
+        if (!map.instance) {
+          map.instance = new StarField(map.canvas, {
+            count: map.count, color: map.color,
+            minSize: map.minSize, maxSize: map.maxSize, speed: map.speed,
+          });
+        } else {
+          map.instance.play();
+        }
+      } else {
+        if (map.instance) {
+          map.instance.pause();
+        }
+      }
+    });
+  }, { threshold: 0.01, rootMargin: '120px 0px 120px 0px' });
+
+  sectionCanvasMap.forEach(m => {
+    const el = document.getElementById(m.id);
+    if (el) observer.observe(el);
+  });
+}
+
+/* ────────────────────────────────────────────────────────────────
+   HERO PHOTO LOAD
+──────────────────────────────────────────────────────────────── */
+function initHero(content) {
+  const heroBg = document.getElementById('hero-bg');
+  if (!heroBg || !content?.hero?.photo?.src) return;
+  heroBg.alt = content.hero.photo.alt || 'Hero photograph';
+  heroBg.onload  = () => heroBg.classList.add('loaded');
+  heroBg.onerror = () => {
+    if (heroBg.src && heroBg.src.endsWith('.webp')) {
+      heroBg.src = heroBg.src.replace(/\.webp$/i, '.png');
+    }
+  };
+  heroBg.src     = content.hero.photo.src;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   CONTENT INJECTION FROM siteContent
+──────────────────────────────────────────────────────────────── */
+function applyContent(content) {
+  const set = (id, text) => { const el = document.getElementById(id); if (el && text) el.textContent = text; };
+  const setHtml = (id, html) => { const el = document.getElementById(id); if (el && html) el.innerHTML = html; };
+
+  /* Intro */
+  set('intro-line-1', content.introduction?.firstLine);
+  set('intro-line-2', content.introduction?.secondLine);
+
+  /* Hero */
+  set('hero-eyebrow', content.hero?.eyebrow);
+  if (content.hero?.heading) {
+    const el = document.getElementById('hero-heading');
+    if (el) { el.innerHTML = content.hero.heading.replace(/\n/g, '<br>'); }
+  }
+  set('hero-subheading', content.hero?.subheading);
+
+  /* Universe name */
+  const univName = document.getElementById('universe-name');
+  if (univName && content.siteTitle) {
+    const name = content.siteTitle.replace(/\s*(little\s*universe|her\s*little\s*universe)/i, '').trim() || "Bhavna's";
+    univName.textContent = name;
+  }
+
+  /* Gallery */
+  set('gallery-eyebrow', content.gallery?.eyebrow);
+
+  /* Letter */
+  set('letter-teaser',     content.letter?.teaser);
+  set('letter-sub-teaser', content.letter?.subTeaser);
+  set('letter-heading',    content.letter?.heading);
+  set('letter-body',       content.letter?.body);
+
+  /* Final */
+  set('final-heading',   content.closing?.heading);
+  set('final-body',      content.closing?.body);
+  set('final-signature', content.closing?.signature);
+
+  /* Secret */
+  set('secret-teaser', content.secret?.teaser);
+  if (content.secret?.shayari && Array.isArray(content.secret.shayari)) {
+    content.secret.shayari.forEach((line, i) => {
+      set(shayari-line-, line);
+    });
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   BOOT
+════════════════════════════════════════════════════════════════ */
+(function boot() {
+  const content = window.HLU_CONTENT || window.siteContent || {};
+  const photos  = content.photos || [];
+
+  /* Apply all text content first */
+  applyContent(content);
+
+  /* Init everything */
+  initNav();
+  initAudio();
+  initSectionCanvases();
+
+  const cursor = new CustomCursor();
+  const lb     = new Lightbox();
+
+  /* Hero photo */
+  initHero(content);
+
+  /* Wait for DOM to settle, then init components */
+  requestAnimationFrame(() => {
+    initGallery(lb, photos);
+    initScrapbook(lb, photos);
+    initMosaic(lb, photos);
+    initUniverse();
+    initSecret(content);
+    initLetter(content);
+    initFinalScene(lb, content, photos);
+    initIntro();
+  });
+})();

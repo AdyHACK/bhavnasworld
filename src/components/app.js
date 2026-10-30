@@ -14,8 +14,11 @@ class StarField {
     this.ctx    = canvas.getContext('2d');
     this.stars  = [];
     this.raf    = null;
+    this.isRunning = false;
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+    const requestedCount = opts.count || 140;
     this.opts   = {
-      count:   opts.count   || 140,
+      count:   isMobile ? Math.min(requestedCount, 30) : Math.min(requestedCount, 65),
       minSize: opts.minSize || 0.4,
       maxSize: opts.maxSize || 2.0,
       color:   opts.color   || '#8C6242',
@@ -36,7 +39,25 @@ class StarField {
       window.addEventListener('resize', () => this._resize(), { passive: true });
     }
     this.stars = Array.from({ length: this.opts.count }, () => this._makeStar());
-    this.reduced ? this._drawStatic() : this._tick();
+    if (this.reduced) {
+      this._drawStatic();
+    } else {
+      this.play();
+    }
+  }
+
+  play() {
+    if (this.isRunning || this.reduced) return;
+    this.isRunning = true;
+    this._tick();
+  }
+
+  pause() {
+    this.isRunning = false;
+    if (this.raf) {
+      cancelAnimationFrame(this.raf);
+      this.raf = null;
+    }
   }
 
   _resize() {
@@ -76,6 +97,7 @@ class StarField {
 
   _drawStatic() {
     const { ctx, canvas, stars } = this;
+    if (!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     stars.forEach(s => {
       ctx.beginPath();
@@ -86,10 +108,13 @@ class StarField {
   }
 
   _tick() {
+    if (!this.isRunning) return;
     const { ctx, canvas, stars } = this;
+    if (!ctx) return;
     const t = performance.now() / 1000;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    stars.forEach(s => {
+    for (let i = 0; i < stars.length; i++) {
+      const s = stars[i];
       const flicker = 0.5 + 0.5 * Math.sin(t * s.speed * 3.5 + s.phase);
       const a = s.alpha * (0.22 + 0.78 * flicker);
 
@@ -98,52 +123,61 @@ class StarField {
       ctx.fillStyle = this._rgba(a);
       ctx.fill();
 
-      if (s.size > 1.3) {
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size * 2.6, 0, Math.PI * 2);
-        ctx.fillStyle = this._rgba(a * 0.1);
-        ctx.fill();
-      }
-
       s.x += s.vx;
       s.y += s.vy;
       if (s.x < -4) s.x = canvas.width  + 4;
       if (s.x > canvas.width  + 4) s.x = -4;
       if (s.y < -4) s.y = canvas.height + 4;
       if (s.y > canvas.height + 4) s.y = -4;
-    });
+    }
     this.raf = requestAnimationFrame(() => this._tick());
   }
 
   destroy() {
-    if (this.raf) cancelAnimationFrame(this.raf);
+    this.pause();
     if (this._resizeObserver) this._resizeObserver.disconnect();
+    if (this.ctx && this.canvas) {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+    this.stars = [];
   }
 }
 
 /* ────────────────────────────────────────────────────────────────
    PARTICLE BURST
 ──────────────────────────────────────────────────────────────── */
-function particleBurst(x, y, color = '#AE8157', count = 14) {
+function particleBurst(x, y, color = '#AE8157', count = 10) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  for (let i = 0; i < count; i++) {
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  const numParticles = Math.min(count, isMobile ? 8 : 12);
+  const frag = document.createDocumentFragment();
+  const elements = [];
+
+  for (let i = 0; i < numParticles; i++) {
     const el    = document.createElement('div');
-    const angle = (i / count) * 360;
-    const dist  = 40 + Math.random() * 60;
+    const angle = (i / numParticles) * 360;
+    const dist  = 35 + Math.random() * 45;
     const px    = Math.cos(angle * Math.PI / 180) * dist;
     const py    = Math.sin(angle * Math.PI / 180) * dist;
-    const size  = 1.5 + Math.random() * 3.5;
+    const size  = 1.5 + Math.random() * 2.5;
     Object.assign(el.style, {
-      position: 'fixed', left: `${x}px`, top: `${y}px`,
+      position: 'fixed', left: '0px', top: '0px',
+      transform: `translate3d(${x}px, ${y}px, 0)`,
       width: `${size}px`, height: `${size}px`,
       background: color, borderRadius: '50%',
       pointerEvents: 'none', zIndex: '9998',
       '--px': `${px}px`, '--py': `${py}px`,
-      animation: 'particle-burst 0.75s cubic-bezier(0.22,1,0.36,1) forwards',
+      animation: 'particle-burst 0.65s cubic-bezier(0.22,1,0.36,1) forwards',
     });
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 850);
+    frag.appendChild(el);
+    elements.push(el);
   }
+  document.body.appendChild(frag);
+  setTimeout(() => {
+    for (let i = 0; i < elements.length; i++) {
+      elements[i].remove();
+    }
+  }, 750);
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -161,11 +195,18 @@ class CustomCursor {
     this.mx = 0; this.my = 0;
     this.rx = 0; this.ry = 0;
     this.raf = null;
+    let scheduled = false;
 
     document.addEventListener('mousemove', e => {
-      this.mx = e.clientX; this.my = e.clientY;
-      this.dot.style.left = `${e.clientX}px`;
-      this.dot.style.top  = `${e.clientY}px`;
+      this.mx = e.clientX;
+      this.my = e.clientY;
+      if (!scheduled) {
+        scheduled = true;
+        requestAnimationFrame(() => {
+          this.dot.style.transform = `translate3d(${this.mx}px, ${this.my}px, 0) translate(-50%, -50%)`;
+          scheduled = false;
+        });
+      }
     }, { passive: true });
 
     const targets = 'button,a,[data-hover],input,label,.gallery-item,.scrap-card,.mosaic-tile,.universe-orb';
@@ -185,10 +226,9 @@ class CustomCursor {
   }
 
   _loop() {
-    this.rx += (this.mx - this.rx) * 0.1;
-    this.ry += (this.my - this.ry) * 0.1;
-    this.ring.style.left = `${this.rx}px`;
-    this.ring.style.top  = `${this.ry}px`;
+    this.rx += (this.mx - this.rx) * 0.12;
+    this.ry += (this.my - this.ry) * 0.12;
+    this.ring.style.transform = `translate3d(${this.rx}px, ${this.ry}px, 0) translate(-50%, -50%)`;
     this.raf = requestAnimationFrame(() => this._loop());
   }
 
@@ -201,15 +241,20 @@ class CustomCursor {
 function initMagneticButtons() {
   if (window.matchMedia('(pointer: coarse)').matches) return;
   document.querySelectorAll('.btn').forEach(btn => {
+    let r = null;
+    btn.addEventListener('mouseenter', () => {
+      r = btn.getBoundingClientRect();
+    }, { passive: true });
     btn.addEventListener('mousemove', e => {
-      const r   = btn.getBoundingClientRect();
+      if (!r) r = btn.getBoundingClientRect();
       const cx  = r.left + r.width  / 2;
       const cy  = r.top  + r.height / 2;
       const dx  = (e.clientX - cx) * 0.32;
       const dy  = (e.clientY - cy) * 0.32;
-      btn.style.transform = `translate(${dx}px, ${dy}px) translateY(-2px)`;
-    });
+      btn.style.transform = `translate3d(${dx}px, ${dy - 2}px, 0)`;
+    }, { passive: true });
     btn.addEventListener('mouseleave', () => {
+      r = null;
       btn.style.transform = '';
     });
   });
@@ -354,6 +399,7 @@ function initIntro() {
       intro.style.opacity    = '0';
       intro.style.transform  = 'scale(1.04)';
       setTimeout(() => {
+        window._destroyIntroSF?.();
         intro.style.display  = 'none';
         document.body.style.overflow = '';
         main.classList.remove('hidden');
@@ -369,6 +415,7 @@ function initIntro() {
         }, 120);
       }, 900);
     } else {
+      window._destroyIntroSF?.();
       intro.style.display = 'none';
       main.classList.remove('hidden');
       document.body.style.overflow = '';
@@ -423,7 +470,13 @@ class Lightbox {
     this.lbImg.src = p.src || '';
     this.lbImg.alt = p.alt || 'Photograph';
     this.lbImg.onload  = () => { this.lbImg.style.opacity = '1'; this.lbImg.classList.add('loaded'); };
-    this.lbImg.onerror = () => { this.lbImg.style.opacity = '0.2'; };
+    this.lbImg.onerror = () => {
+      if (this.lbImg.src && this.lbImg.src.endsWith('.webp')) {
+        this.lbImg.src = this.lbImg.src.replace(/\.webp$/i, '.png');
+      } else {
+        this.lbImg.style.opacity = '0.2';
+      }
+    };
     if (this.lbCap)   this.lbCap.textContent  = p.caption || p.title || '';
     if (this.lbCount) this.lbCount.textContent = `${idx + 1} / ${this.photos.length}`;
     const atStart = idx === 0;
@@ -482,7 +535,13 @@ function buildPhotoEl(photo, context) {
   img.decoding  = 'async';
   img.style.cssText = 'position:absolute; inset:0; opacity:0; transition:opacity 0.9s ease;';
   img.onload  = () => { img.style.opacity = '1'; ph.style.display = 'none'; };
-  img.onerror = () => { img.style.display = 'none'; };
+  img.onerror = () => {
+    if (img.src && img.src.endsWith('.webp')) {
+      img.src = img.src.replace(/\.webp$/i, '.png');
+    } else {
+      img.style.display = 'none';
+    }
+  };
   img.src = photo.src;
 
   wrapper.appendChild(ph);
@@ -642,133 +701,559 @@ function initMosaic(lb, photos) {
 }
 
 /* ────────────────────────────────────────────────────────────────
-   INTERACTIVE UNIVERSE — 3D PREMIUM ORB SYSTEM
+   REALISTIC 3D PLANETARY UNIVERSE — ASTRONOMICAL EXPLORATION
+   Luxury Astronomical Solar System Visualization (Three.js WebGL)
 ──────────────────────────────────────────────────────────────── */
 function initUniverse() {
-  const container = document.getElementById('universe-nodes');
-  if (!container) return;
+  const canvas = document.getElementById('universe-3d-canvas');
+  const section = document.getElementById('universe');
+  if (!canvas || !section) return;
 
-  const nodes = [
+  if (typeof THREE === 'undefined') {
+    console.warn('Three.js not found, skipping 3D planetary rendering');
+    return;
+  }
+
+  // 1. Scene, Camera, Renderer
+  const scene = new THREE.Scene();
+  const width = section.offsetWidth || window.innerWidth;
+  const height = section.offsetHeight || window.innerHeight;
+
+  const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+  camera.position.set(0, 0, 18);
+
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: true,
+    powerPreference: 'high-performance',
+  });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(width, height);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+
+  // 2. Space Lighting
+  // Directional Sun Light (creates natural terminator boundary across all planets)
+  const sunLight = new THREE.DirectionalLight(0xfff6ea, 2.5);
+  sunLight.position.set(-12, 8, 14);
+  scene.add(sunLight);
+
+  // Warm champagne/mocha ambient light (ensures shadowed hemisphere retains subtle detail)
+  const ambientLight = new THREE.AmbientLight(0x72543c, 0.45);
+  scene.add(ambientLight);
+
+  // Delicate atmospheric rim light
+  const rimLight = new THREE.DirectionalLight(0xdfc29d, 0.9);
+  rimLight.position.set(10, -6, -8);
+  scene.add(rimLight);
+
+  // 3. Texture Loading
+  const loader = new THREE.TextureLoader();
+  const textures = {
+    earth: loader.load('public/textures/planets/earth.webp'),
+    earthClouds: loader.load('public/textures/planets/earth_clouds.webp'),
+    mars: loader.load('public/textures/planets/mars.webp'),
+    jupiter: loader.load('public/textures/planets/jupiter.webp'),
+    moon: loader.load('public/textures/planets/moon.webp'),
+    saturn: loader.load('public/textures/planets/saturn.webp'),
+    saturnRing: loader.load('public/textures/planets/saturn_ring_topdown.png'),
+  };
+
+  // Helper: Atmospheric Rim Glow Mesh
+  function createAtmosphereGlow(radius, colorRgb) {
+    const geo = new THREE.SphereGeometry(radius * 1.045, 48, 48);
+    const mat = new THREE.ShaderMaterial({
+      vertexShader: `
+        varying vec3 vNormal;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vNormal;
+        uniform vec3 uColor;
+        uniform float uGlow;
+        void main() {
+          float intensity = pow(clamp(1.0 - abs(vNormal.z), 0.0, 1.0), 2.5);
+          gl_FragColor = vec4(uColor, 1.0) * intensity * uGlow;
+        }
+      `,
+      uniforms: {
+        uColor: { value: new THREE.Vector3(colorRgb[0], colorRgb[1], colorRgb[2]) },
+        uGlow: { value: 0.85 },
+      },
+      blending: THREE.AdditiveBlending,
+      side: THREE.BackSide,
+      transparent: true,
+      depthWrite: false,
+    });
+    return new THREE.Mesh(geo, mat);
+  }
+
+  // 4. Planets Definitions
+  const planetConfigs = [
     {
-      label: 'THE GALLERY', href: '#gallery',
-      gradient: 'radial-gradient(circle at 28% 24%, #F5DEB8 0%, #C8955C 38%, #8A5828 72%, #5C3510 100%)',
-      glowColor: 'rgba(200,149,92,0.45)', shadowColor: 'rgba(90,52,16,0.45)',
-      borderColor: 'rgba(180,130,80,0.55)', orbitColor: 'rgba(170,120,68,0.25)',
-      orbitR: 62, size: 76, x: '14%', y: '30%', floatDir: 'y', floatDur: 7.2, floatDly: 0,
+      id: 'earth',
+      name: 'THE GALLERY',
+      href: '#gallery',
+      radius: 1.25,
+      pos: { x: -5.8, y: 2.3, z: 0 },
+      rotSpeed: 0.0035,
+      tiltZ: 23.4 * (Math.PI / 180),
+      tiltX: 0.08,
+      build(group) {
+        // Earth Base Sphere
+        const geo = new THREE.SphereGeometry(1.25, 64, 64);
+        const mat = new THREE.MeshStandardMaterial({
+          map: textures.earth,
+          roughness: 0.62,
+          metalness: 0.1,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        group.add(mesh);
+
+        // Independent Rotating Clouds Layer
+        const cloudGeo = new THREE.SphereGeometry(1.275, 64, 64);
+        const cloudMat = new THREE.MeshStandardMaterial({
+          map: textures.earthClouds,
+          transparent: true,
+          opacity: 0.72,
+          blending: THREE.NormalBlending,
+          depthWrite: false,
+        });
+        const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+        group.add(cloudMesh);
+        group.userData.cloudMesh = cloudMesh;
+
+        // Rayleigh Cyan-Blue Atmosphere Glow
+        const atmos = createAtmosphereGlow(1.25, [0.38, 0.68, 0.95]);
+        group.add(atmos);
+        group.userData.atmos = atmos;
+      },
     },
     {
-      label: 'LITTLE MOMENTS', href: '#scrapbook',
-      gradient: 'radial-gradient(circle at 28% 24%, #FAE8CC 0%, #D9B48A 38%, #A07040 72%, #6E4820 100%)',
-      glowColor: 'rgba(185,140,90,0.35)', shadowColor: 'rgba(80,50,20,0.38)',
-      borderColor: 'rgba(195,155,105,0.5)', orbitColor: 'rgba(160,115,64,0.2)',
-      orbitR: null, size: 46, x: '70%', y: '17%', floatDir: 'x', floatDur: 8.8, floatDly: 1.4,
+      id: 'mars',
+      name: 'LITTLE MOMENTS',
+      href: '#scrapbook',
+      radius: 0.88,
+      pos: { x: 5.5, y: 2.7, z: 0.4 },
+      rotSpeed: 0.0030,
+      tiltZ: 25.2 * (Math.PI / 180),
+      tiltX: 0.06,
+      build(group) {
+        // Mars Cratered Terrain Sphere
+        const geo = new THREE.SphereGeometry(0.88, 64, 64);
+        const mat = new THREE.MeshStandardMaterial({
+          map: textures.mars,
+          roughness: 0.88,
+          metalness: 0.04,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        group.add(mesh);
+
+        // Terracotta Atmosphere Rim
+        const atmos = createAtmosphereGlow(0.88, [0.92, 0.45, 0.28]);
+        group.add(atmos);
+        group.userData.atmos = atmos;
+      },
     },
     {
-      label: 'THE SCRAPBOOK', href: '#scrapbook',
-      gradient: 'radial-gradient(circle at 28% 24%, #EDD5B2 0%, #BE8E60 38%, #7E5428 72%, #50300E 100%)',
-      glowColor: 'rgba(190,142,96,0.4)', shadowColor: 'rgba(78,46,14,0.42)',
-      borderColor: 'rgba(175,135,88,0.52)', orbitColor: 'rgba(150,112,70,0.22)',
-      orbitR: 52, size: 62, x: '80%', y: '58%', floatDir: 'd', floatDur: 9.5, floatDly: 0.8,
+      id: 'jupiter',
+      name: 'PHOTO MOSAIC',
+      href: '#mosaic',
+      radius: 1.68,
+      pos: { x: 6.4, y: -2.1, z: -0.4 },
+      rotSpeed: 0.0062,
+      tiltZ: 3.1 * (Math.PI / 180),
+      tiltX: 0.02,
+      build(group) {
+        // Jupiter Swirling Atmospheric Bands Sphere
+        const geo = new THREE.SphereGeometry(1.68, 64, 64);
+        const mat = new THREE.MeshStandardMaterial({
+          map: textures.jupiter,
+          roughness: 0.68,
+          metalness: 0.02,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        group.add(mesh);
+
+        // Warm Amber Atmosphere Rim
+        const atmos = createAtmosphereGlow(1.68, [0.88, 0.72, 0.48]);
+        group.add(atmos);
+        group.userData.atmos = atmos;
+      },
     },
     {
-      label: 'A LITTLE SECRET', href: '#secret',
-      gradient: 'radial-gradient(circle at 28% 24%, #E8D0A8 0%, #A87848 38%, #6C4828 72%, #42280E 100%)',
-      glowColor: 'rgba(168,120,72,0.35)', shadowColor: 'rgba(64,38,14,0.42)',
-      borderColor: 'rgba(160,120,72,0.5)', orbitColor: 'rgba(130,95,58,0.2)',
-      orbitR: null, size: 40, x: '11%', y: '65%', floatDir: 'x', floatDur: 10.2, floatDly: 2.1,
+      id: 'moon',
+      name: 'A LITTLE SECRET',
+      href: '#secret',
+      radius: 0.76,
+      pos: { x: -5.6, y: -2.7, z: 0.7 },
+      rotSpeed: 0.0020,
+      tiltZ: 1.5 * (Math.PI / 180),
+      tiltX: 0.02,
+      build(group) {
+        // Moon Cratered Basalt Surface (Sharp Shadows, No Atmosphere)
+        const geo = new THREE.SphereGeometry(0.76, 64, 64);
+        const mat = new THREE.MeshStandardMaterial({
+          map: textures.moon,
+          roughness: 0.96,
+          metalness: 0.0,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        group.add(mesh);
+      },
     },
     {
-      label: 'ONE LAST THING', href: '#letter-section',
-      gradient: 'radial-gradient(circle at 28% 24%, #FAE4C0 0%, #D4AA70 38%, #9C7040 72%, #623E18 100%)',
-      glowColor: 'rgba(212,170,112,0.42)', shadowColor: 'rgba(96,60,22,0.42)',
-      borderColor: 'rgba(196,152,96,0.55)', orbitColor: 'rgba(174,133,80,0.22)',
-      orbitR: 58, size: 68, x: '46%', y: '74%', floatDir: 'y', floatDur: 8.0, floatDly: 1.6,
+      id: 'saturn',
+      name: 'ONE LAST THING',
+      href: '#letter-section',
+      radius: 1.32,
+      pos: { x: 0.2, y: -4.1, z: 0.1 },
+      rotSpeed: 0.0042,
+      tiltZ: 26.7 * (Math.PI / 180),
+      tiltX: 0.32,
+      build(group) {
+        // Saturn Gas Giant Sphere
+        const geo = new THREE.SphereGeometry(1.32, 64, 64);
+        const mat = new THREE.MeshStandardMaterial({
+          map: textures.saturn,
+          roughness: 0.72,
+          metalness: 0.03,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        group.add(mesh);
+
+        // Authentic 3D Tilted Ring System with Cassini Division
+        const ringGeo = new THREE.PlaneGeometry(6.6, 6.6, 32, 32);
+        const ringMat = new THREE.MeshStandardMaterial({
+          map: textures.saturnRing,
+          transparent: true,
+          side: THREE.DoubleSide,
+          opacity: 0.94,
+          roughness: 0.55,
+          metalness: 0.05,
+          depthWrite: false,
+        });
+        const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+        ringMesh.rotation.x = Math.PI / 2.2;
+        group.add(ringMesh);
+
+        // Butterscotch Atmosphere Rim
+        const atmos = createAtmosphereGlow(1.32, [0.92, 0.82, 0.62]);
+        group.add(atmos);
+        group.userData.atmos = atmos;
+      },
     },
   ];
 
-  const isMobile  = window.innerWidth <= 768;
+  // 5. Instantiate Planets & Hit Volumes
+  const planets = [];
+  const hitObjects = [];
+
   const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  nodes.forEach((node, i) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'universe-node';
-
-    if (!isMobile) {
-      wrap.style.cssText = `left:${node.x}; top:${node.y}; position:absolute;`;
-      if (!isReduced) {
-        const animName = { y: 'float-y', x: 'float-x', d: 'float-diagonal' }[node.floatDir] || 'float-y';
-        wrap.style.animation = `${animName} ${node.floatDur}s ease-in-out ${node.floatDly}s infinite`;
-      }
+  // Responsive Celestial Coordinate Calculator
+  function getPlanetCoordinates(w, h, idx) {
+    const isPortrait = h > w;
+    if (w <= 600) {
+      // Mobile vertical alignment
+      const mobX = [-1.3, 1.3, -1.4, 1.3, 0.0];
+      const mobY = [4.2, 2.1, 0.0, -2.1, -4.3];
+      return { x: mobX[idx], y: mobY[idx], z: 0 };
     }
-
-    /* Orbit ring */
-    if (node.orbitR && !isMobile) {
-      const ringSize = (node.orbitR * 2) + node.size + 16;
-      const ring = document.createElement('div');
-      ring.className = 'universe-orbit-ring';
-      ring.style.cssText = `
-        width:${ringSize}px; height:${ringSize}px;
-        border-color:${node.orbitColor};
-        margin-left:-${ringSize/2}px; margin-top:-${ringSize/2}px;
-        top:${node.size/2}px; left:${node.size/2}px;
-        animation: orbit-spin ${22 + i * 5}s linear infinite;
-      `;
-      const dot = document.createElement('div');
-      dot.className = 'universe-orbit-dot';
-      dot.style.cssText = `width:4px;height:4px;background:${node.borderColor};box-shadow:0 0 8px ${node.glowColor};`;
-      ring.appendChild(dot);
-      wrap.appendChild(ring);
+    if (isPortrait && w <= 960) {
+      // Tablet Portrait (768x1024, 820x1180, iPad Mini, iPad Air, iPad Pro)
+      // Intentional vertical oval constellation with clean perimeter framing
+      const tabPortX = [-2.8, 2.8, 3.1, -2.9, 0.0];
+      const tabPortY = [3.2, 3.6, -1.6, -2.2, -5.2];
+      return { x: tabPortX[idx], y: tabPortY[idx], z: 0.1 };
     }
+    if (w <= 1100) {
+      // Tablet Landscape (1024x768)
+      const tabLandX = [-5.0, 4.8, 5.4, -4.8, 0.2];
+      const tabLandY = [2.0, 2.4, -1.9, -2.2, -3.8];
+      return { x: tabLandX[idx], y: tabLandY[idx], z: 0.1 };
+    }
+    // Desktop (> 1100px)
+    return { x: planetConfigs[idx].pos.x, y: planetConfigs[idx].pos.y, z: planetConfigs[idx].pos.z };
+  }
 
-    /* Orb */
-    const orb = document.createElement('a');
-    orb.href      = node.href;
-    orb.className = 'universe-orb anim-orb-breathe';
-    orb.setAttribute('aria-label', `Navigate to ${node.label}`);
-    const s = node.size;
-    orb.style.cssText = `
-      width:${s}px; height:${s}px;
-      background:${node.gradient};
-      color:${node.borderColor};
-      border:1px solid ${node.borderColor};
-      box-shadow:
-        inset 0 0 ${Math.round(s*.42)}px rgba(60,35,10,.35),
-        inset ${Math.round(s*.07)}px ${Math.round(s*.07)}px ${Math.round(s*.18)}px rgba(255,248,225,.18),
-        0 ${Math.round(s*.25)}px ${Math.round(s*.65)}px ${node.shadowColor},
-        0 0 ${Math.round(s*.5)}px ${node.glowColor};
-    `;
+  function getCameraZ(w, h) {
+    const aspect = w / h;
+    if (w <= 600) return 22;
+    if (aspect < 1.0) {
+      // Portrait tablet: dynamically scale Z so horizontal extent comfortably fits +-3.2 units
+      return Math.max(19, Math.min(23, Math.round(14.2 / aspect)));
+    }
+    if (w <= 1100) return 17;
+    return 18;
+  }
 
-    /* Specular highlight */
-    const hl = document.createElement('span');
-    hl.className = 'orb-highlight';
-    orb.appendChild(hl);
+  const initialW = section.offsetWidth || window.innerWidth;
+  const initialH = section.offsetHeight || window.innerHeight;
+  camera.position.z = getCameraZ(initialW, initialH);
 
-    /* Click */
-    orb.addEventListener('click', e => {
-      e.preventDefault();
-      const rect = orb.getBoundingClientRect();
-      particleBurst(rect.left + rect.width/2, rect.top + rect.height/2, '#AE8157', 14);
-      const ripple = document.createElement('div');
-      ripple.className = 'universe-ripple';
-      ripple.style.cssText = `width:${s}px;height:${s}px;border-color:${node.borderColor};`;
-      wrap.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 750);
-      setTimeout(() => {
-        const tgt = document.querySelector(node.href);
-        if (tgt) tgt.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 300);
-    });
+  planetConfigs.forEach((cfg, idx) => {
+    const group = new THREE.Group();
+    const coords = getPlanetCoordinates(initialW, initialH, idx);
+    let px = coords.x;
+    let py = coords.y;
+    let pz = coords.z;
 
-    const labelEl = document.createElement('span');
-    labelEl.className   = 'universe-label';
-    labelEl.textContent = node.label;
+    group.position.set(px, py, pz);
+    group.rotation.z = cfg.tiltZ;
+    group.rotation.x = cfg.tiltX;
 
-    wrap.appendChild(orb);
-    wrap.appendChild(labelEl);
-    container.appendChild(wrap);
+    cfg.build(group);
+    scene.add(group);
+
+    // Invisible Hit Volume for effortless clicking and hover
+    const hitGeo = new THREE.SphereGeometry(cfg.radius * 1.35, 16, 16);
+    const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+    const hitMesh = new THREE.Mesh(hitGeo, hitMat);
+    hitMesh.position.set(px, py, pz);
+    hitMesh.userData = { planetId: cfg.id, config: cfg, group };
+    scene.add(hitMesh);
+    hitObjects.push(hitMesh);
+
+    const planetItem = {
+      id: cfg.id,
+      group,
+      hitMesh,
+      baseX: px,
+      baseY: py,
+      baseZ: pz,
+      rotSpeed: cfg.rotSpeed,
+      scale: 1.0,
+      targetScale: 1.0,
+      config: cfg,
+      card: document.getElementById(`planet-card-${cfg.id}`),
+    };
+
+    planets.push(planetItem);
   });
 
-  /* Easter egg dot */
+  // 6. Interactive Raycasting & Hover / Click Handlers
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2(-9999, -9999);
+  let hoveredPlanet = null;
+  let targetCamX = 0;
+  let targetCamY = 0;
+
+  function updateHover(planetItem) {
+    if (hoveredPlanet === planetItem) return;
+
+    // Unhover previous
+    if (hoveredPlanet) {
+      hoveredPlanet.targetScale = 1.0;
+      if (hoveredPlanet.group.userData.atmos) {
+        hoveredPlanet.group.userData.atmos.material.uniforms.uGlow.value = 0.85;
+      }
+      hoveredPlanet.card?.classList.remove('is-hovered');
+    }
+
+    hoveredPlanet = planetItem;
+
+    // Hover new
+    if (hoveredPlanet) {
+      hoveredPlanet.targetScale = 1.18;
+      if (hoveredPlanet.group.userData.atmos) {
+        hoveredPlanet.group.userData.atmos.material.uniforms.uGlow.value = 1.65;
+      }
+      hoveredPlanet.card?.classList.add('is-hovered');
+      canvas.style.cursor = 'pointer';
+    } else {
+      canvas.style.cursor = 'grab';
+    }
+  }
+
+  function handlePlanetClick(planetItem, clientX, clientY) {
+    if (!planetItem) return;
+    const cfg = planetItem.config;
+
+    // Spawn celestial particle burst
+    particleBurst(clientX, clientY, '#DFC29D', 18);
+
+    // Smooth foreground camera move
+    gsap.to(planetItem.group.scale, {
+      x: 1.45, y: 1.45, z: 1.45,
+      duration: 0.65,
+      ease: 'power3.out',
+      onComplete() {
+        gsap.to(planetItem.group.scale, { x: 1.0, y: 1.0, z: 1.0, duration: 0.5, ease: 'power2.inOut' });
+      }
+    });
+
+    // Smooth scroll to target destination & highlight arrival badge
+    setTimeout(() => {
+      const tgt = document.querySelector(cfg.href);
+      if (tgt) {
+        tgt.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const originBadge = tgt.querySelector('.section-planet-origin');
+        if (originBadge) {
+          originBadge.classList.remove('arrival-highlight');
+          void originBadge.offsetWidth; // trigger reflow for clean re-animation
+          originBadge.classList.add('arrival-highlight');
+        }
+      }
+    }, 280);
+  }
+
+  // Canvas Mousemove Raycasting
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+
+    // Subtle 3D camera parallax
+    targetCamX = mouse.x * 0.75;
+    targetCamY = mouse.y * 0.5;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(hitObjects);
+
+    if (intersects.length > 0) {
+      const hitId = intersects[0].object.userData.planetId;
+      const found = planets.find(p => p.id === hitId);
+      updateHover(found);
+    } else {
+      updateHover(null);
+    }
+  }, { passive: true });
+
+  canvas.addEventListener('mouseleave', () => {
+    mouse.set(-9999, -9999);
+    targetCamX = 0;
+    targetCamY = 0;
+    updateHover(null);
+  });
+
+  // Canvas Click
+  canvas.addEventListener('click', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(hitObjects);
+
+    if (intersects.length > 0) {
+      const hitId = intersects[0].object.userData.planetId;
+      const found = planets.find(p => p.id === hitId);
+      handlePlanetClick(found, e.clientX, e.clientY);
+    }
+  });
+
+  // Card Hover & Click Handlers
+  planets.forEach(p => {
+    if (!p.card) return;
+
+    p.card.addEventListener('mouseenter', () => updateHover(p));
+    p.card.addEventListener('mouseleave', () => updateHover(null));
+
+    p.card.addEventListener('click', e => {
+      e.preventDefault();
+      const rect = p.card.getBoundingClientRect();
+      handlePlanetClick(p, rect.left + rect.width / 2, rect.top + rect.height / 2);
+    });
+  });
+
+  // 7. Animation Loop with Viewport Culling
+  let isRunning = false;
+  let rafId = null;
+
+  function tick() {
+    if (!isRunning) return;
+
+    const time = performance.now() * 0.001;
+
+    // Slow planetary axial rotation
+    planets.forEach((p, i) => {
+      if (!isReduced) {
+        p.group.rotation.y += p.rotSpeed;
+
+        // Earth clouds independent atmospheric rotation
+        if (p.group.userData.cloudMesh) {
+          p.group.userData.cloudMesh.rotation.y += 0.0016;
+        }
+
+        // Harmonic spatial floating drift
+        const phase = i * 1.35;
+        p.group.position.y = p.baseY + Math.sin(time * 0.85 + phase) * 0.12;
+        p.hitMesh.position.y = p.group.position.y;
+      }
+
+      // Smooth hover scale interpolation
+      p.scale += (p.targetScale - p.scale) * 0.12;
+      p.group.scale.set(p.scale, p.scale, p.scale);
+    });
+
+    // Camera parallax tilt
+    if (!isReduced) {
+      camera.position.x += (targetCamX - camera.position.x) * 0.05;
+      camera.position.y += (targetCamY - camera.position.y) * 0.05;
+      camera.lookAt(0, 0, 0);
+    }
+
+    renderer.render(scene, camera);
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function start() {
+    if (isRunning) return;
+    isRunning = true;
+    tick();
+  }
+
+  function stop() {
+    isRunning = false;
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+  }
+
+  // 8. IntersectionObserver (0% GPU when section is not visible)
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        start();
+      } else {
+        stop();
+      }
+    });
+  }, { threshold: 0.01, rootMargin: '100px 0px 100px 0px' });
+
+  obs.observe(section);
+
+  // 9. Resize Handling (Tablet & Desktop Dynamic Repositioning)
+  function onResize() {
+    const w = section.offsetWidth || window.innerWidth;
+    const h = section.offsetHeight || window.innerHeight;
+    camera.aspect = w / h;
+    camera.position.z = getCameraZ(w, h);
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+
+    // Dynamically glide planets to their responsive compositions
+    planets.forEach((p, idx) => {
+      const coords = getPlanetCoordinates(w, h, idx);
+      p.baseX = coords.x;
+      p.baseY = coords.y;
+      p.baseZ = coords.z;
+      p.group.position.x = coords.x;
+      p.group.position.z = coords.z;
+      p.hitMesh.position.x = coords.x;
+      p.hitMesh.position.z = coords.z;
+    });
+  }
+
+  window.addEventListener('resize', onResize, { passive: true });
+
+  // 10. Easter Egg Star Button
   const easterBtn = document.createElement('button');
   easterBtn.id = 'easter-star';
   easterBtn.setAttribute('aria-label', 'A tiny hidden surprise');
@@ -779,7 +1264,7 @@ function initUniverse() {
       msg.classList.toggle('hidden');
     }
   });
-  document.getElementById('universe')?.appendChild(easterBtn);
+  section.appendChild(easterBtn);
 }
 
 function hexToRgb(hex) {
@@ -799,17 +1284,49 @@ function initSecret(content) {
   const seal      = document.getElementById('secret-seal');
   const card      = document.getElementById('secret-card');
   const closeBtn  = document.getElementById('secret-close-btn');
-  const msgText   = document.getElementById('secret-message-text');
+
+  // Hindi Shayari & Ornament Elements
+  const floralEl         = document.getElementById('secret-floral');
+  const monogramEl       = card ? card.querySelector('.secret-card-monogram') : null;
+  const dividerEl        = document.getElementById('secret-divider');
+  const line1            = document.getElementById('shayari-line-1');
+  const line2            = document.getElementById('shayari-line-2');
+  const line3            = document.getElementById('shayari-line-3');
+  const line4            = document.getElementById('shayari-line-4');
+  const highlightCouplet = card ? card.querySelector('.shayari-couplet--highlight') : null;
+  const flourishEl       = document.getElementById('secret-flourish');
 
   if (!envOuter || !card) return;
 
-  if (msgText && content?.secret?.message) {
-    msgText.innerHTML = content.secret.message;
+  // Populate shayari lines if custom content passed
+  if (content?.secret?.shayari && Array.isArray(content.secret.shayari)) {
+    const lines = [line1, line2, line3, line4];
+    content.secret.shayari.forEach((txt, i) => {
+      if (lines[i] && txt) lines[i].textContent = txt;
+    });
   }
 
   let isOpen = false;
   let isAnim = false;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function resetShayari() {
+    if (typeof gsap === 'undefined') return;
+    if (floralEl) gsap.set(floralEl, { opacity: 0, y: 10 });
+    if (monogramEl) gsap.set(monogramEl, { opacity: 0, y: 8 });
+    if (dividerEl) gsap.set(dividerEl, { opacity: 0, scaleX: 0.4, transformOrigin: 'center center' });
+    [line1, line2, line3, line4].forEach(l => {
+      if (l) gsap.set(l, { opacity: 0, y: 16, textShadow: 'none', color: '#442E20' });
+    });
+    if (highlightCouplet) {
+      highlightCouplet.classList.remove('is-highlighted');
+      gsap.set(highlightCouplet, { backgroundColor: 'transparent', boxShadow: 'none' });
+    }
+    if (flourishEl) gsap.set(flourishEl, { opacity: 0, y: 10, scale: 0.88, transformOrigin: 'center center' });
+  }
+
+  // Ensure initial pristine hidden state before envelope opens
+  resetShayari();
 
   if (seal && typeof gsap !== 'undefined') {
     gsap.set(seal, { xPercent: -50, yPercent: -50, transformOrigin: 'center center' });
@@ -829,7 +1346,7 @@ function initSecret(content) {
     }
 
     const isMobile = window.innerWidth <= 768;
-    const riseDist = isMobile ? -130 : -160;
+    const riseDist = isMobile ? -145 : -190;
 
     if (typeof gsap !== 'undefined' && !reduced) {
       const tl = gsap.timeline({
@@ -843,17 +1360,17 @@ function initSecret(content) {
         }
       });
 
-      // 1. Wax seal compression and pop
+      // Step 1: Wax seal compression and pop
       if (seal) {
         tl.to(seal, { scale: 0.9, duration: 0.14, ease: 'power2.in' })
           .to(seal, { scale: 1.15, opacity: 0, duration: 0.3, ease: 'power2.out', pointerEvents: 'none' }, '+=0.02');
       }
 
-      // 2. 3D flap rotation backward (0 -> -180deg)
+      // Step 2: 3D flap opens completely backward around top crease (0 -> -180deg)
       if (flap) {
         tl.to(flap, {
           rotateX: -180,
-          duration: 0.85,
+          duration: 0.88,
           ease: 'power2.inOut',
           onUpdate: function() {
             if (this.progress() >= 0.5) {
@@ -865,7 +1382,7 @@ function initSecret(content) {
         }, '-=0.2');
       }
 
-      // 3. Card emerges cleanly in front of pocket (zIndex: 50) and slides up
+      // Step 3: Letter emerges cleanly in front of pocket (zIndex: 50) and slides out smoothly
       tl.set(card, { zIndex: 50 }, '-=0.4')
         .fromTo(card,
           { y: 0, scale: 0.96, opacity: 0 },
@@ -873,21 +1390,94 @@ function initSecret(content) {
             y: riseDist,
             scale: 1,
             opacity: 1,
-            duration: 0.9,
+            duration: 0.92,
             ease: 'power3.out',
-            boxShadow: '0 24px 60px rgba(73, 50, 36, 0.22)'
+            boxShadow: '0 24px 60px rgba(73, 50, 36, 0.22), 0 4px 14px rgba(73, 50, 36, 0.1)'
           },
           '-=0.4'
         );
 
+      // Step 4: Tiny floral illustration & monogram reveal
+      if (floralEl) {
+        tl.to(floralEl, { opacity: 1, y: 0, duration: 0.55, ease: 'power2.out' }, '+=0.08');
+      }
+      if (monogramEl) {
+        tl.to(monogramEl, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }, '-=0.25');
+      }
+
+      // Step 5: Introduce the small ornamental divider
+      if (dividerEl) {
+        tl.to(dividerEl, { opacity: 1, scaleX: 1, duration: 0.58, ease: 'power2.out' }, '-=0.15');
+      }
+
+      // Step 6: Reveal the shayari one line at a time with gentle upward movement & opacity
+      if (line1) {
+        tl.to(line1, { opacity: 1, y: 0, duration: 0.72, ease: 'power2.out' }, '+=0.12');
+      }
+      if (line2) {
+        tl.to(line2, { opacity: 1, y: 0, duration: 0.72, ease: 'power2.out' }, '+=0.2');
+      }
+
+      // Poetic breathing pause between couplets
+      tl.to({}, { duration: 0.32 });
+
+      if (line3) {
+        tl.to(line3, { opacity: 1, y: 0, duration: 0.72, ease: 'power2.out' });
+      }
+      if (line4) {
+        tl.to(line4, { opacity: 1, y: 0, duration: 0.72, ease: 'power2.out' }, '+=0.2');
+      }
+
+      // Step 7: Highlight the final two lines subtly
+      if (highlightCouplet) {
+        tl.to(highlightCouplet, {
+          backgroundColor: 'rgba(216, 185, 144, 0.14)',
+          boxShadow: '0 0 28px rgba(216, 185, 144, 0.25)',
+          duration: 0.8,
+          ease: 'power2.out',
+          onStart: () => { highlightCouplet.classList.add('is-highlighted'); }
+        }, '+=0.15');
+      }
+      if (line3 && line4) {
+        tl.to([line3, line4], {
+          color: '#2E190E',
+          textShadow: '0 0 16px rgba(216, 185, 144, 0.42), 0 1px 1px rgba(255, 255, 255, 0.6)',
+          duration: 0.8,
+          ease: 'power2.out'
+        }, '<');
+      }
+
+      // Step 8: Finish with a delicate decorative flourish
+      if (flourishEl) {
+        tl.to(flourishEl, {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          duration: 0.65,
+          ease: 'back.out(1.7)'
+        }, '+=0.12');
+      }
+
     } else {
-      // Fallback
+      // Graceful fallback for reduced motion
       if (flap) { flap.style.transform = 'rotateX(-180deg)'; flap.style.zIndex = '2'; }
       if (seal) { seal.style.opacity = '0'; seal.style.pointerEvents = 'none'; }
       card.style.transform = `translate3d(0, ${riseDist}px, 0) scale(1)`;
       card.style.opacity = '1';
       card.style.zIndex = '50';
       card.classList.add('is-active');
+
+      if (floralEl) { floralEl.style.opacity = '1'; floralEl.style.transform = 'none'; }
+      if (monogramEl) { monogramEl.style.opacity = '1'; monogramEl.style.transform = 'none'; }
+      if (dividerEl) { dividerEl.style.opacity = '1'; dividerEl.style.transform = 'none'; }
+      [line1, line2, line3, line4].forEach(l => {
+        if (l) { l.style.opacity = '1'; l.style.transform = 'none'; }
+      });
+      if (highlightCouplet) {
+        highlightCouplet.classList.add('is-highlighted');
+      }
+      if (flourishEl) { flourishEl.style.opacity = '1'; flourishEl.style.transform = 'none'; }
+
       isOpen = true;
       isAnim = false;
       if (revealBtn) revealBtn.innerHTML = 'Fold &amp; Close <span aria-hidden="true">✦</span>';
@@ -913,23 +1503,34 @@ function initSecret(content) {
           gsap.set(envOuter, { y: 0 });
           if (flap) gsap.set(flap, { rotateX: 0, zIndex: 30 });
           if (seal) gsap.set(seal, { scale: 1, opacity: 1, xPercent: -50, yPercent: -50, pointerEvents: 'auto' });
+          resetShayari();
         }
       });
+
+      // Quick graceful fade out of shayari elements
+      const elementsToFade = [floralEl, monogramEl, dividerEl, line1, line2, line3, line4, highlightCouplet, flourishEl].filter(Boolean);
+      if (elementsToFade.length) {
+        closeTl.to(elementsToFade, {
+          opacity: 0,
+          duration: 0.22,
+          ease: 'power2.in'
+        });
+      }
 
       // 1. Card slides back into pocket
       closeTl.to(card, {
         y: 0,
         scale: 0.96,
         opacity: 0,
-        duration: 0.6,
+        duration: 0.55,
         ease: 'power3.in',
         onComplete: () => { card.style.zIndex = '10'; }
-      })
+      }, '-=0.08')
 
       // 2. Flap folds back down
       .to(flap, {
         rotateX: 0,
-        duration: 0.75,
+        duration: 0.7,
         ease: 'power2.inOut',
         onUpdate: function() {
           if (this.progress() >= 0.5) {
@@ -938,14 +1539,14 @@ function initSecret(content) {
             flap.style.zIndex = '2';
           }
         }
-      }, '-=0.2')
+      }, '-=0.18')
 
       // 3. Wax seal returns
       .to(seal, {
         scale: 1,
         opacity: 1,
         pointerEvents: 'auto',
-        duration: 0.38,
+        duration: 0.35,
         ease: 'back.out(1.8)'
       }, '-=0.15');
 
@@ -957,6 +1558,7 @@ function initSecret(content) {
       envOuter.style.transform = 'none';
       if (flap) { flap.style.transform = 'rotateX(0deg)'; flap.style.zIndex = '30'; }
       if (seal) { seal.style.opacity = '1'; seal.style.pointerEvents = 'auto'; }
+      resetShayari();
       isOpen = false;
       isAnim = false;
       if (revealBtn) revealBtn.innerHTML = 'Take a Look <span aria-hidden="true">✦</span>';
@@ -1327,12 +1929,18 @@ function initFinalScene(lb, content, photos) {
     finalPhoto.src = fp.src;
     finalPhoto.alt = fp.alt || 'Closing photograph';
     finalPhoto.onload  = () => { finalPhoto.style.opacity = '1'; if (finalPh) finalPh.style.opacity = '0'; };
-    finalPhoto.onerror = () => { if (finalPh) finalPh.style.display = 'flex'; };
+    finalPhoto.onerror = () => {
+      if (finalPhoto.src && finalPhoto.src.endsWith('.webp')) {
+        finalPhoto.src = finalPhoto.src.replace(/\.webp$/i, '.png');
+      } else if (finalPh) {
+        finalPh.style.display = 'flex';
+      }
+    };
   }
 
   if (replayBtn) {
     replayBtn.addEventListener('click', e => {
-      particleBurst(e.clientX, e.clientY, '#AE8157', 14);
+      particleBurst(e.clientX, e.clientY, '#AE8157', 12);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
@@ -1393,7 +2001,7 @@ function initAudio() {
 }
 
 /* ────────────────────────────────────────────────────────────────
-   STARFIELD LAZY INIT — section canvases
+   STARFIELD LAZY INIT — section canvases with active IntersectionObserver
 ──────────────────────────────────────────────────────────────── */
 function initSectionCanvases() {
   const introCanvas    = document.getElementById('intro-canvas');
@@ -1401,36 +2009,49 @@ function initSectionCanvases() {
   const secretCanvas   = document.getElementById('secret-canvas');
   const finalCanvas    = document.getElementById('final-canvas');
 
-  let universeSF, finalSF;
-
   /* Intro starfield — visible immediately */
-  const introSF = introCanvas
-    ? new StarField(introCanvas, { count: 150, color: '#9E7248', maxSize: 1.8, speed: 0.014 })
+  let introSF = introCanvas
+    ? new StarField(introCanvas, { count: 45, color: '#9E7248', maxSize: 1.8, speed: 0.014 })
     : null;
 
+  window._destroyIntroSF = () => {
+    if (introSF) {
+      introSF.destroy();
+      introSF = null;
+    }
+  };
+
   const sectionCanvasMap = [
-    { id: 'universe',    canvas: universeCanvas, color: '#7A5030', count: 145, minSize: 0.5, maxSize: 2.0, speed: 0.016, ref: r => universeSF = r },
-    { id: 'secret',      canvas: secretCanvas,   color: '#8C6238', count: 80,  minSize: 0.4, maxSize: 1.6, speed: 0.012, ref: () => {} },
-    { id: 'final-scene', canvas: finalCanvas,    color: '#966840', count: 100, minSize: 0.4, maxSize: 1.8, speed: 0.015, ref: r => finalSF = r },
+    { id: 'universe',    canvas: universeCanvas, color: '#7A5030', count: 55, minSize: 0.5, maxSize: 2.0, speed: 0.016, instance: null },
+    { id: 'secret',      canvas: secretCanvas,   color: '#8C6238', count: 35, minSize: 0.4, maxSize: 1.6, speed: 0.012, instance: null },
+    { id: 'final-scene', canvas: finalCanvas,    color: '#966840', count: 45, minSize: 0.4, maxSize: 1.8, speed: 0.015, instance: null },
   ];
 
-  const lazyObs = new IntersectionObserver(entries => {
+  const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
       const map = sectionCanvasMap.find(m => m.id === entry.target.id);
       if (!map || !map.canvas) return;
-      const sf = new StarField(map.canvas, {
-        count: map.count, color: map.color,
-        minSize: map.minSize, maxSize: map.maxSize, speed: map.speed,
-      });
-      map.ref(sf);
-      lazyObs.unobserve(entry.target);
+
+      if (entry.isIntersecting) {
+        if (!map.instance) {
+          map.instance = new StarField(map.canvas, {
+            count: map.count, color: map.color,
+            minSize: map.minSize, maxSize: map.maxSize, speed: map.speed,
+          });
+        } else {
+          map.instance.play();
+        }
+      } else {
+        if (map.instance) {
+          map.instance.pause();
+        }
+      }
     });
-  }, { threshold: 0.01 });
+  }, { threshold: 0.01, rootMargin: '120px 0px 120px 0px' });
 
   sectionCanvasMap.forEach(m => {
     const el = document.getElementById(m.id);
-    if (el) lazyObs.observe(el);
+    if (el) observer.observe(el);
   });
 }
 
@@ -1442,7 +2063,11 @@ function initHero(content) {
   if (!heroBg || !content?.hero?.photo?.src) return;
   heroBg.alt = content.hero.photo.alt || 'Hero photograph';
   heroBg.onload  = () => heroBg.classList.add('loaded');
-  heroBg.onerror = () => {};
+  heroBg.onerror = () => {
+    if (heroBg.src && heroBg.src.endsWith('.webp')) {
+      heroBg.src = heroBg.src.replace(/\.webp$/i, '.png');
+    }
+  };
   heroBg.src     = content.hero.photo.src;
 }
 
@@ -1487,8 +2112,12 @@ function applyContent(content) {
   set('final-signature', content.closing?.signature);
 
   /* Secret */
-  set('secret-teaser',       content.secret?.teaser);
-  set('secret-message-text', content.secret?.message);
+  set('secret-teaser', content.secret?.teaser);
+  if (content.secret?.shayari && Array.isArray(content.secret.shayari)) {
+    content.secret.shayari.forEach((line, i) => {
+      set('shayari-line-' + (i + 1), line);
+    });
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════

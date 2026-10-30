@@ -56,8 +56,8 @@
   }
 }
 @keyframes orb-breathe {
-  0%, 100% { filter: brightness(1) drop-shadow(0 10px 24px rgba(73, 50, 36, 0.3)); }
-  50% { filter: brightness(1.1) drop-shadow(0 18px 40px rgba(73, 50, 36, 0.5)); }
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.03); }
 }
 @keyframes star-breathe {
   0%, 100% {
@@ -81,11 +81,6 @@
 @keyframes orbit-spin-reverse { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(-360deg); } }
 
 /* ── Particle ── */
-@keyframes particle-burst {
-  0%   { opacity: 0.9; transform: translate(0,0) scale(1); }
-  70%  { opacity: 0.5; }
-  100% { opacity: 0; transform: translate(var(--px,20px), var(--py,-20px)) scale(0.1); }
-}
 @keyframes twinkle {
   0%, 100% { opacity: 0.1; transform: scale(0.75); }
   50%       { opacity: 0.7; transform: scale(1.35); }

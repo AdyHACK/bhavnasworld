@@ -3,19 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="A tiny corner of the internet, made just for you — Her Little Universe." />
+  <meta name="description" content="A tiny corner of the internet, made just for you — Bhavna's Little Universe." />
   <meta name="theme-color" content="#F3E7D6" />
-  <title>Her Little Universe</title>
+  <title>Bhavna's Little Universe</title>
 
   <!-- Preconnect fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=Manrope:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Martel:wght@300;400;600;700&family=Rozha+One&display=swap" rel="stylesheet" />
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="src/styles/globals.css" />
   <link rel="stylesheet" href="src/styles/animations.css" />
-  <link rel="stylesheet" href="src/styles/responsive.css" />
+  <link rel="stylesheet" href="src/styles/responsive.css?v=realistic-3d" />
+  <link rel="stylesheet" href="src/styles/backgrounds.css" />
 
   <!-- GSAP -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -86,25 +88,7 @@
       z-index: 1;
     }
 
-    /* Scrapbook torn-paper edge */
-    .scrapbook-edge {
-      position: absolute;
-      bottom: -1px; left: 0; right: 0;
-      height: 56px;
-      background: linear-gradient(180deg, #EBD8C0 0%, #F3E7D6 100%);
-      clip-path: polygon(
-        0% 100%,  2% 42%,  4% 72%,  6% 28%,  9% 58%,
-        12% 18%, 15% 52%, 18% 14%, 21% 48%, 24% 22%,
-        27% 58%, 30% 28%, 33% 62%, 36% 18%, 40% 52%,
-        43% 16%, 46% 50%, 50% 20%, 54% 55%, 57% 22%,
-        60% 58%, 63% 18%, 66% 52%, 69% 25%, 72% 60%,
-        75% 20%, 78% 52%, 81% 28%, 84% 62%, 87% 22%,
-        90% 55%, 93% 28%, 96% 60%, 98% 32%, 100% 48%,
-        100% 100%
-      );
-      pointer-events: none;
-      z-index: 2;
-    }
+    .scrapbook-edge { display: none !important; }
 
     /* Gallery → mosaic fade */
     .section-fade-bottom {
@@ -250,10 +234,11 @@
       <ul class="nav-links" id="nav-link-list" role="list">
         <li><a href="#hero" data-section="hero">Home</a></li>
         <li><a href="#universe" data-section="universe">Universe</a></li>
-        <li><a href="#gallery" data-section="gallery">Gallery</a></li>
-        <li><a href="#scrapbook" data-section="scrapbook">Scrapbook</a></li>
-        <li><a href="#secret" data-section="secret">Surprise</a></li>
-        <li><a href="#letter-section" data-section="letter-section">Letter</a></li>
+        <li><a href="#gallery" data-section="gallery">Gallery <span class="nav-planet-tag">Terra</span></a></li>
+        <li><a href="#scrapbook" data-section="scrapbook">Scrapbook <span class="nav-planet-tag">Ares</span></a></li>
+        <li><a href="#mosaic" data-section="mosaic">Mosaic <span class="nav-planet-tag">Jove</span></a></li>
+        <li><a href="#secret" data-section="secret">Surprise <span class="nav-planet-tag">Luna</span></a></li>
+        <li><a href="#letter-section" data-section="letter-section">Letter <span class="nav-planet-tag">Chronos</span></a></li>
       </ul>
 
       <!-- Active section progress indicator -->
@@ -267,6 +252,65 @@
     ══════════════════════════════════════════════════════════════ -->
     <section id="hero" class="section" aria-label="Hero — Made of little moments"
              style="padding:0; min-height:100vh; overflow:hidden;">
+
+            <!-- ══════════════════════════════════════════════════════
+           LUXURY BACKGROUND — HOMEPAGE / HERO
+      ══════════════════════════════════════════════════════════ -->
+      <div class="section-bg section-bg--hero" aria-hidden="true">
+        <!-- Soft Dappled Sunlight Beam -->
+        <div class="hero-sunbeam"></div>
+
+        <!-- Botanical Corner Illustration — Top Left (Wild Olive Branch) -->
+        <svg class="hero-botanical-tl" viewBox="0 0 160 160" fill="none">
+          <path d="M 12 12 C 45 35, 75 75, 125 135" stroke="currentColor" stroke-width="0.9" stroke-linecap="round"/>
+          <path d="M 38 32 C 48 20, 68 22, 62 38 C 56 50, 42 42, 38 32 Z" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="0.75"/>
+          <path d="M 52 50 C 65 42, 82 46, 78 60 C 72 72, 58 64, 52 50 Z" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="0.75"/>
+          <path d="M 72 74 C 88 66, 102 72, 98 86 C 92 98, 78 88, 72 74 Z" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="0.75"/>
+          <path d="M 94 102 C 110 94, 126 100, 120 115 C 114 126, 100 116, 94 102 Z" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="0.75"/>
+          <!-- Hanging Olive Berries -->
+          <circle cx="48" cy="42" r="3" stroke="currentColor" stroke-width="0.75" fill="none"/>
+          <circle cx="85" cy="78" r="3.2" stroke="currentColor" stroke-width="0.75" fill="none"/>
+          <circle cx="106" cy="108" r="3.5" stroke="currentColor" stroke-width="0.75" fill="none"/>
+        </svg>
+
+        <!-- Botanical Corner Illustration — Bottom Right -->
+        <svg class="hero-botanical-br" viewBox="0 0 160 160" fill="none">
+          <path d="M 12 12 C 45 35, 75 75, 125 135" stroke="currentColor" stroke-width="0.9" stroke-linecap="round"/>
+          <path d="M 38 32 C 48 20, 68 22, 62 38 C 56 50, 42 42, 38 32 Z" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="0.75"/>
+          <path d="M 62 60 C 78 52, 95 58, 88 74 C 82 85, 68 76, 62 60 Z" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="0.75"/>
+          <path d="M 88 95 C 105 88, 122 94, 115 110 C 108 122, 95 112, 88 95 Z" fill="currentColor" fill-opacity="0.12" stroke="currentColor" stroke-width="0.75"/>
+          <circle cx="56" cy="52" r="3" stroke="currentColor" stroke-width="0.75" fill="none"/>
+          <circle cx="98" cy="98" r="3.4" stroke="currentColor" stroke-width="0.75" fill="none"/>
+        </svg>
+
+        <!-- Vintage Editorial Watermark Medallion -->
+        <svg class="hero-editorial-watermark" viewBox="0 0 320 320" fill="none">
+          <circle cx="160" cy="160" r="150" stroke="currentColor" stroke-width="0.7" stroke-dasharray="2 3"/>
+          <circle cx="160" cy="160" r="142" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="160" cy="160" r="114" stroke="currentColor" stroke-width="0.8"/>
+          <!-- Star studs -->
+          <circle cx="160" cy="24" r="2" fill="currentColor"/>
+          <circle cx="160" cy="296" r="2" fill="currentColor"/>
+          <circle cx="24" cy="160" r="2" fill="currentColor"/>
+          <circle cx="296" cy="160" r="2" fill="currentColor"/>
+          <!-- Circular text path -->
+          <path id="hero-seal-path" d="M 160 160 m -128, 0 a 128,128 0 1,1 256,0 a 128,128 0 1,1 -256,0" fill="none"/>
+          <text font-family="'DM Sans', sans-serif" font-size="7.5" font-weight="500" letter-spacing="4" fill="currentColor">
+            <textPath href="#hero-seal-path" startOffset="0%">
+              ✦ HER LITTLE UNIVERSE ✦ COLLECTED MOMENTS • MCMXXIV •
+            </textPath>
+          </text>
+          <!-- Center blossom motif -->
+          <g transform="translate(160, 160)">
+            <ellipse cx="0" cy="-24" rx="10" ry="20" stroke="currentColor" stroke-width="0.8" fill="none"/>
+            <ellipse cx="0" cy="24" rx="10" ry="20" stroke="currentColor" stroke-width="0.8" fill="none"/>
+            <ellipse cx="-24" cy="0" rx="20" ry="10" stroke="currentColor" stroke-width="0.8" fill="none"/>
+            <ellipse cx="24" cy="0" rx="20" ry="10" stroke="currentColor" stroke-width="0.8" fill="none"/>
+            <circle cx="0" cy="0" r="6" stroke="currentColor" stroke-width="0.9" fill="none"/>
+            <circle cx="0" cy="0" r="2" fill="currentColor"/>
+          </g>
+        </svg>
+      </div>
 
       <div class="hero-layout">
 
@@ -321,7 +365,7 @@
             <!-- Decorative double-border frame -->
             <div class="hero-photo-frame photo-frame--mat">
               <div id="hero-bg-wrap">
-                <img id="hero-bg" src="" alt="" aria-hidden="true" loading="eager" />
+                <img id="hero-bg" src="" alt="" aria-hidden="true" width="1157" height="1359" loading="eager" fetchpriority="high" decoding="sync" />
               </div>
               <!-- Inner border accent -->
               <div class="hero-photo-inner-border" aria-hidden="true"></div>
@@ -344,6 +388,13 @@
       <div class="hero-fade-bottom" aria-hidden="true"></div>
     </section>
 
+        <!-- Section Transition Divider -->
+    <div class="section-transition-divider" aria-hidden="true">
+      <div class="transition-rule-line"></div>
+      <span class="transition-glyph">✦</span>
+      <div class="transition-rule-line"></div>
+    </div>
+
     <!-- ══════════════════════════════════════════════════════════
          SCENE 3 — INTERACTIVE UNIVERSE
     ══════════════════════════════════════════════════════════════ -->
@@ -352,18 +403,114 @@
              aria-label="Universe — choose a destination">
       <canvas id="universe-canvas" aria-hidden="true"></canvas>
 
+      <!-- ══════════════════════════════════════════════════════
+           LUXURY BACKGROUND — UNIVERSE
+      ══════════════════════════════════════════════════════════ -->
+      <div class="section-bg section-bg--universe" aria-hidden="true">
+        <!-- Grand Armillary Sphere Engraving -->
+        <svg class="universe-armillary-svg" viewBox="0 0 600 600" fill="none">
+          <!-- Concentric Celestial Rings -->
+          <circle cx="300" cy="300" r="280" stroke="currentColor" stroke-width="0.75" stroke-dasharray="3 4"/>
+          <circle cx="300" cy="300" r="268" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="300" cy="300" r="220" stroke="currentColor" stroke-width="0.8"/>
+          <circle cx="300" cy="300" r="160" stroke="currentColor" stroke-width="0.75" stroke-dasharray="2 3"/>
+          <circle cx="300" cy="300" r="95" stroke="currentColor" stroke-width="0.8"/>
+          <!-- Degree tick marks on outer ring -->
+          <circle cx="300" cy="300" r="264" stroke="currentColor" stroke-width="0.6" stroke-dasharray="1 8"/>
+          <!-- Tilted Ecliptic Oval -->
+          <ellipse cx="300" cy="300" rx="268" ry="120" stroke="currentColor" stroke-width="0.9" transform="rotate(-25 300 300)"/>
+          <ellipse cx="300" cy="300" rx="210" ry="85" stroke="currentColor" stroke-width="0.7" stroke-dasharray="2 3" transform="rotate(-25 300 300)"/>
+          <!-- Celestial Coordinate Lines -->
+          <line x1="300" y1="20" x2="300" y2="580" stroke="currentColor" stroke-width="0.6" stroke-dasharray="3 4"/>
+          <line x1="20" y1="300" x2="580" y2="300" stroke="currentColor" stroke-width="0.6" stroke-dasharray="3 4"/>
+          <line x1="102" y1="102" x2="498" y2="498" stroke="currentColor" stroke-width="0.5" stroke-dasharray="1 5"/>
+          <line x1="102" y1="498" x2="498" y2="102" stroke="currentColor" stroke-width="0.5" stroke-dasharray="1 5"/>
+          <!-- Logarithmic Golden Ratio Spiral -->
+          <path d="M 300 300 Q 300 240, 360 240 Q 440 240, 440 340 Q 440 480, 260 480 Q 60 480, 60 260 Q 60 40, 320 40" stroke="currentColor" stroke-width="0.65" stroke-dasharray="2 3" fill="none"/>
+        </svg>
+
+        <!-- Constellation Star Chart Overlay -->
+        <svg class="universe-chart-overlay" viewBox="0 0 1200 800" preserveAspectRatio="none" fill="none">
+          <!-- Cygnus (Northern Cross) -->
+          <g transform="translate(180, 160)">
+            <polyline points="0,0 45,35 90,65 145,105" stroke="currentColor" stroke-width="0.6"/>
+            <polyline points="15,65 45,35 75,10" stroke="currentColor" stroke-width="0.6"/>
+            <circle cx="0" cy="0" r="2.5" fill="currentColor"/>
+            <circle cx="45" cy="35" r="3.2" fill="currentColor"/>
+            <circle cx="90" cy="65" r="2.2" fill="currentColor"/>
+            <circle cx="145" cy="105" r="3" fill="currentColor"/>
+            <circle cx="15" cy="65" r="2" fill="currentColor"/>
+            <circle cx="75" cy="10" r="2" fill="currentColor"/>
+            <text x="50" y="48" font-family="'Cormorant Garamond', serif" font-size="9" font-style="italic" letter-spacing="1" fill="currentColor" opacity="0.75">Deneb • Cygnus</text>
+          </g>
+          <!-- Cassiopeia -->
+          <g transform="translate(860, 140)">
+            <polyline points="0,40 35,0 70,30 110,5 145,45" stroke="currentColor" stroke-width="0.6"/>
+            <circle cx="0" cy="40" r="2.2" fill="currentColor"/>
+            <circle cx="35" cy="0" r="2.8" fill="currentColor"/>
+            <circle cx="70" cy="30" r="2.5" fill="currentColor"/>
+            <circle cx="110" cy="5" r="2.2" fill="currentColor"/>
+            <circle cx="145" cy="45" r="2.6" fill="currentColor"/>
+            <text x="40" y="22" font-family="'Cormorant Garamond', serif" font-size="9" font-style="italic" letter-spacing="1" fill="currentColor" opacity="0.75">Cassiopeia</text>
+          </g>
+          <!-- Lyra -->
+          <g transform="translate(940, 560)">
+            <polygon points="25,25 60,10 80,45 45,60" stroke="currentColor" stroke-width="0.55"/>
+            <line x1="0" y1="0" x2="25" y2="25" stroke="currentColor" stroke-width="0.65"/>
+            <circle cx="0" cy="0" r="3.8" fill="currentColor"/>
+            <circle cx="25" cy="25" r="2.2" fill="currentColor"/>
+            <circle cx="60" cy="10" r="2" fill="currentColor"/>
+            <circle cx="80" cy="45" r="2" fill="currentColor"/>
+            <circle cx="45" cy="60" r="2" fill="currentColor"/>
+            <text x="8" y="-4" font-family="'Cormorant Garamond', serif" font-size="9" font-style="italic" letter-spacing="1" fill="currentColor" opacity="0.8">Vega • Lyra</text>
+          </g>
+        </svg>
+      </div>
+
       <!-- Ambient glow -->
       <div class="universe-glow-center" aria-hidden="true"></div>
 
-      <!-- SVG constellation lines (drawn by JS) -->
+      <!-- 3D Realistic Planetary Universe Canvas (WebGL) -->
+      <canvas id="universe-3d-canvas" aria-label="Interactive 3D Planetary Universe"></canvas>
+
+      <!-- SVG orbital ellipses & constellation paths -->
       <svg id="universe-constellation" class="universe-constellation-svg" aria-hidden="true"
            viewBox="0 0 100 100" preserveAspectRatio="none">
-        <g id="constellation-paths" fill="none" stroke="rgba(189,149,107,0.22)" stroke-width="0.3">
-          <line x1="20" y1="35" x2="50" y2="78" />
-          <line x1="50" y1="78" x2="82" y2="62" />
-          <line x1="20" y1="35" x2="72" y2="22" />
-          <line x1="72" y1="22" x2="82" y2="62" />
-          <line x1="14" y1="70" x2="50" y2="78" />
+        <!-- Planetary Orbital Ellipses -->
+        <ellipse cx="50" cy="50" rx="38" ry="26" fill="none" stroke="rgba(189,149,107,0.25)" stroke-width="0.4" stroke-dasharray="1.5 2.5" />
+        <ellipse cx="50" cy="50" rx="46" ry="34" fill="none" stroke="rgba(189,149,107,0.20)" stroke-width="0.3" stroke-dasharray="2 3" />
+        <ellipse cx="50" cy="50" rx="28" ry="18" fill="none" stroke="rgba(189,149,107,0.28)" stroke-width="0.4" stroke-dasharray="1 2" />
+
+        <!-- Direct Planet-to-Card Connecting Hairlines -->
+        <!-- Earth line (planet ~18,33 to card ~12,38) -->
+        <line x1="18" y1="33" x2="12" y2="38" stroke="rgba(189,149,107,0.45)" stroke-width="0.4" stroke-dasharray="1 2" class="planet-connector-line planet-connector-earth" />
+        <circle cx="18" cy="33" r="0.6" fill="#DFC29D" opacity="0.8" />
+        <!-- Mars line (planet ~80,25 to card ~86,26) -->
+        <line x1="80" y1="25" x2="86" y2="26" stroke="rgba(189,149,107,0.45)" stroke-width="0.4" stroke-dasharray="1 2" class="planet-connector-line planet-connector-mars" />
+        <circle cx="80" cy="25" r="0.6" fill="#DFC29D" opacity="0.8" />
+        <!-- Jupiter line (planet ~82,67 to card ~86,68) -->
+        <line x1="82" y1="67" x2="86" y2="68" stroke="rgba(189,149,107,0.45)" stroke-width="0.4" stroke-dasharray="1 2" class="planet-connector-line planet-connector-jupiter" />
+        <circle cx="82" cy="67" r="0.6" fill="#DFC29D" opacity="0.8" />
+        <!-- Moon line (planet ~18,71 to card ~12,72) -->
+        <line x1="18" y1="71" x2="12" y2="72" stroke="rgba(189,149,107,0.45)" stroke-width="0.4" stroke-dasharray="1 2" class="planet-connector-line planet-connector-moon" />
+        <circle cx="18" cy="71" r="0.6" fill="#DFC29D" opacity="0.8" />
+        <!-- Saturn line (planet ~50,81 to card ~50,88) -->
+        <line x1="50" y1="81" x2="50" y2="88" stroke="rgba(189,149,107,0.45)" stroke-width="0.4" stroke-dasharray="1 2" class="planet-connector-line planet-connector-saturn" />
+        <circle cx="50" cy="81" r="0.6" fill="#DFC29D" opacity="0.8" />
+
+        <!-- Inter-Planetary Constellation Journey Vector -->
+        <g id="constellation-paths" fill="none" stroke="rgba(189,149,107,0.28)" stroke-width="0.35">
+          <line x1="18" y1="33" x2="80" y2="25" stroke-dasharray="1 3"/>
+          <line x1="80" y1="25" x2="82" y2="67" stroke-dasharray="1.5 2.5"/>
+          <line x1="82" y1="67" x2="50" y2="81" stroke-dasharray="1 3"/>
+          <line x1="50" y1="81" x2="18" y2="71" stroke-dasharray="1.5 2.5"/>
+          <line x1="18" y1="71" x2="18" y2="33" stroke-dasharray="1 3"/>
+          <!-- Central Sun Connections -->
+          <line x1="18" y1="33" x2="50" y2="50" stroke-dasharray="0.8 4"/>
+          <line x1="80" y1="25" x2="50" y2="50" stroke-dasharray="0.8 4"/>
+          <line x1="82" y1="67" x2="50" y2="50" stroke-dasharray="0.8 4"/>
+          <line x1="18" y1="71" x2="50" y2="50" stroke-dasharray="0.8 4"/>
+          <line x1="50" y1="81" x2="50" y2="50" stroke-dasharray="0.8 4"/>
         </g>
       </svg>
 
@@ -384,16 +531,86 @@
       <div class="universe-heading-area">
         <p class="t-eyebrow reveal-up" data-delay="100" style="--reveal-delay:100ms;
            color:var(--chestnut); display:block; text-align:center; opacity:0.85;">
-          EXPLORE
+          INTERACTIVE SOLAR SYSTEM
         </p>
         <h2 class="t-h2 reveal-up" data-delay="220" style="--reveal-delay:220ms;
-            color:var(--deep-espresso); font-weight:400; margin-top:0.6rem; text-align:center; opacity:0.9;">
-          Choose your destination
+           color:var(--deep-espresso); font-weight:400; margin-top:0.6rem; text-align:center; opacity:0.9;">
+          Choose your planetary destination
         </h2>
       </div>
 
-      <!-- Universe nodes (JS populated) -->
-      <div id="universe-nodes" aria-label="Navigation destinations"></div>
+      <!-- Universe destination observatory cards -->
+      <div id="universe-nodes" aria-label="Navigation destinations">
+        <!-- Earth -> Gallery -->
+        <a href="#gallery" class="universe-planet-card universe-planet-card--earth" data-planet="earth" id="planet-card-earth" aria-label="Navigate to The Gallery (Earth)">
+          <div class="planet-card-pill">
+            <span class="planet-pill-astronomy">TERRA • III</span>
+            <span class="planet-pill-status">HABITABLE WORLD</span>
+          </div>
+          <div class="planet-card-title-wrap">
+            <span class="planet-card-title">THE GALLERY</span>
+            <span class="planet-card-arrow" aria-hidden="true">↗</span>
+          </div>
+          <p class="planet-card-meta">Connected to Scene 03 • Photo Exhibition</p>
+          <div class="planet-card-travel">TRAVEL TO WORLD ↓</div>
+        </a>
+
+        <!-- Mars -> Scrapbook -->
+        <a href="#scrapbook" class="universe-planet-card universe-planet-card--mars" data-planet="mars" id="planet-card-mars" aria-label="Navigate to Little Moments (Mars)">
+          <div class="planet-card-pill">
+            <span class="planet-pill-astronomy">ARES • IV</span>
+            <span class="planet-pill-status">TERRESTRIAL</span>
+          </div>
+          <div class="planet-card-title-wrap">
+            <span class="planet-card-title">LITTLE MOMENTS</span>
+            <span class="planet-card-arrow" aria-hidden="true">↗</span>
+          </div>
+          <p class="planet-card-meta">Connected to Scene 04 • Vintage Scrapbook</p>
+          <div class="planet-card-travel">TRAVEL TO WORLD ↓</div>
+        </a>
+
+        <!-- Jupiter -> Mosaic -->
+        <a href="#mosaic" class="universe-planet-card universe-planet-card--jupiter" data-planet="jupiter" id="planet-card-jupiter" aria-label="Navigate to The Photo Mosaic (Jupiter)">
+          <div class="planet-card-pill">
+            <span class="planet-pill-astronomy">JOVE • V</span>
+            <span class="planet-pill-status">GAS GIANT</span>
+          </div>
+          <div class="planet-card-title-wrap">
+            <span class="planet-card-title">PHOTO MOSAIC</span>
+            <span class="planet-card-arrow" aria-hidden="true">↗</span>
+          </div>
+          <p class="planet-card-meta">Connected to Scene 05 • Exhibition Wall</p>
+          <div class="planet-card-travel">TRAVEL TO WORLD ↓</div>
+        </a>
+
+        <!-- Moon -> Secret -->
+        <a href="#secret" class="universe-planet-card universe-planet-card--moon" data-planet="moon" id="planet-card-moon" aria-label="Navigate to A Little Secret (The Moon)">
+          <div class="planet-card-pill">
+            <span class="planet-pill-astronomy">LUNA • I</span>
+            <span class="planet-pill-status">CRATER ARCHIVE</span>
+          </div>
+          <div class="planet-card-title-wrap">
+            <span class="planet-card-title">A LITTLE SECRET</span>
+            <span class="planet-card-arrow" aria-hidden="true">↗</span>
+          </div>
+          <p class="planet-card-meta">Connected to Scene 06 • Surprise Envelope</p>
+          <div class="planet-card-travel">TRAVEL TO WORLD ↓</div>
+        </a>
+
+        <!-- Saturn -> Letter -->
+        <a href="#letter-section" class="universe-planet-card universe-planet-card--saturn" data-planet="saturn" id="planet-card-saturn" aria-label="Navigate to One Last Thing (Saturn)">
+          <div class="planet-card-pill">
+            <span class="planet-pill-astronomy">CHRONOS • VI</span>
+            <span class="planet-pill-status">RINGED SYSTEM</span>
+          </div>
+          <div class="planet-card-title-wrap">
+            <span class="planet-card-title">ONE LAST THING</span>
+            <span class="planet-card-arrow" aria-hidden="true">↗</span>
+          </div>
+          <p class="planet-card-meta">Connected to Scene 07 • Handcrafted Letter</p>
+          <div class="planet-card-travel">TRAVEL TO WORLD ↓</div>
+        </a>
+      </div>
 
       <!-- Scroll hint -->
       <div class="universe-scroll-hint reveal-up" data-delay="1200" style="--reveal-delay:1200ms" aria-hidden="true">
@@ -402,10 +619,41 @@
       </div>
     </section>
 
+        <!-- Section Transition Divider -->
+    <div class="section-transition-divider" aria-hidden="true">
+      <div class="transition-rule-line"></div>
+      <span class="transition-glyph">✦</span>
+      <div class="transition-rule-line"></div>
+    </div>
+
     <!-- ══════════════════════════════════════════════════════════
          SCENE 4 — GALLERY (Photography Exhibition)
     ══════════════════════════════════════════════════════════════ -->
     <section id="gallery" class="section" aria-label="Gallery — A collection of little moments">
+
+      <!-- ══════════════════════════════════════════════════════
+           LUXURY BACKGROUND — GALLERY
+      ══════════════════════════════════════════════════════════ -->
+      <div class="section-bg section-bg--gallery" aria-hidden="true">
+        <!-- Neoclassical Architectural Gallery Arches -->
+        <svg class="gallery-arch-svg" viewBox="0 0 1200 900" preserveAspectRatio="none" fill="none">
+          <!-- Central Arch Pair -->
+          <path d="M 250 900 L 250 340 C 250 140, 550 140, 550 340 L 550 900" stroke="currentColor" stroke-width="0.8"/>
+          <path d="M 265 900 L 265 345 C 265 160, 535 160, 535 345 L 535 900" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 3"/>
+          <path d="M 650 900 L 650 340 C 650 140, 950 140, 950 340 L 950 900" stroke="currentColor" stroke-width="0.8"/>
+          <path d="M 665 900 L 665 345 C 665 160, 935 160, 935 345 L 935 900" stroke="currentColor" stroke-width="0.5" stroke-dasharray="3 3"/>
+          <!-- Keystone Flourishes -->
+          <path d="M 390 190 L 410 190 L 405 215 L 395 215 Z" stroke="currentColor" stroke-width="0.75" fill="none"/>
+          <path d="M 790 190 L 810 190 L 805 215 L 795 215 Z" stroke="currentColor" stroke-width="0.75" fill="none"/>
+        </svg>
+
+        <!-- French Rule Architectural Grid Framing -->
+        <div class="gallery-french-rule-grid"></div>
+
+        <!-- Catalog Margin Annotations -->
+        <span class="gallery-margin-annotation gallery-margin-annotation--tl">EXPOSITION PRIVÉE • SALLE N° I</span>
+        <span class="gallery-margin-annotation gallery-margin-annotation--br">ARCHIVE CATALOGUE • PLATE III</span>
+      </div>
 
       <!-- Corner ornaments -->
       <svg class="corner-ornament-svg corner-ornament-svg--tl" viewBox="0 0 44 44" fill="none" aria-hidden="true">
@@ -420,6 +668,14 @@
       <div class="container">
         <header class="section-header">
           <span class="section-num">01</span>
+
+          <!-- Planetary Connection: Earth (Terra • III) -->
+          <div class="section-planet-origin reveal-up" data-delay="30">
+            <span class="origin-planet-icon origin-planet-icon--earth" aria-hidden="true"></span>
+            <span class="origin-planet-tag">DESTINATION 01 • TERRA (EARTH)</span>
+            <span class="origin-sep">✦</span>
+            <a href="#universe" class="origin-orbit-link">Return to Solar Orbit ↑</a>
+          </div>
 
           <div class="eyebrow-row eyebrow-row--light">
             <span class="t-eyebrow" id="gallery-eyebrow">A COLLECTION OF LITTLE MOMENTS</span>
@@ -442,10 +698,86 @@
       <div class="section-fade-bottom" aria-hidden="true"></div>
     </section>
 
+        <!-- Section Transition Divider -->
+    <div class="section-transition-divider" aria-hidden="true">
+      <div class="transition-rule-line"></div>
+      <span class="transition-glyph">✦</span>
+      <div class="transition-rule-line"></div>
+    </div>
+
     <!-- ══════════════════════════════════════════════════════════
          SCENE 5 — DIGITAL SCRAPBOOK
     ══════════════════════════════════════════════════════════════ -->
     <section id="scrapbook" class="section" aria-label="Scrapbook — Little things, beautifully kept">
+
+      <!-- ══════════════════════════════════════════════════════
+           LUXURY BACKGROUND — SCRAPBOOK
+      ══════════════════════════════════════════════════════════ -->
+      <div class="section-bg section-bg--scrapbook" aria-hidden="true">
+        <!-- Herbarium Pressed Fern (Left Side) -->
+        <svg class="scrapbook-herbarium-left" viewBox="0 0 200 460" fill="none">
+          <path d="M 100 450 C 95 380, 85 240, 115 20" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+          <!-- Frond Pinnae Left & Right -->
+          <g stroke="currentColor" stroke-width="0.75" fill="currentColor" fill-opacity="0.10">
+            <path d="M 96 390 C 65 380, 40 370, 30 380 C 45 395, 75 398, 95 394 Z"/>
+            <path d="M 98 390 C 130 380, 155 372, 165 382 C 150 396, 120 398, 99 393 Z"/>
+            <path d="M 92 330 C 60 318, 35 308, 25 318 C 42 334, 72 336, 91 333 Z"/>
+            <path d="M 95 330 C 128 318, 158 310, 168 320 C 152 335, 122 338, 96 333 Z"/>
+            <path d="M 88 270 C 58 258, 32 248, 24 258 C 40 274, 68 276, 87 273 Z"/>
+            <path d="M 92 270 C 124 258, 150 250, 160 260 C 145 274, 118 276, 93 273 Z"/>
+            <path d="M 87 210 C 60 198, 38 190, 30 198 C 45 212, 70 214, 86 212 Z"/>
+            <path d="M 90 210 C 120 198, 142 192, 150 200 C 136 213, 112 215, 91 212 Z"/>
+            <path d="M 92 150 C 70 140, 52 134, 46 142 C 58 154, 78 155, 91 152 Z"/>
+            <path d="M 94 150 C 118 140, 136 135, 142 143 C 130 155, 110 156, 95 152 Z"/>
+            <path d="M 98 90 C 82 82, 68 78, 64 84 C 74 94, 88 95, 97 92 Z"/>
+            <path d="M 100 90 C 118 82, 132 78, 136 84 C 126 94, 112 95, 101 92 Z"/>
+          </g>
+          <!-- Handwritten Herbarium Label -->
+          <text x="25" y="445" font-family="'Cormorant Garamond', serif" font-size="10" font-style="italic" fill="currentColor" opacity="0.65">Herbarium Horti • Specimen N° 24</text>
+        </svg>
+
+        <!-- Herbarium Wild Rose (Right Side) -->
+        <svg class="scrapbook-herbarium-right" viewBox="0 0 220 440" fill="none">
+          <path d="M 110 430 C 115 350, 125 210, 90 20" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/>
+          <!-- Rose Leaves -->
+          <g stroke="currentColor" stroke-width="0.75" fill="currentColor" fill-opacity="0.10">
+            <path d="M 112 370 C 145 358, 172 364, 178 376 C 160 390, 132 385, 114 374 Z"/>
+            <path d="M 108 340 C 75 328, 48 334, 42 346 C 60 360, 88 355, 106 344 Z"/>
+            <path d="M 116 270 C 150 258, 178 262, 185 275 C 166 290, 136 284, 118 274 Z"/>
+            <path d="M 104 230 C 70 216, 42 222, 36 235 C 55 250, 84 244, 102 233 Z"/>
+            <!-- Rosehip / Flower bud at top -->
+            <path d="M 88 45 C 72 25, 108 25, 92 45 Z" fill="currentColor" fill-opacity="0.18"/>
+            <ellipse cx="90" cy="55" rx="12" ry="16" fill="currentColor" fill-opacity="0.14"/>
+          </g>
+          <text x="35" y="425" font-family="'Cormorant Garamond', serif" font-size="10" font-style="italic" fill="currentColor" opacity="0.65">Rosa Canina • Collectio Botanica</text>
+        </svg>
+
+        <!-- Vintage French Postmark Cancellation (Top Right) -->
+        <svg class="scrapbook-postal-mark" viewBox="0 0 140 140" fill="none">
+          <circle cx="70" cy="70" r="62" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="70" cy="70" r="54" stroke="currentColor" stroke-width="0.75" stroke-dasharray="2 2"/>
+          <!-- Wavy cancellation lines -->
+          <path d="M -40 50 Q -20 40 0 50 Q 20 60 40 50" stroke="currentColor" stroke-width="0.9" fill="none"/>
+          <path d="M -40 70 Q -20 60 0 70 Q 20 80 40 70" stroke="currentColor" stroke-width="0.9" fill="none"/>
+          <path d="M -40 90 Q -20 80 0 90 Q 20 100 40 90" stroke="currentColor" stroke-width="0.9" fill="none"/>
+          <!-- Circular Postmark Typography -->
+          <path id="scrap-post-path" d="M 70 70 m -46, 0 a 46,46 0 1,1 92,0 a 46,46 0 1,1 -92,0" fill="none"/>
+          <text font-family="'DM Sans', sans-serif" font-size="6.5" font-weight="600" letter-spacing="2.2" fill="currentColor">
+            <textPath href="#scrap-post-path" startOffset="5%">
+              ★ POSTES DE PARIS ★ ARCHIVE 1924
+            </textPath>
+          </text>
+          <text x="70" y="74" font-family="'Cormorant Garamond', serif" font-size="11" font-weight="600" text-anchor="middle" fill="currentColor">15 OCT</text>
+        </svg>
+
+        <!-- Vintage Airmail Boxed Cachet (Bottom Left) -->
+        <svg class="scrapbook-postal-mark scrapbook-postal-mark--alt" viewBox="0 0 130 65" fill="none">
+          <rect x="3" y="3" width="124" height="59" rx="3" stroke="currentColor" stroke-width="1.2"/>
+          <rect x="7" y="7" width="116" height="51" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 2"/>
+          <text x="65" y="28" font-family="'DM Sans', sans-serif" font-size="8.5" font-weight="700" letter-spacing="3" text-anchor="middle" fill="currentColor">PAR AVION</text>
+          <text x="65" y="46" font-family="'Cormorant Garamond', serif" font-size="8" font-style="italic" letter-spacing="1.5" text-anchor="middle" fill="currentColor">Poste Restante • Service Spécial</text>
+        </svg>
+      </div>
 
       <!-- Decorative botanical corner illustrations -->
       <svg class="corner-ornament-svg corner-ornament-svg--tr" viewBox="0 0 60 60" fill="none" aria-hidden="true"
@@ -459,6 +791,14 @@
       <div class="scrapbook-inner container">
         <header class="section-header" style="padding-bottom:var(--s-6);">
           <span class="section-num" style="color:var(--chestnut); opacity:0.72;">02</span>
+
+          <!-- Planetary Connection: Mars (Ares • IV) -->
+          <div class="section-planet-origin reveal-up" data-delay="30">
+            <span class="origin-planet-icon origin-planet-icon--mars" aria-hidden="true"></span>
+            <span class="origin-planet-tag">DESTINATION 02 • ARES (MARS)</span>
+            <span class="origin-sep">✦</span>
+            <a href="#universe" class="origin-orbit-link">Return to Solar Orbit ↑</a>
+          </div>
 
           <div class="eyebrow-row eyebrow-row--dark">
             <span class="t-eyebrow" style="color:var(--chestnut); opacity:0.82;">LITTLE THINGS, BEAUTIFULLY KEPT</span>
@@ -486,17 +826,62 @@
         <div id="scrapbook-grid" class="scrapbook-grid" role="list" aria-label="Scrapbook photos"></div>
       </div>
 
-      <!-- Torn-paper bottom edge transition -->
-      <div class="scrapbook-edge" aria-hidden="true"></div>
+
     </section>
+
+        <!-- Section Transition Divider -->
+    <div class="section-transition-divider" aria-hidden="true">
+      <div class="transition-rule-line"></div>
+      <span class="transition-glyph">✦</span>
+      <div class="transition-rule-line"></div>
+    </div>
 
     <!-- ══════════════════════════════════════════════════════════
          SCENE 6 — PHOTO MOSAIC (Exhibition Wall)
     ══════════════════════════════════════════════════════════════ -->
     <section id="mosaic" class="section" aria-label="Mosaic — Every frame has its place">
+
+      <!-- ══════════════════════════════════════════════════════
+           LUXURY BACKGROUND — MOSAIC
+      ══════════════════════════════════════════════════════════ -->
+      <div class="section-bg section-bg--mosaic" aria-hidden="true">
+        <!-- Layered Organic Parchment Silhouettes -->
+        <div class="mosaic-organic-blob-1"></div>
+        <div class="mosaic-organic-blob-2"></div>
+
+        <!-- Refined Architectural Drafting Compass & Golden Spiral -->
+        <svg class="mosaic-architectural-svg" viewBox="0 0 800 800" fill="none">
+          <!-- Golden Ratio Rectangles & Golden Spiral -->
+          <rect x="100" y="100" width="600" height="371" stroke="currentColor" stroke-width="0.8"/>
+          <rect x="100" y="100" width="371" height="371" stroke="currentColor" stroke-width="0.6" stroke-dasharray="3 3"/>
+          <rect x="471" y="100" width="229" height="229" stroke="currentColor" stroke-width="0.6"/>
+          <rect x="471" y="329" width="142" height="142" stroke="currentColor" stroke-width="0.6"/>
+          <path d="M 471 471 A 371 371 0 0 1 100 100" stroke="currentColor" stroke-width="0.9" fill="none"/>
+          <path d="M 471 100 A 229 229 0 0 1 700 329" stroke="currentColor" stroke-width="0.8" fill="none"/>
+          <path d="M 700 329 A 142 142 0 0 1 558 471" stroke="currentColor" stroke-width="0.75" fill="none"/>
+          <!-- Diagonal drafting projection guidelines -->
+          <line x1="50" y1="750" x2="750" y2="50" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 4"/>
+          <line x1="50" y1="50" x2="750" y2="750" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 4"/>
+          <!-- Architectural Compass Axis Rings -->
+          <circle cx="400" cy="400" r="320" stroke="currentColor" stroke-width="0.6" stroke-dasharray="1 6"/>
+          <circle cx="400" cy="400" r="260" stroke="currentColor" stroke-width="0.7"/>
+          <circle cx="400" cy="400" r="180" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 3"/>
+          <circle cx="400" cy="400" r="3" fill="currentColor"/>
+          <!-- Architectural Caption -->
+          <text x="105" y="90" font-family="'DM Sans', sans-serif" font-size="7.5" font-weight="500" letter-spacing="2" fill="currentColor" opacity="0.65">SECTION 03 • ELEVATION ARCHIVE — N 48° 51' 24"</text>
+        </svg>
+      </div>
       <div class="container">
         <div class="mosaic-heading-wrap">
           <span class="section-num">03</span>
+
+          <!-- Planetary Connection: Jupiter (Jove • V) -->
+          <div class="section-planet-origin reveal-up" data-delay="30">
+            <span class="origin-planet-icon origin-planet-icon--jupiter" aria-hidden="true"></span>
+            <span class="origin-planet-tag">DESTINATION 03 • JOVE (JUPITER)</span>
+            <span class="origin-sep">✦</span>
+            <a href="#universe" class="origin-orbit-link">Return to Solar Orbit ↑</a>
+          </div>
 
           <p class="t-eyebrow reveal-up" data-delay="0" style="--reveal-delay:0ms">EVERY FRAME</p>
 
@@ -514,11 +899,51 @@
       </div>
     </section>
 
+        <!-- Section Transition Divider -->
+    <div class="section-transition-divider" aria-hidden="true">
+      <div class="transition-rule-line"></div>
+      <span class="transition-glyph">✦</span>
+      <div class="transition-rule-line"></div>
+    </div>
+
     <!-- ══════════════════════════════════════════════════════════
          SCENE 7 — THE HIDDEN SURPRISE
     ══════════════════════════════════════════════════════════════ -->
     <section id="secret" class="section" style="padding:0;" aria-label="A little secret">
       <canvas id="secret-canvas" aria-hidden="true"></canvas>
+
+      <!-- ══════════════════════════════════════════════════════
+           LUXURY BACKGROUND — SURPRISE / SECRET
+      ══════════════════════════════════════════════════════════ -->
+      <div class="section-bg section-bg--secret" aria-hidden="true">
+        <!-- Postal Chevron Borders -->
+        <div class="secret-postal-chevrons"></div>
+        <div class="secret-postal-chevrons secret-postal-chevrons--bottom"></div>
+
+        <!-- Ambient Candlelight Halo behind Envelope -->
+        <div class="secret-ambient-aura"></div>
+
+        <!-- Heraldic Secret Seal Watermark -->
+        <svg class="secret-seal-watermark-svg" viewBox="0 0 360 360" fill="none">
+          <circle cx="180" cy="180" r="170" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="180" cy="180" r="162" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 3"/>
+          <circle cx="180" cy="180" r="128" stroke="currentColor" stroke-width="0.8"/>
+          <!-- Circular Latin Motto -->
+          <path id="secret-watermark-path" d="M 180 180 m -142, 0 a 142,142 0 1,1 284,0 a 142,142 0 1,1 -284,0" fill="none"/>
+          <text font-family="'DM Sans', sans-serif" font-size="7.2" font-weight="600" letter-spacing="3.2" fill="currentColor">
+            <textPath href="#secret-watermark-path" startOffset="4%">
+              ✦ SIGILLUM SECRETI • AD USUM PRIVATUM • MCMXXIV ✦
+            </textPath>
+          </text>
+          <!-- 8-Point Compass Star in Center -->
+          <g transform="translate(180, 180)">
+            <polygon points="0,-70 12,-16 70,0 16,12 0,70 -12,16 -70,0 -16,-12" stroke="currentColor" stroke-width="0.85" fill="currentColor" fill-opacity="0.08"/>
+            <polygon points="0,-48 8,-12 48,0 12,8 0,48 -8,12 -48,0 -12,-8" transform="rotate(45)" stroke="currentColor" stroke-width="0.65" fill="none"/>
+            <circle cx="0" cy="0" r="7" stroke="currentColor" stroke-width="0.8" fill="none"/>
+            <circle cx="0" cy="0" r="2.5" fill="currentColor"/>
+          </g>
+        </svg>
+      </div>
 
       <!-- Botanical corner decorations -->
       <svg class="corner-ornament-svg corner-ornament-svg--bl" viewBox="0 0 60 60" fill="none" aria-hidden="true"
@@ -535,6 +960,14 @@
 
       <div class="secret-inner">
         <span class="section-num">04</span>
+
+        <!-- Planetary Connection: The Moon (Luna • I) -->
+        <div class="section-planet-origin reveal-up" data-delay="30" style="margin-left:auto; margin-right:auto;">
+          <span class="origin-planet-icon origin-planet-icon--moon" aria-hidden="true"></span>
+          <span class="origin-planet-tag">DESTINATION 04 • LUNA (THE MOON)</span>
+          <span class="origin-sep">✦</span>
+          <a href="#universe" class="origin-orbit-link">Return to Solar Orbit ↑</a>
+        </div>
 
         <!-- Editorial label -->
         <p class="secret-editorial-label t-eyebrow reveal-up"
@@ -593,22 +1026,87 @@
             </div>
 
             <!-- Secret Keepsake Card (Slides out of envelope) -->
-            <article id="secret-card" class="secret-card" aria-label="Secret discovery note">
-              <button id="secret-close-btn" class="secret-close-btn" aria-label="Close secret note" title="Close note">✕</button>
-              <div class="secret-card-border" aria-hidden="true"></div>
-              <div class="secret-card-header">
-                <span class="secret-card-monogram">✦ PRIVATE DISCOVERY ✦</span>
-                <h3 class="secret-card-title">You found it. ✨</h3>
+            <article id="secret-card" class="secret-card" aria-label="Secret keepsake note">
+              <button id="secret-close-btn" class="secret-close-btn" aria-label="Close secret note" title="Close note">
+                <span class="close-icon">✕</span>
+              </button>
+              <div class="secret-card-texture" aria-hidden="true"></div>
+              <div class="secret-card-border" aria-hidden="true">
+                <div class="secret-border-inner">
+                  <!-- Corner Botanical Accents -->
+                  <svg class="secret-corner-botanical secret-corner--tl" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M2 18 C 2 9, 9 2, 18 2 M 2 2 L 6 6" stroke="rgba(189,149,107,0.5)" stroke-width="0.8" stroke-linecap="round"/>
+                  </svg>
+                  <svg class="secret-corner-botanical secret-corner--tr" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M2 18 C 2 9, 9 2, 18 2 M 2 2 L 6 6" stroke="rgba(189,149,107,0.5)" stroke-width="0.8" stroke-linecap="round"/>
+                  </svg>
+                  <svg class="secret-corner-botanical secret-corner--bl" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M2 18 C 2 9, 9 2, 18 2 M 2 2 L 6 6" stroke="rgba(189,149,107,0.5)" stroke-width="0.8" stroke-linecap="round"/>
+                  </svg>
+                  <svg class="secret-corner-botanical secret-corner--br" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                    <path d="M2 18 C 2 9, 9 2, 18 2 M 2 2 L 6 6" stroke="rgba(189,149,107,0.5)" stroke-width="0.8" stroke-linecap="round"/>
+                  </svg>
+                </div>
               </div>
-              <div class="secret-card-body">
-                <p id="secret-message-text" class="secret-message-text">
-                  You found the little secret. ✨<br>
-                  Some things are made to be discovered.
-                </p>
+
+              <!-- Header with Tiny Decorative Floral Illustration -->
+              <header class="secret-card-header">
+                <!-- Tiny Decorative Floral Illustration -->
+                <div class="secret-floral-illustration" id="secret-floral" aria-hidden="true">
+                  <svg class="secret-floral-svg" viewBox="0 0 100 24" fill="none">
+                    <!-- Central Rose Bud Motif -->
+                    <circle cx="50" cy="12" r="2.4" fill="#BD956B" opacity="0.85"/>
+                    <path d="M50 8 C 47 4, 43 7, 45 11 C 48 10, 50 8, 50 8 Z" fill="#BD956B" opacity="0.6"/>
+                    <path d="M50 8 C 53 4, 57 7, 55 11 C 52 10, 50 8, 50 8 Z" fill="#BD956B" opacity="0.6"/>
+                    <!-- Graceful Botanical Vine & Leaves Stem Left -->
+                    <path d="M44 12 C 34 11, 24 14, 10 12" stroke="#BD956B" stroke-width="0.85" stroke-linecap="round"/>
+                    <path d="M30 11.8 C 28 8.5, 23 9.5, 25 12.8 C 27.5 12.5, 30 11.8, 30 11.8 Z" fill="#BD956B" opacity="0.45"/>
+                    <path d="M20 12.2 C 18 15, 14 14, 15.5 11.5 C 17.5 11.8, 20 12.2, 20 12.2 Z" fill="#BD956B" opacity="0.45"/>
+                    <circle cx="9" cy="12" r="1.2" fill="#BD956B" opacity="0.6"/>
+                    <!-- Graceful Botanical Vine & Leaves Stem Right -->
+                    <path d="M56 12 C 66 11, 76 14, 90 12" stroke="#BD956B" stroke-width="0.85" stroke-linecap="round"/>
+                    <path d="M70 11.8 C 72 8.5, 77 9.5, 75 12.8 C 72.5 12.5, 70 11.8, 70 11.8 Z" fill="#BD956B" opacity="0.45"/>
+                    <path d="M80 12.2 C 82 15, 86 14, 84.5 11.5 C 82.5 11.8, 80 12.2, 80 12.2 Z" fill="#BD956B" opacity="0.45"/>
+                    <circle cx="91" cy="12" r="1.2" fill="#BD956B" opacity="0.6"/>
+                  </svg>
+                </div>
+
+                <span class="secret-card-monogram">✦ EK EHSAAS • A PRIVATE DISCOVERY ✦</span>
+
+                <!-- Small Ornamental Divider -->
+                <div class="secret-ornamental-divider" id="secret-divider" aria-hidden="true">
+                  <span class="secret-divider-line"></span>
+                  <span class="secret-divider-star">✦</span>
+                  <span class="secret-divider-line"></span>
+                </div>
+              </header>
+
+              <!-- Shayari Body: Line by Line Devanagari Poetry -->
+              <div class="secret-shayari-body" id="secret-shayari-body">
+                <!-- Couplet 1 -->
+                <div class="shayari-couplet shayari-couplet--1">
+                  <p class="shayari-line shayari-line--1" id="shayari-line-1">कुछ लम्हे ख़ामोशी में भी, कहानी कह जाते हैं,</p>
+                  <p class="shayari-line shayari-line--2" id="shayari-line-2">कुछ चेहरे बिना कोशिश के, मुस्कान दे जाते हैं।</p>
+                </div>
+
+                <!-- Couplet 2 (Subtly Highlighted) -->
+                <div class="shayari-couplet shayari-couplet--2 shayari-couplet--highlight">
+                  <p class="shayari-line shayari-line--3" id="shayari-line-3">तस्वीरों में क़ैद तो बस एक झलक होती है,</p>
+                  <p class="shayari-line shayari-line--4" id="shayari-line-4">असल ख़ूबसूरती तो वो है, जो एहसास बन जाती है।</p>
+                </div>
               </div>
-              <div class="secret-card-footer" aria-hidden="true">
-                <span class="secret-star-flourish">✦ &nbsp; ★ &nbsp; ✦</span>
-              </div>
+
+              <!-- Stationery Footer & Delicate Decorative Flourish -->
+              <footer class="secret-card-footer" id="secret-footer">
+                <div class="secret-flourish-wrap" id="secret-flourish" aria-hidden="true">
+                  <svg class="secret-bottom-flourish-svg" viewBox="0 0 120 18" fill="none">
+                    <path d="M10 9 Q 35 3 60 9 Q 85 15 110 9" stroke="#BD956B" stroke-width="0.75" stroke-linecap="round" opacity="0.5"/>
+                    <circle cx="60" cy="9" r="2.2" fill="#BD956B" opacity="0.8"/>
+                    <circle cx="48" cy="9" r="1.3" fill="#BD956B" opacity="0.5"/>
+                    <circle cx="72" cy="9" r="1.3" fill="#BD956B" opacity="0.5"/>
+                  </svg>
+                </div>
+              </footer>
             </article>
 
             <!-- Front Envelope Pocket Folds -->
@@ -631,12 +1129,92 @@
       </div>
     </section>
 
+        <!-- Section Transition Divider -->
+    <div class="section-transition-divider" aria-hidden="true">
+      <div class="transition-rule-line"></div>
+      <span class="transition-glyph">✦</span>
+      <div class="transition-rule-line"></div>
+    </div>
+
     <!-- ══════════════════════════════════════════════════════════
          SCENE 8 — THE ENVELOPE & LETTER
     ══════════════════════════════════════════════════════════════ -->
     <section id="letter-section" class="section" style="padding:0;" aria-label="A letter for you">
+
+      <!-- ══════════════════════════════════════════════════════
+           LUXURY BACKGROUND — LETTER
+      ══════════════════════════════════════════════════════════ -->
+      <div class="section-bg section-bg--letter" aria-hidden="true">
+        <!-- Writing-Desk Candlelight Illumination -->
+        <div class="letter-desk-light"></div>
+
+        <!-- Grand Blind-Embossed Stationery Crest Watermark -->
+        <svg class="letter-stationery-crest-svg" viewBox="0 0 500 500" fill="none">
+          <!-- Outer Laurel Wreath -->
+          <g stroke="currentColor" stroke-width="0.8" fill="currentColor" fill-opacity="0.09">
+            <!-- Left laurel branch -->
+            <path d="M 250 430 C 130 430, 80 320, 80 230 C 80 140, 150 70, 230 65"/>
+            <!-- Right laurel branch -->
+            <path d="M 250 430 C 370 430, 420 320, 420 230 C 420 140, 350 70, 270 65"/>
+            <!-- Laurel Leaves -->
+            <ellipse cx="100" cy="300" rx="14" ry="7" transform="rotate(-40 100 300)"/>
+            <ellipse cx="85" cy="240" rx="14" ry="7" transform="rotate(-15 85 240)"/>
+            <ellipse cx="100" cy="180" rx="14" ry="7" transform="rotate(15 100 180)"/>
+            <ellipse cx="140" cy="120" rx="14" ry="7" transform="rotate(40 140 120)"/>
+            <ellipse cx="400" cy="300" rx="14" ry="7" transform="rotate(40 400 300)"/>
+            <ellipse cx="415" cy="240" rx="14" ry="7" transform="rotate(15 415 240)"/>
+            <ellipse cx="400" cy="180" rx="14" ry="7" transform="rotate(-15 400 180)"/>
+            <ellipse cx="360" cy="120" rx="14" ry="7" transform="rotate(-40 360 120)"/>
+          </g>
+          <!-- Central Cartouche Frame -->
+          <circle cx="250" cy="240" r="110" stroke="currentColor" stroke-width="1.2"/>
+          <circle cx="250" cy="240" r="102" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 3"/>
+          <circle cx="250" cy="240" r="80" stroke="currentColor" stroke-width="0.75"/>
+          <!-- Radiant Starburst at Top -->
+          <path d="M 250 110 L 250 85 M 250 110 L 260 92 M 250 110 L 240 92" stroke="currentColor" stroke-width="0.8"/>
+          <!-- Center Monogram -->
+          <text x="250" y="248" font-family="'Playfair Display', serif" font-size="28" font-style="italic" text-anchor="middle" fill="currentColor" letter-spacing="3">✦ B ✦</text>
+          <!-- Latin Motto Ribbon at Bottom -->
+          <path d="M 160 380 Q 250 365 340 380 Q 250 395 160 380 Z" stroke="currentColor" stroke-width="0.75" fill="none"/>
+          <text x="250" y="388" font-family="'DM Sans', sans-serif" font-size="7" font-weight="500" letter-spacing="2" text-anchor="middle" fill="currentColor">SCRIPTUM EX CORDE • PERPETUO MANET</text>
+        </svg>
+
+        <!-- Classical Acanthus Corner Flourishes -->
+        <svg class="letter-corner-flourish letter-corner-flourish--tl" viewBox="0 0 100 100" fill="none">
+          <path d="M 12 88 C 12 40, 40 12, 88 12" stroke="currentColor" stroke-width="1"/>
+          <path d="M 12 60 C 12 30, 30 12, 60 12" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 2"/>
+          <path d="M 12 12 Q 28 28 44 12 Q 28 28 12 44" stroke="currentColor" stroke-width="0.8" fill="none"/>
+          <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+        </svg>
+        <svg class="letter-corner-flourish letter-corner-flourish--tr" viewBox="0 0 100 100" fill="none">
+          <path d="M 12 88 C 12 40, 40 12, 88 12" stroke="currentColor" stroke-width="1"/>
+          <path d="M 12 60 C 12 30, 30 12, 60 12" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 2"/>
+          <path d="M 12 12 Q 28 28 44 12 Q 28 28 12 44" stroke="currentColor" stroke-width="0.8" fill="none"/>
+          <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+        </svg>
+        <svg class="letter-corner-flourish letter-corner-flourish--bl" viewBox="0 0 100 100" fill="none">
+          <path d="M 12 88 C 12 40, 40 12, 88 12" stroke="currentColor" stroke-width="1"/>
+          <path d="M 12 60 C 12 30, 30 12, 60 12" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 2"/>
+          <path d="M 12 12 Q 28 28 44 12 Q 28 28 12 44" stroke="currentColor" stroke-width="0.8" fill="none"/>
+          <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+        </svg>
+        <svg class="letter-corner-flourish letter-corner-flourish--br" viewBox="0 0 100 100" fill="none">
+          <path d="M 12 88 C 12 40, 40 12, 88 12" stroke="currentColor" stroke-width="1"/>
+          <path d="M 12 60 C 12 30, 30 12, 60 12" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 2"/>
+          <path d="M 12 12 Q 28 28 44 12 Q 28 28 12 44" stroke="currentColor" stroke-width="0.8" fill="none"/>
+          <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+        </svg>
+      </div>
       <div class="letter-inner">
         <span class="section-num">05</span>
+
+        <!-- Planetary Connection: Saturn (Chronos • VI) -->
+        <div class="section-planet-origin reveal-up" data-delay="30" style="margin-left:auto; margin-right:auto;">
+          <span class="origin-planet-icon origin-planet-icon--saturn" aria-hidden="true"></span>
+          <span class="origin-planet-tag">DESTINATION 05 • CHRONOS (SATURN)</span>
+          <span class="origin-sep">✦</span>
+          <a href="#universe" class="origin-orbit-link">Return to Solar Orbit ↑</a>
+        </div>
 
         <p id="letter-teaser" class="t-eyebrow reveal-up"
            style="color:var(--chestnut); opacity:0.82;" data-delay="0" style="--reveal-delay:0ms">
@@ -803,11 +1381,45 @@
       </div>
     </section>
 
+        <!-- Section Transition Divider -->
+    <div class="section-transition-divider" aria-hidden="true">
+      <div class="transition-rule-line"></div>
+      <span class="transition-glyph">✦</span>
+      <div class="transition-rule-line"></div>
+    </div>
+
     <!-- ══════════════════════════════════════════════════════════
          SCENE 9 — FINAL CINEMATIC CLOSING
     ══════════════════════════════════════════════════════════════ -->
     <section id="final-scene" class="section" style="padding:0;" aria-label="And that's your little world">
       <canvas id="final-canvas" aria-hidden="true"></canvas>
+
+      <!-- ══════════════════════════════════════════════════════
+           LUXURY BACKGROUND — FINAL SCENE
+      ══════════════════════════════════════════════════════════ -->
+      <div class="section-bg section-bg--final" aria-hidden="true">
+        <!-- Cinematic Golden Spotlight Halo -->
+        <div class="final-cinematic-halo"></div>
+
+        <!-- Celestial Starlight Ring -->
+        <svg class="final-starlight-ring-svg" viewBox="0 0 500 500" fill="none">
+          <circle cx="250" cy="250" r="240" stroke="currentColor" stroke-width="0.75" stroke-dasharray="2 4"/>
+          <circle cx="250" cy="250" r="228" stroke="currentColor" stroke-width="1.1"/>
+          <circle cx="250" cy="250" r="185" stroke="currentColor" stroke-width="0.6"/>
+          <!-- Starburst markers around circumference -->
+          <g stroke="currentColor" stroke-width="0.7">
+            <line x1="250" y1="5" x2="250" y2="25"/>
+            <line x1="250" y1="475" x2="250" y2="495"/>
+            <line x1="5" y1="250" x2="25" y2="250"/>
+            <line x1="475" y1="250" x2="495" y2="250"/>
+          </g>
+          <!-- Tiny Stars -->
+          <circle cx="250" cy="22" r="2" fill="currentColor"/>
+          <circle cx="250" cy="478" r="2" fill="currentColor"/>
+          <circle cx="22" cy="250" r="2" fill="currentColor"/>
+          <circle cx="478" cy="250" r="2" fill="currentColor"/>
+        </svg>
+      </div>
 
       <!-- Ambient glow -->
       <div class="final-glow-orb" aria-hidden="true"></div>
@@ -839,7 +1451,7 @@
                 </svg>
                 <span>Your closing photograph</span>
               </div>
-              <img id="final-photo" src="" alt="" class="img-cover"
+              <img id="final-photo" src="" alt="" class="img-cover" width="1507" height="1044" loading="lazy" decoding="async"
                    style="position:absolute; inset:0; opacity:0; transition:opacity 1.4s;" />
             </div>
           </div>
@@ -898,6 +1510,8 @@
   </div><!-- /main-content -->
 
   <!-- ══ SCRIPTS ══════════════════════════════════════════════════ -->
+  <!-- 0. Three.js for Realistic 3D Planetary Universe -->
+  <script src="public/vendor/three.min.js"></script>
   <!-- 1. Content config -->
   <script src="src/data/siteContent.js"></script>
 
@@ -940,13 +1554,13 @@
 
       function initGSAP() {
 
-        /* ── 1. HERO — Blur-to-sharp + split editorial reveal ── */
+        /* ── 1. HERO — Editorial scale-down reveal ── */
         const heroBg = document.getElementById('hero-bg');
-        if (heroBg && heroBg.classList.contains('loaded')) {
+        if (heroBg) {
           gsap.fromTo(heroBg,
-            { scale: 1.1, filter: 'blur(8px) saturate(0.75)' },
-            { scale: 1,   filter: 'blur(0px) saturate(1.02)',
-              duration: 2.2, ease: 'power4.out' });
+            { scale: 1.06, opacity: 0.7 },
+            { scale: 1,   opacity: 1,
+              duration: 1.6, ease: 'power3.out' });
         }
 
         /* Hero left/right entrance */
@@ -999,16 +1613,26 @@
           });
         });
 
-        const universeNodes = document.querySelectorAll('.universe-node');
-        if (universeNodes.length) {
-          gsap.set(universeNodes, { opacity: 0, scale: 0.4, y: 20 });
+        const canvas3D = document.getElementById('universe-3d-canvas');
+        if (canvas3D) {
+          gsap.fromTo(canvas3D,
+            { opacity: 0, scale: 0.94 },
+            { opacity: 1, scale: 1, duration: 1.5, ease: 'power3.out',
+              scrollTrigger: { trigger: '#universe', start: 'top 80%', once: true }
+            }
+          );
+        }
+
+        const planetCards = document.querySelectorAll('.universe-planet-card');
+        if (planetCards.length) {
+          gsap.set(planetCards, { opacity: 0, y: 25, scale: 0.95 });
           ScrollTrigger.create({
             trigger: '#universe', start: 'top 75%', once: true,
             onEnter: () => {
-              gsap.to(universeNodes, {
-                opacity: 1, scale: 1, y: 0,
-                duration: 1.0, ease: 'back.out(1.6)',
-                stagger: { each: 0.18, from: 'random' },
+              gsap.to(planetCards, {
+                opacity: 1, y: 0, scale: 1,
+                duration: 1.0, ease: 'power3.out',
+                stagger: { each: 0.12 },
               });
             },
           });
@@ -1018,21 +1642,28 @@
         const universeSection = document.getElementById('universe');
         if (universeSection) {
           let ux = 0, uy = 0;
+          let ticking = false;
           universeSection.addEventListener('mousemove', e => {
             const rect = universeSection.getBoundingClientRect();
             ux = (e.clientX - rect.left) / rect.width - 0.5;
             uy = (e.clientY - rect.top)  / rect.height - 0.5;
-            universeNodes.forEach((node, i) => {
-              const depth = 0.8 + i * 0.3;
-              gsap.to(node, {
-                x: ux * 22 * depth, y: uy * 14 * depth,
-                duration: 1.6, ease: 'power2.out', overwrite: 'auto',
+            if (!ticking) {
+              ticking = true;
+              requestAnimationFrame(() => {
+                universeNodes.forEach((node, i) => {
+                  const depth = 0.8 + i * 0.3;
+                  gsap.to(node, {
+                    x: ux * 22 * depth, y: uy * 14 * depth,
+                    duration: 1.2, ease: 'power2.out', overwrite: 'auto',
+                  });
+                });
+                ticking = false;
               });
-            });
-          });
+            }
+          }, { passive: true });
           universeSection.addEventListener('mouseleave', () => {
             universeNodes.forEach(node => {
-              gsap.to(node, { x: 0, y: 0, duration: 1.8, ease: 'power2.out', overwrite: 'auto' });
+              gsap.to(node, { x: 0, y: 0, duration: 1.2, ease: 'power2.out', overwrite: 'auto' });
             });
           });
         }
@@ -1171,7 +1802,7 @@
   </script>
 
   <!-- 4. Main application logic -->
-  <script src="src/components/app.js"></script>
+  <script src="src/components/app.js?v=realistic-3d"></script>
 
 </body>
 </html>

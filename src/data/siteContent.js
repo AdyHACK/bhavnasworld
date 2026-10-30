@@ -35,7 +35,7 @@ const siteContent = {
     buttonText: "Explore the World ↓",
     // Photo used as hero background — replace with your chosen image
     photo: {
-      src: "public/images/photo-hero.png",
+      src: "public/images/photo-hero.webp",
       alt: "A personal photograph",
     },
   },
@@ -46,7 +46,7 @@ const siteContent = {
   photos: [
     {
       id: "photo-01",
-      src: "public/images/photo-01.png",
+      src: "public/images/photo-01.webp",
       alt: "Personal photograph",
       title: "A Little Moment",
       caption: "A little moment worth keeping.",
@@ -55,7 +55,7 @@ const siteContent = {
     },
     {
       id: "photo-02",
-      src: "public/images/photo-02.png",
+      src: "public/images/photo-02.webp",
       alt: "Personal photograph",
       title: "Soft Light",
       caption: "Filed under: lovely things.",
@@ -64,7 +64,7 @@ const siteContent = {
     },
     {
       id: "photo-03",
-      src: "public/images/photo-03.png",
+      src: "public/images/photo-03.webp",
       alt: "Personal photograph",
       title: "A Small Frame",
       caption: "Some pictures deserve their own page.",
@@ -73,7 +73,7 @@ const siteContent = {
     },
     {
       id: "photo-04",
-      src: "public/images/photo-04.png",
+      src: "public/images/photo-04.webp",
       alt: "Personal photograph",
       title: "Kept Quietly",
       caption: "A small frame for a small moment.",
@@ -82,7 +82,7 @@ const siteContent = {
     },
     {
       id: "photo-05",
-      src: "public/images/photo-05.png",
+      src: "public/images/photo-05.webp",
       alt: "Personal photograph",
       title: "Little Things",
       caption: "Little things, beautifully kept.",
@@ -91,7 +91,7 @@ const siteContent = {
     },
     {
       id: "photo-06",
-      src: "public/images/photo-06.png",
+      src: "public/images/photo-06.webp",
       alt: "Personal photograph",
       title: "On a Quiet Day",
       caption: "On a quiet day, remembered.",
@@ -100,7 +100,7 @@ const siteContent = {
     },
     {
       id: "photo-07",
-      src: "public/images/photo-07.png",
+      src: "public/images/photo-07.webp",
       alt: "Personal photograph",
       title: "Warm Corners",
       caption: "Warm corners, worth revisiting.",
@@ -109,7 +109,7 @@ const siteContent = {
     },
     {
       id: "photo-final",
-      src: "public/images/photo-final.png",
+      src: "public/images/photo-final.webp",
       alt: "Personal photograph — closing scene",
       title: "That's Your World",
       caption: "And that's your little world.",
@@ -140,6 +140,12 @@ const siteContent = {
     teaser: "Hmm... there's something here.",
     buttonText: "Take a Look",
     message: "You found the little secret. ✨\nSome things are made to be discovered.",
+    shayari: [
+      "कुछ लम्हे ख़ामोशी में भी, कहानी कह जाते हैं,",
+      "कुछ चेहरे बिना कोशिश के, मुस्कान दे जाते हैं।",
+      "तस्वीरों में क़ैद तो बस एक झलक होती है,",
+      "असल ख़ूबसूरती तो वो है, जो एहसास बन जाती है।"
+    ],
   },
 
   // ── Letter Section ─────────────────────────────────────────────

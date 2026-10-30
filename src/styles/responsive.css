@@ -699,7 +699,7 @@
   top: var(--s-16);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 5;
+  z-index: 6;
   text-align: center;
   width: 100%;
   max-width: 500px;
@@ -707,11 +707,288 @@
   pointer-events: none;
 }
 
-/* Universe nodes container */
+/* ════════════════════════════════════════════════
+   3D PLANETARY UNIVERSE & OBSERVATORY DESTINATION CARDS
+════════════════════════════════════════════════ */
+#universe-3d-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  pointer-events: auto;
+  cursor: grab;
+}
+#universe-3d-canvas:active {
+  cursor: grabbing;
+}
+
+/* Universe nodes overlay */
 #universe-nodes {
   position: absolute;
   inset: 0;
-  z-index: 6;
+  z-index: 7;
+  pointer-events: none;
+}
+
+/* Luxury Observatory Destination Cards */
+.universe-planet-card {
+  position: absolute;
+  pointer-events: auto;
+  text-decoration: none;
+  background: rgba(253, 249, 243, 0.90);
+  border: 1px solid rgba(189, 149, 107, 0.38);
+  border-radius: 12px;
+  padding: 0.65rem 1rem;
+  box-shadow: 0 8px 24px rgba(78, 46, 14, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.35s ease,
+              border-color 0.35s ease,
+              box-shadow 0.38s ease;
+  width: max-content;
+  max-width: 220px;
+  z-index: 7;
+  cursor: pointer;
+}
+
+/* Card positioning on desktop */
+.universe-planet-card--earth   { left: 7%; top: 38%; }
+.universe-planet-card--mars    { right: 7%; top: 26%; }
+.universe-planet-card--jupiter { right: 7%; top: 68%; }
+.universe-planet-card--moon    { left: 7%; top: 72%; }
+.universe-planet-card--saturn  { left: 50%; top: 88%; transform: translateX(-50%); }
+
+.universe-planet-card:hover,
+.universe-planet-card.is-hovered {
+  background: rgba(255, 253, 250, 0.98);
+  border-color: rgba(189, 149, 107, 0.85);
+  box-shadow: 0 16px 36px rgba(110, 72, 32, 0.18), 0 0 22px rgba(223, 194, 157, 0.38);
+}
+.universe-planet-card--earth:hover,
+.universe-planet-card--earth.is-hovered { transform: translateY(-4px) scale(1.04); }
+.universe-planet-card--mars:hover,
+.universe-planet-card--mars.is-hovered { transform: translateY(-4px) scale(1.04); }
+.universe-planet-card--jupiter:hover,
+.universe-planet-card--jupiter.is-hovered { transform: translateY(-4px) scale(1.04); }
+.universe-planet-card--moon:hover,
+.universe-planet-card--moon.is-hovered { transform: translateY(-4px) scale(1.04); }
+.universe-planet-card--saturn:hover,
+.universe-planet-card--saturn.is-hovered { transform: translate(-50%, -4px) scale(1.04); }
+
+.planet-card-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.22rem;
+}
+
+.planet-pill-astronomy {
+  font-family: var(--font-nav);
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--caramel);
+  text-transform: uppercase;
+}
+
+.planet-pill-status {
+  font-family: var(--font-nav);
+  font-size: 0.44rem;
+  letter-spacing: 0.12em;
+  color: var(--chestnut);
+  opacity: 0.62;
+  text-transform: uppercase;
+}
+
+.planet-card-title-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.planet-card-title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--deep-espresso);
+  line-height: 1.15;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+
+.universe-planet-card:hover .planet-card-title,
+.universe-planet-card.is-hovered .planet-card-title {
+  color: var(--chestnut);
+}
+
+.planet-card-arrow {
+  font-size: 0.85rem;
+  color: var(--caramel);
+  transition: transform 0.3s var(--ease-out);
+}
+
+.universe-planet-card:hover .planet-card-arrow,
+.universe-planet-card.is-hovered .planet-card-arrow {
+  transform: translate(2px, -2px);
+  color: var(--chestnut);
+}
+
+.planet-card-meta {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-style: italic;
+  color: var(--chestnut);
+  opacity: 0.82;
+  margin-top: 0.18rem;
+  line-height: 1.25;
+}
+
+/* Planet Card Travel Action */
+.planet-card-travel {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-nav);
+  font-size: 0.50rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--soft-caramel);
+  text-transform: uppercase;
+  margin-top: 0.35rem;
+  border-top: 1px dashed rgba(189, 149, 107, 0.25);
+  padding-top: 0.35rem;
+  width: 100%;
+  transition: color 0.3s;
+}
+.universe-planet-card:hover .planet-card-travel,
+.universe-planet-card.is-hovered .planet-card-travel {
+  color: var(--chestnut);
+}
+
+/* Nav Planet Indicator Tag */
+.nav-planet-tag {
+  font-size: 0.54rem;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--soft-caramel);
+  opacity: 0.72;
+  margin-left: 0.32rem;
+  padding: 0.08rem 0.32rem;
+  border-radius: 3px;
+  background: rgba(189, 149, 107, 0.12);
+  vertical-align: middle;
+  transition: all 0.3s ease;
+}
+.nav-links a:hover .nav-planet-tag,
+.nav-links a.active .nav-planet-tag {
+  color: var(--chestnut);
+  background: rgba(189, 149, 107, 0.26);
+  opacity: 1;
+}
+
+/* ════════════════════════════════════════════════
+   PLANETARY ORIGIN BADGES & SECTION TIE-IN
+════════════════════════════════════════════════ */
+.section-planet-origin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.38rem 0.95rem;
+  background: rgba(253, 249, 243, 0.94);
+  border: 1px solid rgba(189, 149, 107, 0.42);
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(78, 46, 14, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  margin-bottom: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  width: fit-content;
+}
+.section-planet-origin:hover {
+  background: rgba(255, 253, 250, 0.98);
+  border-color: rgba(189, 149, 107, 0.85);
+  box-shadow: 0 8px 24px rgba(110, 72, 32, 0.14), 0 0 14px rgba(223, 194, 157, 0.35);
+  transform: translateY(-2px);
+}
+.section-planet-origin.arrival-highlight {
+  animation: origin-pulse 1.6s ease-out;
+}
+@keyframes origin-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(189, 149, 107, 0.7); transform: scale(1); }
+  50%  { box-shadow: 0 0 0 12px rgba(189, 149, 107, 0); transform: scale(1.05); }
+  100% { box-shadow: 0 4px 16px rgba(78, 46, 14, 0.08); transform: scale(1); }
+}
+
+.origin-planet-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(189, 149, 107, 0.45);
+}
+.origin-planet-icon--earth {
+  background: radial-gradient(circle at 35% 35%, #8bc34a 0%, #1976d2 45%, #0d47a1 85%);
+  box-shadow: 0 0 10px rgba(66, 165, 245, 0.55);
+}
+.origin-planet-icon--mars {
+  background: radial-gradient(circle at 35% 35%, #ffab91 0%, #d84315 50%, #4e1a0b 90%);
+  box-shadow: 0 0 10px rgba(226, 123, 88, 0.55);
+}
+.origin-planet-icon--jupiter {
+  background: repeating-linear-gradient(180deg, #d7ccc8 0px, #bcaaa4 3px, #a1887f 6px, #d7ccc8 9px);
+  box-shadow: 0 0 10px rgba(212, 170, 112, 0.55);
+}
+.origin-planet-icon--moon {
+  background: radial-gradient(circle at 35% 35%, #eceff1 0%, #90a4ae 55%, #37474f 90%);
+  box-shadow: 0 0 10px rgba(176, 190, 197, 0.55);
+}
+.origin-planet-icon--saturn {
+  background: radial-gradient(circle at 35% 35%, #ffe082 0%, #d4aa70 50%, #6d4c41 90%);
+  box-shadow: 0 0 10px rgba(238, 208, 152, 0.55);
+}
+.origin-planet-icon--saturn::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 28px; height: 9px;
+  border: 1.5px solid rgba(223, 194, 157, 0.9);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(-25deg);
+  pointer-events: none;
+}
+
+.origin-planet-tag {
+  font-family: var(--font-nav);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.20em;
+  color: var(--chestnut);
+  text-transform: uppercase;
+}
+.origin-sep {
+  color: var(--soft-caramel);
+  font-size: 0.55rem;
+  opacity: 0.7;
+}
+.origin-orbit-link {
+  font-family: var(--font-nav);
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--caramel);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color 0.25s, transform 0.25s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.origin-orbit-link:hover {
+  color: var(--deep-espresso);
+  transform: translateX(2px);
 }
 
 /* Individual node wrapper */
@@ -813,7 +1090,7 @@
   bottom: var(--s-6);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 5;
+  z-index: 6;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1008,7 +1285,7 @@
     var(--warm-sand) 50%,
     var(--antique-beige) 100%
   );
-  padding: var(--s-12) 0 calc(var(--s-16) + 56px);
+  padding: var(--s-12) 0 var(--s-16);
   position: relative;
 }
 
@@ -1054,10 +1331,11 @@
 .scrapbook-grid {
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  grid-auto-rows: 200px;
-  gap: 16px;
+  grid-auto-rows: minmax(210px, auto);
+  gap: 20px;
   align-items: start;
   padding-top: var(--s-4);
+  padding-bottom: var(--s-8);
 }
 
 /* Card base */
@@ -1092,6 +1370,7 @@
 }
 .scrap-card--wide {
   grid-column: span 7;
+  grid-row: span 2;
 }
 
 /* Photo area */
@@ -1250,8 +1529,8 @@
 .secret-envelope-wrap {
   position: relative;
   width: 100%;
-  max-width: 360px;
-  margin: 110px auto 30px;
+  max-width: 520px;
+  margin: 135px auto 35px;
   perspective: 1200px;
   -webkit-perspective: 1200px;
   overflow: visible;
@@ -1260,7 +1539,7 @@
 .secret-env-outer {
   position: relative;
   width: 100%;
-  height: 230px;
+  height: 270px;
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
   user-select: none;
@@ -1275,8 +1554,7 @@
   right: 6%;
   height: 26px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(73, 50, 36, 0.28) 0%, transparent 70%);
-  filter: blur(8px);
+  background: radial-gradient(ellipse at center, rgba(73, 50, 36, 0.22) 0%, rgba(73, 50, 36, 0.06) 45%, transparent 75%);
   pointer-events: none;
   z-index: 0;
 }
@@ -1439,14 +1717,14 @@
 /* Secret Keepsake Card */
 .secret-card {
   position: absolute;
-  top: 10px;
-  left: 6%;
-  right: 6%;
-  min-height: 250px;
-  background: #FFFDF9;
-  border-radius: 2px;
-  box-shadow: 0 16px 42px rgba(73, 50, 36, 0.16);
-  padding: 1.8rem 1.6rem 1.4rem;
+  top: 8px;
+  left: 4%;
+  right: 4%;
+  min-height: 295px;
+  background: #FAF5EE;
+  border-radius: 4px;
+  box-shadow: 0 20px 52px rgba(73, 50, 36, 0.18), 0 2px 8px rgba(73, 50, 36, 0.08);
+  padding: 2.1rem 2.2rem 1.6rem;
   box-sizing: border-box;
   opacity: 0;
   transform: translate3d(0, 0, 0) scale(0.96);
@@ -1454,6 +1732,7 @@
   will-change: transform, opacity;
   z-index: 10;
   text-align: center;
+  border: 1px solid rgba(189, 149, 107, 0.38);
 }
 
 .secret-card.is-active {
@@ -1461,68 +1740,202 @@
   pointer-events: auto;
 }
 
-.secret-card-border {
+.secret-card-texture {
   position: absolute;
-  inset: 8px;
-  border: 1px solid rgba(189, 149, 107, 0.35);
+  inset: 0;
+  border-radius: 4px;
+  background-image: radial-gradient(rgba(189, 149, 107, 0.07) 1px, transparent 0);
+  background-size: 8px 8px;
+  opacity: 0.7;
   pointer-events: none;
 }
 
+.secret-card-border {
+  position: absolute;
+  inset: 7px;
+  border: 1px solid rgba(189, 149, 107, 0.3);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.secret-border-inner {
+  position: absolute;
+  inset: 3px;
+  border: 0.8px dashed rgba(189, 149, 107, 0.22);
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+.secret-corner-botanical {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+}
+.secret-corner--tl { top: 2px; left: 2px; }
+.secret-corner--tr { top: 2px; right: 2px; transform: scaleX(-1); }
+.secret-corner--bl { bottom: 2px; left: 2px; transform: scaleY(-1); }
+.secret-corner--br { bottom: 2px; right: 2px; transform: scale(-1); }
+
+/* Header with Tiny Decorative Floral Illustration */
+.secret-card-header {
+  position: relative;
+  margin-bottom: 0.3rem;
+}
+
+.secret-floral-illustration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.45rem;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  will-change: transform, opacity;
+}
+
+.secret-floral-svg {
+  width: 86px;
+  height: 20px;
+  overflow: visible;
+}
+
 .secret-card-monogram {
-  font-family: var(--font-nav);
-  font-size: 0.46rem;
-  letter-spacing: 0.28em;
-  color: var(--soft-caramel);
+  font-family: var(--font-nav, 'DM Sans', sans-serif);
+  font-size: 0.48rem;
+  letter-spacing: 0.26em;
+  color: var(--soft-caramel, #BD956B);
   text-transform: uppercase;
   display: block;
   margin-bottom: 0.4rem;
+  opacity: 0;
+  transform: translate3d(0, 6px, 0);
 }
 
-.secret-card-title {
-  font-family: var(--font-display);
-  font-size: 1.45rem;
-  font-style: italic;
-  color: var(--deep-espresso);
-  margin: 0 0 0.8rem;
+.secret-ornamental-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 0.5rem auto 1.15rem;
+  width: 70%;
+  max-width: 200px;
+  opacity: 0;
+  transform: scaleX(0.5);
+  transform-origin: center center;
+  will-change: transform, opacity;
 }
 
-.secret-message-text {
-  font-family: var(--font-heading);
-  font-size: 1.05rem;
-  line-height: 1.85;
-  color: #523D2D;
+.secret-divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(189, 149, 107, 0.45), transparent);
+}
+
+.secret-divider-star {
+  font-size: 0.60rem;
+  color: #BD956B;
+  line-height: 1;
+  text-shadow: 0 0 8px rgba(216, 185, 144, 0.5);
+}
+
+/* Shayari Body: Line by Line Devanagari Poetry */
+.secret-shayari-body {
+  margin: 0.2rem 0 0.8rem;
+  text-align: center;
+  position: relative;
+}
+
+.shayari-couplet {
+  margin-bottom: 0.95rem;
+  position: relative;
+}
+
+.shayari-couplet:last-child {
+  margin-bottom: 0;
+}
+
+.shayari-line {
+  font-family: 'Martel', 'Rozha One', 'Noto Serif Devanagari', 'Kokila', 'Mangal', 'Nirmala UI', serif;
+  font-size: clamp(0.96rem, 2.3vw, 1.15rem);
+  font-weight: 400;
+  line-height: 2.15;
+  letter-spacing: 0.025em;
+  color: #442E20; /* Deep Mocha-Brown */
   margin: 0;
+  padding: 0.1rem 0;
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  will-change: transform, opacity;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
+/* Subtle highlight on the final two lines */
+.shayari-couplet--highlight {
+  position: relative;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  transition: background-color 0.8s ease, box-shadow 0.8s ease;
+}
+
+.shayari-couplet--highlight .shayari-line {
+  color: #382214;
+  font-weight: 450;
+}
+
+.shayari-couplet--highlight.is-highlighted {
+  background-color: rgba(216, 185, 144, 0.14);
+  box-shadow: 0 0 28px rgba(216, 185, 144, 0.25);
+}
+
+/* Footer & Delicate Decorative Flourish */
 .secret-card-footer {
   margin-top: 1rem;
-  color: var(--soft-caramel);
-  font-size: 0.75rem;
-  opacity: 0.6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.secret-flourish-wrap {
+  opacity: 0;
+  transform: translate3d(0, 8px, 0) scale(0.9);
+  will-change: transform, opacity;
+}
+
+.secret-bottom-flourish-svg {
+  width: 95px;
+  height: 15px;
+  overflow: visible;
 }
 
 .secret-close-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 26px;
-  height: 26px;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: 1px solid rgba(189, 149, 107, 0.35);
-  background: rgba(255, 253, 248, 0.9);
+  background: rgba(254, 250, 243, 0.92);
   color: var(--chestnut);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   cursor: pointer;
-  z-index: 10;
-  transition: all 0.25s ease;
+  z-index: 60;
+  transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 2px 6px rgba(73, 50, 36, 0.1);
 }
+
 .secret-close-btn:hover {
   background: var(--card-primary);
   color: var(--deep-espresso);
   transform: rotate(90deg) scale(1.1);
+  border-color: var(--champagne);
 }
 
 /* ════════════════════════════════════════════════
@@ -1579,8 +1992,7 @@
   right: 5%;
   height: 38px;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(73, 50, 36, 0.28) 0%, rgba(73, 50, 36, 0.08) 55%, transparent 75%);
-  filter: blur(10px);
+  background: radial-gradient(ellipse at center, rgba(73, 50, 36, 0.22) 0%, rgba(73, 50, 36, 0.06) 48%, transparent 75%);
   pointer-events: none;
   z-index: 0;
   transition: transform 0.8s ease, opacity 0.8s ease;
@@ -2315,32 +2727,492 @@
 }
 
 /* ════════════════════════════════════════════════
-   RESPONSIVE — TABLET
+   COMPREHENSIVE TABLET & RESPONSIVE ARCHITECTURE
+   Tailored compositions for 768x1024, 820x1180, 1024x768
 ════════════════════════════════════════════════ */
-@media (max-width: 1100px) {
-  .hero-layout { grid-template-columns: 1fr 1fr; }
-  .hero-heading { font-size: clamp(2.4rem, 4.5vw, 4.2rem); }
-  .hero-left { padding: var(--s-12) var(--s-6) var(--s-12) var(--s-6); }
 
-  .gallery-grid { grid-auto-rows: 220px; }
-  .gallery-item--featured { grid-column: span 7; }
-  .gallery-item--wide { grid-column: span 7; }
+/* Common touch and tablet baseline (max-width: 1024px) */
+@media (max-width: 1024px) {
+  #cursor-dot, #cursor-ring {
+    display: none !important;
+  }
+  * {
+    cursor: auto !important;
+  }
+  button, a, .btn, .wax-seal, .universe-planet-card, .scrap-card, .gallery-item {
+    cursor: pointer !important;
+  }
 
-  #lb-prev { left: -3rem; }
-  #lb-next { right: -3rem; }
+  /* Universal section clearance */
+  .section {
+    padding: var(--s-12) 0;
+  }
+
+  /* Lightbox touch optimization */
+  .lb-btn {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 1.4rem !important;
+    background: rgba(243, 231, 214, 0.92) !important;
+    box-shadow: 0 4px 16px rgba(73, 50, 36, 0.22) !important;
+  }
+  #lb-prev { left: 1rem !important; }
+  #lb-next { right: 1rem !important; }
+  .lightbox-close { top: 1rem !important; right: 1rem !important; width: 44px !important; height: 44px !important; }
 }
 
-/* ════════════════════════════════════════════════
-   RESPONSIVE — MOBILE
-════════════════════════════════════════════════ */
-@media (max-width: 768px) {
+/* ────────────────────────────────────────────────────────────
+   1. TABLET PORTRAIT COMPOSITIONS (768x1024, 820x1180)
+   iPad Mini, iPad Air, iPad Pro 11", standard tablets
+──────────────────────────────────────────────────────────── */
+@media (min-width: 600px) and (max-width: 960px) and (orientation: portrait),
+       (min-width: 768px) and (max-width: 850px) {
+
+  /* Tablet Nav with Slide-out Drawer */
+  #nav {
+    padding: 0.9rem 1.8rem;
+  }
+  .nav-menu-btn {
+    display: flex !important;
+  }
+  .nav-links {
+    position: fixed !important;
+    top: 0 !important;
+    right: -100% !important;
+    height: 100vh !important;
+    width: min(340px, 82vw) !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: flex-start !important;
+    background: rgba(248, 241, 231, 0.98) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    padding: 3rem 2.2rem !important;
+    gap: 1.2rem !important;
+    transition: right 0.42s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    box-shadow: -6px 0 40px rgba(73, 50, 36, 0.18) !important;
+    z-index: 9999 !important;
+  }
+  .nav-links.open {
+    right: 0 !important;
+  }
+  .nav-links a {
+    font-size: 0.90rem !important;
+    letter-spacing: 0.16em !important;
+    padding: 0.5rem 0 !important;
+    width: 100% !important;
+    border-bottom: 1px dashed rgba(189, 149, 107, 0.22) !important;
+  }
+  .nav-planet-tag {
+    font-size: 0.60rem !important;
+    margin-left: 0.6rem !important;
+    padding: 0.12rem 0.45rem !important;
+  }
+
+  /* Hero Section: Intentional Editorial Tablet Spread */
+  .hero-layout {
+    display: grid !important;
+    grid-template-columns: 1.05fr 0.95fr !important;
+    min-height: 100vh !important;
+    min-height: 100svh !important;
+    align-items: center !important;
+  }
+  .hero-left {
+    padding: 4rem 1.6rem 3.5rem 2.2rem !important;
+  }
+  .hero-heading {
+    font-size: clamp(2.3rem, 4.8vw, 3.5rem) !important;
+    line-height: 1.06 !important;
+  }
+  .hero-sub {
+    font-size: 0.90rem !important;
+    max-width: 360px !important;
+  }
+  .hero-right {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 3rem 2.2rem 3rem 0.8rem !important;
+    height: 100% !important;
+  }
+  .hero-frame {
+    width: 100% !important;
+    max-width: 340px !important;
+    max-height: 72vh !important;
+    aspect-ratio: 3/4 !important;
+    box-shadow: var(--shadow-card), 0 20px 48px rgba(73, 50, 36, 0.14) !important;
+  }
+  .hero-frame img {
+    object-fit: cover !important;
+    object-position: 50% 20% !important;
+  }
+  .hero-vertical-label {
+    left: 0.8rem !important;
+    font-size: 0.50rem !important;
+  }
+  .hero-num {
+    bottom: 2rem !important;
+    right: 2rem !important;
+    font-size: 3rem !important;
+    opacity: 0.12 !important;
+  }
+
+  /* 3D Planetary Universe: Perimeter Composition (Zero Planet Overlap) */
+  #universe {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+  #universe-nodes {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 7 !important;
+    pointer-events: none !important;
+    display: block !important;
+  }
+  .universe-heading-area {
+    position: absolute !important;
+    top: 4.8rem !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 6 !important;
+    text-align: center !important;
+    width: 90% !important;
+    max-width: 440px !important;
+  }
+  .universe-heading-area .t-eyebrow {
+    font-size: 0.56rem !important;
+    letter-spacing: 0.24em !important;
+  }
+  .universe-heading-area .t-h2 {
+    font-size: clamp(1.4rem, 2.8vw, 1.95rem) !important;
+    margin-top: 0.4rem !important;
+  }
+  .universe-center {
+    position: absolute !important;
+    top: 52% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 4 !important;
+    text-align: center !important;
+  }
+  .universe-center-title {
+    font-size: 0.68rem !important;
+    letter-spacing: 0.26em !important;
+  }
+  .universe-center-ring--outer {
+    width: 150px !important;
+    height: 150px !important;
+    margin-left: -75px !important;
+    margin-top: -75px !important;
+  }
+  .universe-center-ring--inner {
+    width: 90px !important;
+    height: 90px !important;
+    margin-left: -45px !important;
+    margin-top: -45px !important;
+  }
+  .universe-constellation-svg {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 3 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .universe-scroll-hint {
+    display: none !important;
+  }
+
+  /* Observatory Cards Tablet Perimeter Styling */
+  .universe-planet-card {
+    position: absolute !important;
+    pointer-events: auto !important;
+    max-width: 195px !important;
+    width: auto !important;
+    padding: 0.52rem 0.80rem !important;
+    border-radius: 10px !important;
+    z-index: 8 !important;
+    box-shadow: 0 6px 20px rgba(78, 46, 14, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
+  }
+  .universe-planet-card .planet-card-title {
+    font-size: 0.72rem !important;
+  }
+  .universe-planet-card .planet-pill-astronomy {
+    font-size: 0.50rem !important;
+  }
+  .universe-planet-card .planet-pill-status {
+    font-size: 0.44rem !important;
+  }
+  .universe-planet-card .planet-card-meta {
+    font-size: 0.55rem !important;
+    line-height: 1.3 !important;
+  }
+  .universe-planet-card .planet-card-travel {
+    font-size: 0.48rem !important;
+  }
+  .universe-planet-card--earth   { left: 4% !important; top: 22% !important; transform: none !important; }
+  .universe-planet-card--mars    { right: 4% !important; top: 20% !important; transform: none !important; }
+  .universe-planet-card--moon    { left: 4% !important; top: 62% !important; transform: none !important; }
+  .universe-planet-card--jupiter { right: 4% !important; top: 64% !important; transform: none !important; }
+  .universe-planet-card--saturn  { left: 50% !important; top: auto !important; bottom: 3% !important; transform: translateX(-50%) !important; }
+
+  /* Gallery Section: 2-Column Balanced Exhibition */
+  .gallery-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: minmax(240px, 300px) !important;
+    gap: 16px !important;
+  }
+  .gallery-item--featured {
+    grid-column: span 2 !important;
+    grid-row: span 1 !important;
+    max-height: 440px !important;
+  }
+  .gallery-item--wide,
+  .gallery-item--tall,
+  .gallery-item--medium,
+  .gallery-item--small {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+  }
+
+  /* Scrapbook Section: 2-Column Vintage Layout */
+  .scrapbook-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: minmax(220px, auto) !important;
+    gap: 20px !important;
+    padding-bottom: var(--s-8) !important;
+  }
+  .scrap-card--large {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+  }
+  .scrap-card--small {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
+  }
+  .scrap-card--wide {
+    grid-column: span 2 !important;
+    grid-row: span 1 !important;
+    max-width: 640px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+  }
+
+  /* Mosaic Section: 2-Column Wall of Memories */
+  .mosaic-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-auto-rows: minmax(200px, 240px) !important;
+    gap: 12px !important;
+  }
+  .mosaic-tile--featured,
+  .mosaic-tile--large {
+    grid-column: span 2 !important;
+  }
+  .mosaic-tile--wide,
+  .mosaic-tile--tall,
+  .mosaic-tile {
+    grid-column: span 1 !important;
+  }
+
+  /* Secret Envelope Section */
+  .secret-envelope-wrap,
+  .secret-envelope-wrapper {
+    max-width: min(500px, 88vw) !important;
+    margin: 115px auto 35px !important;
+  }
+  .secret-env-outer,
+  .secret-envelope {
+    width: 100% !important;
+    height: min(280px, 50vw) !important;
+  }
+  .secret-card {
+    min-height: 285px !important;
+    padding: 1.8rem 1.6rem 1.4rem !important;
+  }
+
+  /* Handcrafted Letter Section */
+  .envelope-wrapper {
+    max-width: min(540px, 88vw) !important;
+    margin: 140px auto 45px !important;
+  }
+  .envelope {
+    width: min(540px, 88vw) !important;
+    height: min(340px, 54vw) !important;
+  }
+  .letter-stationery {
+    width: min(500px, 86vw) !important;
+    padding: 2.2rem 2.4rem !important;
+  }
+  .letter-para {
+    font-size: 0.98rem !important;
+    line-height: 1.85 !important;
+  }
+
+  /* Final Cinematic Section */
+  #final-scene {
+    padding: 4.5rem 1.6rem 5.5rem !important;
+    min-height: auto !important;
+  }
+  .final-scene-content {
+    max-width: 520px !important;
+    margin: 0 auto !important;
+  }
+  .final-heading {
+    font-size: clamp(2.2rem, 5vw, 3.2rem) !important;
+  }
+  .final-photo-frame {
+    max-width: 380px !important;
+    width: 78vw !important;
+    margin: 1.5rem auto 2rem !important;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────
+   2. TABLET LANDSCAPE COMPOSITIONS (1024x768)
+   iPad Landscape, 10" - 12" widescreen tablets
+──────────────────────────────────────────────────────────── */
+@media (min-width: 961px) and (max-width: 1100px) and (orientation: landscape),
+       (min-width: 900px) and (max-width: 1040px) {
+
+  /* Compact Desktop Nav for Landscape Tablet */
+  #nav {
+    padding: 0.8rem 1.6rem;
+  }
+  .nav-menu-btn {
+    display: none !important;
+  }
+  .nav-links {
+    display: flex !important;
+    position: static !important;
+    height: auto !important;
+    width: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    gap: 0.75rem !important;
+  }
+  .nav-links a {
+    font-size: 0.58rem !important;
+    letter-spacing: 0.18em !important;
+  }
+  .nav-planet-tag {
+    font-size: 0.48rem !important;
+    padding: 0.05rem 0.25rem !important;
+    margin-left: 0.2rem !important;
+  }
+
+  /* Hero Section: Landscape Tablet Spread */
+  .hero-layout {
+    display: grid !important;
+    grid-template-columns: 1.15fr 0.85fr !important;
+    min-height: 100vh !important;
+    align-items: center !important;
+  }
+  .hero-left {
+    padding: 3.5rem 2rem 3rem 3.5rem !important;
+  }
+  .hero-heading {
+    font-size: clamp(2.5rem, 4.2vw, 3.8rem) !important;
+  }
+  .hero-right {
+    padding: 2.5rem 3.5rem 2.5rem 1rem !important;
+  }
+  .hero-frame {
+    max-height: 75vh !important;
+    aspect-ratio: 4/5 !important;
+  }
+
+  /* 3D Planetary Universe: Landscape Tablet Composition */
+  #universe {
+    height: 100vh !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+  #universe-nodes {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 7 !important;
+    pointer-events: none !important;
+    display: block !important;
+  }
+  .universe-heading-area {
+    position: absolute !important;
+    top: 3.5rem !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 6 !important;
+    text-align: center !important;
+    width: 90% !important;
+    max-width: 480px !important;
+  }
+  .universe-heading-area .t-h2 {
+    font-size: 1.8rem !important;
+  }
+  .universe-planet-card {
+    position: absolute !important;
+    pointer-events: auto !important;
+    max-width: 190px !important;
+    padding: 0.45rem 0.75rem !important;
+    border-radius: 10px !important;
+    z-index: 8 !important;
+  }
+  .universe-planet-card--earth   { left: 3% !important; top: 30% !important; transform: none !important; }
+  .universe-planet-card--mars    { right: 3% !important; top: 22% !important; transform: none !important; }
+  .universe-planet-card--moon    { left: 3% !important; top: 66% !important; transform: none !important; }
+  .universe-planet-card--jupiter { right: 3% !important; top: 64% !important; transform: none !important; }
+  .universe-planet-card--saturn  { left: 50% !important; top: auto !important; bottom: 2% !important; transform: translateX(-50%) !important; }
+
+  /* Gallery, Scrapbook, Mosaic Landscape */
+  .gallery-grid {
+    grid-template-columns: repeat(12, 1fr) !important;
+    grid-auto-rows: 220px !important;
+    gap: 12px !important;
+  }
+  .gallery-item--featured { grid-column: span 6 !important; }
+  .gallery-item--wide { grid-column: span 6 !important; }
+
+  .scrapbook-grid {
+    grid-template-columns: repeat(12, 1fr) !important;
+    grid-auto-rows: minmax(210px, auto) !important;
+    gap: 16px !important;
+  }
+  .scrap-card--large { grid-column: span 5 !important; grid-row: span 2 !important; }
+  .scrap-card--small { grid-column: span 3 !important; grid-row: span 1 !important; }
+  .scrap-card--wide  { grid-column: span 7 !important; grid-row: span 2 !important; }
+
+  .mosaic-grid {
+    grid-template-columns: repeat(12, 1fr) !important;
+    grid-auto-rows: 190px !important;
+    gap: 8px !important;
+  }
+
+  /* Envelopes in Landscape */
+  .secret-envelope-wrap,
+  .secret-envelope-wrapper { max-width: 500px !important; margin: 95px auto 30px !important; }
+  .secret-env-outer,
+  .secret-envelope { height: 260px !important; }
+  .secret-card { min-height: 285px !important; padding: 1.8rem 1.8rem 1.4rem !important; }
+  .envelope-wrapper { max-width: 540px !important; margin: 120px auto 40px !important; }
+}
+
+/* ────────────────────────────────────────────────────────────
+   3. MOBILE PHONES (max-width: 599px)
+──────────────────────────────────────────────────────────── */
+@media (max-width: 599px) {
   /* Nav */
-  .nav-menu-btn { display: flex; }
+  .nav-menu-btn { display: flex !important; }
   .nav-links {
     position: fixed;
     top: 0; right: -100%;
     height: 100vh;
-    width: min(280px, 80vw);
+    width: min(280px, 85vw);
     flex-direction: column;
     justify-content: center;
     background: rgba(243, 231, 214, 0.97);
@@ -2348,11 +3220,11 @@
     padding: var(--s-8) var(--s-6);
     gap: var(--s-4);
     transition: right 0.45s var(--ease-out);
-    box-shadow: -4px 0 30px rgba(73,50,36,0.12);
+    box-shadow: -4px 0 30px rgba(73, 50, 36, 0.12);
   }
   .nav-links.open { right: 0; }
-  .nav-links a { font-size: 0.8rem; }
-  #nav { padding: 1rem var(--s-3); }
+  .nav-links a { font-size: 0.82rem; }
+  #nav { padding: 0.8rem 1rem; }
 
   /* Hero — stacked */
   .hero-layout { grid-template-columns: 1fr; min-height: 100svh; }
@@ -2363,106 +3235,64 @@
   }
   .hero-right {
     order: 1;
-    height: 50svh;
-    min-height: 320px;
+    height: 48svh;
+    min-height: 300px;
   }
   .hero-vertical-label { display: none; }
   .hero-num { display: none; }
   .hero-annotation { display: none; }
   .hero-heading { font-size: clamp(2.2rem, 8vw, 3.2rem); }
 
-  /* Universe — nodes in flow */
-  #universe-nodes { position: static; display: flex; flex-wrap: wrap;
-    justify-content: center; gap: 1.5rem;
-    padding: var(--s-8) var(--s-4) var(--s-8); }
-  .universe-node { position: static !important; animation: none !important; }
+  /* Universe — vertical scroll stack */
+  #universe { min-height: auto; height: auto; padding: 2rem 0 3rem; }
+  #universe-nodes {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.9rem;
+    padding: var(--s-6) var(--s-4) var(--s-10);
+    z-index: 7;
+  }
+  .universe-planet-card {
+    position: static !important;
+    width: 100% !important;
+    max-width: 330px !important;
+    transform: none !important;
+  }
   .universe-orbit-ring { display: none; }
-  .universe-center { position: static; transform: none;
-    margin: var(--s-8) auto 0; padding: 0 var(--s-4); }
-  .universe-heading-area { position: static; transform: none;
-    padding: var(--s-8) var(--s-4) 0; }
+  .universe-center { position: static; transform: none; margin: var(--s-8) auto 0; padding: 0 var(--s-4); }
+  .universe-heading-area { position: static; transform: none; padding: var(--s-8) var(--s-4) 0; }
   .universe-constellation-svg { display: none; }
   .universe-scroll-hint { display: none; }
 
-  /* Gallery */
-  .gallery-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-auto-rows: 200px;
-    gap: 8px;
+  /* Content Grids */
+  .gallery-grid, .scrapbook-grid, .mosaic-grid {
+    grid-template-columns: 1fr !important;
+    grid-auto-rows: 240px !important;
   }
-  .gallery-item--featured,
-  .gallery-item--wide,
-  .gallery-item--medium,
-  .gallery-item--tall,
-  .gallery-item--small { grid-column: span 1; grid-row: span 1; }
-
-  /* Scrapbook */
-  .scrapbook-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-auto-rows: 180px;
-    gap: 10px;
+  .gallery-item--featured, .gallery-item--wide, .gallery-item,
+  .scrap-card--large, .scrap-card--wide, .scrap-card,
+  .mosaic-tile--large, .mosaic-tile--wide, .mosaic-tile {
+    grid-column: span 1 !important;
+    grid-row: span 1 !important;
   }
-  .scrap-card--large,
-  .scrap-card--wide,
-  .scrap-card--medium,
-  .scrap-card--small { grid-column: span 1; grid-row: span 1; }
 
-  /* Mosaic */
-  .mosaic-grid {
-    grid-template-columns: 1fr 1fr;
-    grid-auto-rows: 180px;
-    gap: 6px;
-  }
-  .mosaic-tile--large,
-  .mosaic-tile--wide,
-  .mosaic-tile--tall,
-  .mosaic-tile { grid-column: span 1; grid-row: span 1; }
-
-  /* Letter */
-  .letter-envelope-wrap { max-width: 94vw; margin-top: 120px; margin-bottom: 30px; }
+  /* Envelope & Letter */
+  .letter-envelope-wrap { max-width: 94vw; margin-top: 110px; margin-bottom: 25px; }
   .letter-env-outer { height: 260px; }
-  .letter-card {
-    padding: 1.8rem 1.4rem;
-    min-height: 440px;
-    top: 10px;
-    left: 3%;
-    right: 3%;
-  }
+  .letter-card { padding: 1.8rem 1.4rem; min-height: 440px; }
   .letter-heading { font-size: 1.55rem; }
-  .letter-para { font-size: 0.98rem; line-height: 1.95; }
-  .vintage-postage-stamp { width: 50px; height: 60px; top: 10px; right: 12px; }
-  .vintage-postmark { width: 72px; height: 72px; top: 14px; right: 38px; }
-  .letter-env-seal { width: 50px; height: 50px; }
-  .wax-seal-inner { width: 34px; height: 34px; }
+  .letter-para { font-size: 0.95rem; line-height: 1.9; }
 
-  /* Secret */
-  .secret-envelope-wrap { max-width: 90vw; margin-top: 80px; margin-bottom: 24px; }
-  .secret-env-outer { height: 210px; }
-  .secret-card {
-    min-height: 220px;
-    top: 8px;
-    left: 4%;
-    right: 4%;
-    padding: 1.4rem 1.2rem;
-  }
+  .secret-envelope-wrap { max-width: 92vw !important; margin-top: 85px !important; margin-bottom: 25px !important; }
+  .secret-env-outer { height: 250px !important; }
+  .secret-card { min-height: 275px !important; padding: 1.6rem 0.85rem 1.1rem !important; }
+  .shayari-couplet--highlight { padding: 0.25rem 0.25rem !important; }
+  .shayari-line { font-size: clamp(0.74rem, 3.15vw, 0.82rem) !important; line-height: 2.05 !important; letter-spacing: 0.005em !important; }
 
-  /* Final */
   .final-photo-frame { max-width: 320px; }
-
-  /* Lightbox */
   #lb-prev { left: 0.4rem; width: 36px; height: 36px; }
   #lb-next { right: 0.4rem; width: 36px; height: 36px; }
   .lightbox-close { top: -2.5rem; }
-}
-
-@media (max-width: 480px) {
-  .intro-line { font-size: 1.5rem; }
-  .intro-line--italic { font-size: 1.22rem; }
-  #enter-btn { padding: 1rem 2rem; }
-  .hero-heading { font-size: 2rem; }
-
-  .gallery-grid, .scrapbook-grid, .mosaic-grid {
-    grid-template-columns: 1fr;
-    grid-auto-rows: 240px;
-  }
 }
