@@ -553,48 +553,80 @@
           Hmm... there's something here.
         </h2>
 
-        <!-- Premium envelope -->
-        <div id="secret-envelope" class="secret-envelope" aria-hidden="true">
-          <!-- Postal detail strip -->
-          <div class="envelope-postal-strip" aria-hidden="true">
-            <span>✉</span>
-            <span>PRIVATE</span>
-            <span>✦</span>
-          </div>
-          <div class="envelope-body">
-            <!-- Flap -->
-            <div class="envelope-flap" aria-hidden="true">
-              <div class="envelope-flap-crease"></div>
+        <!-- Handcrafted 3D Secret Envelope -->
+        <div class="secret-envelope-wrap reveal-scale" id="secret-envelope-wrap" data-delay="300" style="--reveal-delay:300ms">
+          <div id="secret-envelope" class="secret-env-outer" role="region" aria-label="Secret keepsake envelope">
+            <!-- Ambient shadow -->
+            <div class="secret-env-ambient-shadow" aria-hidden="true"></div>
+
+            <!-- Envelope Back with Vintage Star Lining -->
+            <div class="secret-env-back" aria-hidden="true">
+              <div class="env-lining-pattern env-lining-pattern--secret"></div>
             </div>
-            <!-- Wax seal -->
-            <div class="envelope-seal" aria-label="Wax seal">
-              <span>✦</span>
+
+            <!-- 3D Top Flap -->
+            <div class="secret-env-flap" id="secret-flap" aria-hidden="true">
+              <div class="secret-flap-outer">
+                <svg class="secret-flap-border-svg" viewBox="0 0 320 140" preserveAspectRatio="none">
+                  <path d="M 0 0 L 160 120 L 320 0" stroke="rgba(189,149,107,0.45)" stroke-width="1.5" fill="none" />
+                  <path d="M 12 0 L 160 110 L 308 0" stroke="rgba(189,149,107,0.25)" stroke-width="0.8" stroke-dasharray="3 3" fill="none" />
+                </svg>
+              </div>
+              <div class="secret-flap-inner">
+                <div class="env-lining-pattern env-lining-pattern--secret"></div>
+              </div>
             </div>
-            <!-- Corner decorations -->
-            <div class="envelope-corner envelope-corner--tl" aria-hidden="true"></div>
-            <div class="envelope-corner envelope-corner--tr" aria-hidden="true"></div>
-            <div class="envelope-corner envelope-corner--bl" aria-hidden="true"></div>
-            <div class="envelope-corner envelope-corner--br" aria-hidden="true"></div>
+
+            <!-- Wax Seal (Clickable trigger) -->
+            <div class="secret-env-seal" id="secret-seal" role="button" tabindex="0" aria-label="Open secret envelope">
+              <div class="wax-seal-outer">
+                <div class="wax-seal-inner">
+                  <span class="wax-seal-icon">✦</span>
+                </div>
+              </div>
+              <span class="wax-seal-tooltip">Open Secret ✦</span>
+            </div>
+
+            <!-- Vintage Postal Strip -->
+            <div class="secret-postal-strip" aria-hidden="true">
+              <span class="secret-strip-text">✦ CONFIDENTIAL &amp; PRIVATE ✦</span>
+            </div>
+
+            <!-- Secret Keepsake Card (Slides out of envelope) -->
+            <article id="secret-card" class="secret-card" aria-label="Secret discovery note">
+              <button id="secret-close-btn" class="secret-close-btn" aria-label="Close secret note" title="Close note">✕</button>
+              <div class="secret-card-border" aria-hidden="true"></div>
+              <div class="secret-card-header">
+                <span class="secret-card-monogram">✦ PRIVATE DISCOVERY ✦</span>
+                <h3 class="secret-card-title">You found it. ✨</h3>
+              </div>
+              <div class="secret-card-body">
+                <p id="secret-message-text" class="secret-message-text">
+                  You found the little secret. ✨<br>
+                  Some things are made to be discovered.
+                </p>
+              </div>
+              <div class="secret-card-footer" aria-hidden="true">
+                <span class="secret-star-flourish">✦ &nbsp; ★ &nbsp; ✦</span>
+              </div>
+            </article>
+
+            <!-- Front Envelope Pocket Folds -->
+            <div class="secret-env-pocket" aria-hidden="true">
+              <div class="secret-pocket-fold secret-pocket-fold--left"></div>
+              <div class="secret-pocket-fold secret-pocket-fold--right"></div>
+              <div class="secret-pocket-fold secret-pocket-fold--bottom">
+                <div class="secret-pocket-crease"></div>
+              </div>
+            </div>
+
           </div>
-          <!-- Envelope shadow -->
-          <div class="envelope-shadow" aria-hidden="true"></div>
         </div>
 
-        <div class="reveal-up" data-delay="400" style="--reveal-delay:400ms">
+        <div class="reveal-up" data-delay="400" style="--reveal-delay:400ms; margin-top:2rem;">
           <button id="secret-reveal-btn" class="btn btn--primary" aria-label="Reveal the hidden surprise">
             Take a Look <span aria-hidden="true">✦</span>
           </button>
-        </div>
-
-        <!-- Revealed content -->
-        <div id="secret-reveal" class="secret-reveal" aria-live="polite" aria-atomic="true">
-          <div class="deco-divider" aria-hidden="true"><span>✦</span></div>
-          <p id="secret-message-text"
-             class="t-body"
-             style="max-width:440px; text-align:center; color:var(--deep-espresso); font-family:var(--font-heading); font-size:1.12rem; line-height:1.9;">
-            You found the little secret. ✨<br>
-            Some things are made to be discovered.
-          </p>
         </div>
       </div>
     </section>
@@ -622,45 +654,144 @@
           <span>✦</span>
         </div>
 
-        <!-- Premium letter envelope -->
-        <div class="letter-envelope-wrap reveal-scale" data-delay="320" style="--reveal-delay:320ms">
+        <!-- Premium Handcrafted 3D Letter Envelope -->
+        <div class="letter-envelope-wrap reveal-scale" id="letter-envelope-wrap" data-delay="320" style="--reveal-delay:320ms">
           <div id="letter-env" class="letter-env-outer">
-            <!-- Envelope back panel -->
-            <div class="letter-env-back" aria-hidden="true"></div>
-            <!-- Envelope flap -->
-            <div class="letter-env-flap" aria-hidden="true">
-              <div class="letter-env-flap-crease" aria-hidden="true"></div>
-            </div>
-            <!-- Seal -->
-            <div class="letter-env-seal" aria-hidden="true">✉</div>
-            <!-- Postal decoration -->
-            <div class="letter-env-postal" aria-hidden="true">
-              <span class="letter-env-stamp">✦ HER LITTLE UNIVERSE ✦</span>
+            <!-- Realistic ambient drop shadow -->
+            <div class="env-ambient-shadow" aria-hidden="true"></div>
+
+            <!-- Envelope Back with Vintage Star Lining -->
+            <div class="letter-env-back" aria-hidden="true">
+              <div class="env-lining-pattern"></div>
             </div>
 
-            <!-- Letter card (shown after opening) -->
+            <!-- The 3D Top Flap (Hinged at top: 0, rotates around top crease) -->
+            <div class="letter-env-flap" id="letter-flap" aria-hidden="true">
+              <div class="flap-outer-face">
+                <svg class="flap-border-svg" viewBox="0 0 540 220" preserveAspectRatio="none">
+                  <path d="M 0 0 L 270 190 L 540 0" stroke="rgba(189,149,107,0.45)" stroke-width="1.5" fill="none" />
+                  <path d="M 14 0 L 270 180 L 526 0" stroke="rgba(189,149,107,0.25)" stroke-width="0.8" stroke-dasharray="3 3" fill="none" />
+                </svg>
+                <div class="flap-crease-shadow"></div>
+              </div>
+              <div class="flap-inner-face">
+                <div class="env-lining-pattern env-lining-pattern--flap"></div>
+              </div>
+            </div>
+
+            <!-- Champagne Wax Seal (Clickable trigger on flap tip) -->
+            <div class="letter-env-seal" id="letter-seal" role="button" tabindex="0" aria-label="Open personal letter">
+              <div class="wax-seal-outer">
+                <div class="wax-seal-inner">
+                  <span class="wax-seal-icon">✦</span>
+                </div>
+              </div>
+              <div class="wax-seal-ripple" aria-hidden="true"></div>
+              <span class="wax-seal-tooltip">Click to Open ✦</span>
+            </div>
+
+            <!-- Vintage Postal Markings -->
+            <div class="letter-postal-decorations" aria-hidden="true">
+              <!-- Perforated Postage Stamp -->
+              <div class="vintage-postage-stamp">
+                <div class="stamp-inner">
+                  <span class="stamp-star">✦</span>
+                  <span class="stamp-denom">N° 05</span>
+                  <span class="stamp-label">SPECIAL AIRMAIL</span>
+                </div>
+              </div>
+              <!-- Circular Postmark Cancellation -->
+              <div class="vintage-postmark">
+                <svg viewBox="0 0 100 100" class="postmark-svg">
+                  <circle cx="50" cy="50" r="44" stroke="currentColor" stroke-width="1.2" fill="none" stroke-dasharray="140 8 4 8" />
+                  <circle cx="50" cy="50" r="36" stroke="currentColor" stroke-width="0.6" fill="none" />
+                  <path id="postmark-curve" d="M 18,50 A 32,32 0 1,1 82,50" fill="none" />
+                  <text font-size="7.5" fill="currentColor" letter-spacing="1.8">
+                    <textPath href="#postmark-curve" startOffset="50%" text-anchor="middle">
+                      BHAVNA'S UNIVERSE
+                    </textPath>
+                  </text>
+                  <text x="50" y="52" font-size="7.5" text-anchor="middle" fill="currentColor" font-family="'DM Sans', sans-serif">★ 2024 ★</text>
+                  <text x="50" y="64" font-size="6" text-anchor="middle" fill="currentColor" letter-spacing="1.2">ARCHIVE</text>
+                </svg>
+              </div>
+              <!-- Metal Filigree Corner Accents -->
+              <div class="env-corner env-corner--tl"></div>
+              <div class="env-corner env-corner--tr"></div>
+              <div class="env-corner env-corner--bl"></div>
+              <div class="env-corner env-corner--br"></div>
+            </div>
+
+            <!-- Letter & Vintage Stationery Sheet -->
             <article id="letter-card" class="letter-card" aria-label="Personal note">
-              <button id="letter-close-btn" class="letter-close-btn" aria-label="Close letter">✕</button>
+              <!-- Close Button -->
+              <button id="letter-close-btn" class="letter-close-btn" aria-label="Close letter" title="Close letter">
+                <span class="close-icon">✕</span>
+              </button>
 
-              <!-- Premium stationery header -->
-              <div class="letter-stationery-top" aria-hidden="true">
-                <div class="letter-deco-line"></div>
-                <span class="letter-monogram">✦ H.L.U. ✦</span>
-                <div class="letter-deco-line"></div>
+              <!-- Paper Textures & Framing -->
+              <div class="letter-paper-texture" aria-hidden="true"></div>
+              <div class="letter-border-frame" aria-hidden="true">
+                <div class="letter-border-inner">
+                  <!-- Corner Botanical Ornaments -->
+                  <svg class="letter-corner-botanical letter-corner--tl" viewBox="0 0 24 24" fill="none">
+                    <path d="M2 22 C 2 12, 12 2, 22 2 M 2 2 L 8 8 M 5 13 C 8 10, 10 8, 13 5" stroke="#BD956B" stroke-width="0.9" stroke-linecap="round"/>
+                  </svg>
+                  <svg class="letter-corner-botanical letter-corner--tr" viewBox="0 0 24 24" fill="none">
+                    <path d="M2 22 C 2 12, 12 2, 22 2 M 2 2 L 8 8 M 5 13 C 8 10, 10 8, 13 5" stroke="#BD956B" stroke-width="0.9" stroke-linecap="round"/>
+                  </svg>
+                  <svg class="letter-corner-botanical letter-corner--bl" viewBox="0 0 24 24" fill="none">
+                    <path d="M2 22 C 2 12, 12 2, 22 2 M 2 2 L 8 8 M 5 13 C 8 10, 10 8, 13 5" stroke="#BD956B" stroke-width="0.9" stroke-linecap="round"/>
+                  </svg>
+                  <svg class="letter-corner-botanical letter-corner--br" viewBox="0 0 24 24" fill="none">
+                    <path d="M2 22 C 2 12, 12 2, 22 2 M 2 2 L 8 8 M 5 13 C 8 10, 10 8, 13 5" stroke="#BD956B" stroke-width="0.9" stroke-linecap="round"/>
+                  </svg>
+                </div>
               </div>
 
-              <h3 id="letter-heading" class="letter-heading">A Little Note</h3>
+              <!-- Stationery Header -->
+              <header class="letter-header">
+                <!-- Botanical Sprig -->
+                <svg class="letter-botanical-sprig" viewBox="0 0 60 16" fill="none" aria-hidden="true">
+                  <path d="M5 8 Q 30 5 55 8" stroke="#BD956B" stroke-width="0.8" />
+                  <path d="M20 7 Q 17 2 13 4 Q 16 8 20 7 Z" fill="#BD956B" opacity="0.35" />
+                  <path d="M40 7 Q 43 2 47 4 Q 44 8 40 7 Z" fill="#BD956B" opacity="0.35" />
+                  <circle cx="30" cy="7.5" r="1.5" fill="#BD956B" />
+                </svg>
+                <div class="letter-monogram">✦ B.L.U. • PERSONAL ARCHIVE ✦</div>
+                <h3 id="letter-heading" class="letter-heading">A Little Note</h3>
+              </header>
 
-              <!-- Ruling lines background (decorative) -->
+              <!-- Subtle Paper Ruling Lines -->
               <div class="letter-ruled-bg" aria-hidden="true"></div>
 
-              <p id="letter-body" class="letter-body"></p>
-
-              <div class="letter-signature-wrap">
-                <div class="letter-signature-line" aria-hidden="true"></div>
-                <p class="letter-signature t-note" id="letter-signature">— with love ✦</p>
+              <!-- Dynamic Staggered Paragraphs Container -->
+              <div id="letter-paragraphs-container" class="letter-paragraphs-container">
+                <p id="letter-body" class="letter-body"></p>
               </div>
+
+              <!-- Stationery Footer & Handwritten Signature -->
+              <footer class="letter-footer">
+                <div class="letter-footer-flourish" aria-hidden="true">
+                  <span>✦</span>
+                </div>
+                <div class="letter-signature-wrap" id="letter-signature-wrap">
+                  <div class="letter-signature-line" aria-hidden="true"></div>
+                  <p class="letter-signature" id="letter-signature">— Aadi ✦</p>
+                </div>
+              </footer>
             </article>
+
+            <!-- Envelope Pocket (Folds covering the letter inside) -->
+            <div class="letter-env-pocket" aria-hidden="true">
+              <div class="pocket-fold pocket-fold--left"></div>
+              <div class="pocket-fold pocket-fold--right"></div>
+              <div class="pocket-fold pocket-fold--bottom">
+                <div class="pocket-crease-shadow"></div>
+              </div>
+              <div class="pocket-edge-highlight"></div>
+            </div>
+
           </div>
         </div>
 

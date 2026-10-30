@@ -1244,169 +1244,289 @@
   margin-bottom: var(--s-2);
 }
 
-/* Premium envelope */
-.secret-envelope {
+/* ════════════════════════════════════════════════
+   SCENE 7 — HANDCRAFTED 3D SECRET ENVELOPE
+════════════════════════════════════════════════ */
+.secret-envelope-wrap {
   position: relative;
-  margin: var(--s-8) auto;
-  width: 280px;
-  height: 196px;
-  cursor: none;
-  transform-style: preserve-3d;
-  transition: transform 0.6s var(--ease-out);
-}
-.secret-envelope:hover:not(.opened) {
-  transform: translateY(-6px) rotate(-0.5deg);
+  width: 100%;
+  max-width: 360px;
+  margin: 110px auto 30px;
+  perspective: 1200px;
+  -webkit-perspective: 1200px;
+  overflow: visible;
 }
 
-/* Postal strip top */
-.envelope-postal-strip {
+.secret-env-outer {
+  position: relative;
+  width: 100%;
+  height: 230px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  user-select: none;
+  cursor: pointer;
+  will-change: transform;
+}
+
+.secret-env-ambient-shadow {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 22px;
-  background: var(--champagne);
-  border-bottom: 1px solid rgba(189, 149, 107, 0.3);
+  bottom: -16px;
+  left: 6%;
+  right: 6%;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(73, 50, 36, 0.28) 0%, transparent 70%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.secret-env-back {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #F8F1E7 0%, #EBDBC8 100%);
+  border-radius: 3px;
+  border: 1.5px solid rgba(189, 149, 107, 0.4);
+  box-shadow: 0 12px 32px rgba(73, 50, 36, 0.14), inset 0 0 40px rgba(189, 149, 107, 0.18);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.env-lining-pattern--secret {
+  background-size: 18px 18px;
+  opacity: 0.85;
+}
+
+/* 3D Flap */
+.secret-env-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64%;
+  transform-origin: top center;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transform: rotateX(0deg);
+  z-index: 30;
+  will-change: transform;
+}
+
+.secret-flap-outer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(170deg, #FAF4E8 0%, #EFE1D0 55%, #DFC9B2 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 74%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 50% 74%);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  filter: drop-shadow(0 4px 10px rgba(73, 50, 36, 0.18));
+}
+
+.secret-flap-border-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.secret-flap-inner {
+  position: absolute;
+  inset: 0;
+  background: #FAF4E8;
+  clip-path: polygon(0 0, 100% 0, 50% 74%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 50% 74%);
+  transform: rotateX(180deg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-bottom: 1.5px solid rgba(189, 149, 107, 0.35);
+}
+
+/* Wax Seal */
+.secret-env-seal {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%,
+    #F7E9D3 0%,
+    #E2C49C 28%,
+    #C69B6A 65%,
+    #8C6242 100%
+  );
+  border: 2px solid rgba(140, 98, 66, 0.55);
+  box-shadow:
+    0 6px 18px rgba(73, 50, 36, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.6),
+    inset 0 -2px 4px rgba(73, 50, 36, 0.4);
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 var(--s-3);
+  justify-content: center;
+  cursor: pointer;
+  z-index: 35;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+}
+
+.secret-env-seal:hover {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 8px 24px rgba(73, 50, 36, 0.48), 0 0 16px rgba(216, 185, 144, 0.7);
+}
+
+/* Vintage Postal Strip */
+.secret-postal-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(90deg, rgba(216,185,144,0.4), rgba(240,230,215,0.7), rgba(216,185,144,0.4));
+  border-bottom: 1px solid rgba(189, 149, 107, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-nav);
+  font-size: 0.44rem;
+  letter-spacing: 0.28em;
+  color: var(--chestnut);
+  z-index: 22;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* Pocket folds */
+.secret-env-pocket {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.secret-pocket-fold--left {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 0 100%, 52% 52%);
+  -webkit-clip-path: polygon(0 0, 0 100%, 52% 52%);
+  background: linear-gradient(135deg, #FAF4E8 0%, #EBDEC9 70%, #DEC8B0 100%);
+  filter: drop-shadow(2px 2px 6px rgba(73, 50, 36, 0.08));
+  border-left: 1.5px solid rgba(189, 149, 107, 0.35);
+  border-bottom: 1.5px solid rgba(189, 149, 107, 0.35);
+}
+
+.secret-pocket-fold--right {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(100% 0, 100% 100%, 48% 52%);
+  -webkit-clip-path: polygon(100% 0, 100% 100%, 48% 52%);
+  background: linear-gradient(225deg, #F6EEE2 0%, #E9D7C3 70%, #DEC8B0 100%);
+  filter: drop-shadow(-2px 2px 6px rgba(73, 50, 36, 0.08));
+  border-right: 1.5px solid rgba(189, 149, 107, 0.35);
+  border-bottom: 1.5px solid rgba(189, 149, 107, 0.35);
+}
+
+.secret-pocket-fold--bottom {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 100%, 100% 100%, 50% 48%);
+  -webkit-clip-path: polygon(0 100%, 100% 100%, 50% 48%);
+  background: linear-gradient(0deg, #FCF6EC 0%, #EFE1D0 60%, #E3CEB8 100%);
+  filter: drop-shadow(0 -3px 8px rgba(73, 50, 36, 0.12));
+}
+
+/* Secret Keepsake Card */
+.secret-card {
+  position: absolute;
+  top: 10px;
+  left: 6%;
+  right: 6%;
+  min-height: 250px;
+  background: #FFFDF9;
+  border-radius: 2px;
+  box-shadow: 0 16px 42px rgba(73, 50, 36, 0.16);
+  padding: 1.8rem 1.6rem 1.4rem;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translate3d(0, 0, 0) scale(0.96);
+  pointer-events: none;
+  will-change: transform, opacity;
+  z-index: 10;
+  text-align: center;
+}
+
+.secret-card.is-active {
+  z-index: 50 !important;
+  pointer-events: auto;
+}
+
+.secret-card-border {
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(189, 149, 107, 0.35);
+  pointer-events: none;
+}
+
+.secret-card-monogram {
   font-family: var(--font-nav);
   font-size: 0.46rem;
   letter-spacing: 0.28em;
-  color: var(--chestnut);
-  opacity: 0.7;
-  z-index: 6;
+  color: var(--soft-caramel);
   text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.4rem;
 }
 
-/* Envelope body */
-.envelope-body {
-  position: absolute;
-  top: 22px; left: 0; right: 0; bottom: 0;
-  background: var(--card-secondary);
-  border: 1.5px solid rgba(189, 149, 107, 0.4);
-  box-shadow:
-    var(--shadow-deep),
-    inset 0 0 40px rgba(235, 216, 192, 0.3);
-  overflow: hidden;
-  border-radius: 1px;
+.secret-card-title {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-style: italic;
+  color: var(--deep-espresso);
+  margin: 0 0 0.8rem;
 }
 
-/* Left/Right V-fold shadows */
-.envelope-body::before,
-.envelope-body::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  width: 50%;
-  height: 70%;
-  pointer-events: none;
-  z-index: 1;
-}
-.envelope-body::before {
-  left: 0;
-  background: linear-gradient(135deg,
-    rgba(189, 149, 107, 0.12) 0%,
-    transparent 60%
-  );
-}
-.envelope-body::after {
-  right: 0;
-  background: linear-gradient(225deg,
-    rgba(189, 149, 107, 0.12) 0%,
-    transparent 60%
-  );
+.secret-message-text {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: #523D2D;
+  margin: 0;
 }
 
-/* Flap */
-.envelope-flap {
-  position: absolute;
-  top: 0; left: -1px; right: -1px;
-  height: 50%;
-  background: linear-gradient(160deg, var(--card-vintage) 0%, var(--antique-beige) 100%);
-  border: 1.5px solid rgba(189, 149, 107, 0.38);
-  border-bottom: none;
-  clip-path: polygon(0 0, 50% 75%, 100% 0);
-  transform-origin: top center;
-  transform: scaleY(1);
-  transition: transform 0.7s var(--ease-cinematic),
-              box-shadow 0.5s;
-  z-index: 5;
-}
-.envelope-flap-crease {
-  position: absolute;
-  top: 68%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 60%;
-  height: 1px;
-  background: rgba(140, 98, 66, 0.15);
-}
-
-/* Opened flap */
-.secret-envelope.opened .envelope-flap {
-  transform: scaleY(0);
-  opacity: 0;
-}
-
-/* Wax seal */
-.envelope-seal {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 38% 38%, var(--champagne) 0%, var(--warm-caramel) 45%, var(--chestnut) 100%);
-  border: 2px solid rgba(140, 98, 66, 0.5);
-  box-shadow: 0 3px 12px rgba(73, 50, 36, 0.3), inset 0 1px 4px rgba(255, 250, 243, 0.3);
-  display: flex; align-items: center; justify-content: center;
+.secret-card-footer {
+  margin-top: 1rem;
+  color: var(--soft-caramel);
   font-size: 0.75rem;
-  color: var(--ivory);
-  z-index: 7;
-  animation: seal-pop 4s ease-in-out infinite;
-  cursor: none;
+  opacity: 0.6;
 }
-.secret-envelope.opened .envelope-seal { opacity: 0; transform: translate(-50%, -50%) scale(0); transition: all 0.4s; }
 
-/* Corner decorations */
-.envelope-corner {
+.secret-close-btn {
   position: absolute;
-  width: 12px; height: 12px;
-  border-color: rgba(189, 149, 107, 0.28);
-  border-style: solid;
-  z-index: 3;
-}
-.envelope-corner--tl { top:  6px; left:  6px; border-width: 1px 0 0 1px; }
-.envelope-corner--tr { top:  6px; right: 6px; border-width: 1px 1px 0 0; }
-.envelope-corner--bl { bottom: 6px; left:  6px; border-width: 0 0 1px 1px; }
-.envelope-corner--br { bottom: 6px; right: 6px; border-width: 0 1px 1px 0; }
-
-/* Shadow beneath envelope */
-.envelope-shadow {
-  position: absolute;
-  bottom: -14px; left: 10%; right: 10%;
-  height: 14px;
-  background: radial-gradient(ellipse at 50% 0%, rgba(73, 50, 36, 0.22), transparent 70%);
-  filter: blur(4px);
-  pointer-events: none;
-}
-
-/* Secret reveal */
-.secret-reveal {
+  top: 12px;
+  right: 12px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid rgba(189, 149, 107, 0.35);
+  background: rgba(255, 253, 248, 0.9);
+  color: var(--chestnut);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: var(--s-3);
-  opacity: 0;
-  transform: translateY(18px);
-  transition: opacity 0.85s var(--ease-out), transform 0.85s var(--ease-out);
-  pointer-events: none;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.25s ease;
 }
-.secret-reveal.visible {
-  opacity: 1; transform: none; pointer-events: all;
+.secret-close-btn:hover {
+  background: var(--card-primary);
+  color: var(--deep-espresso);
+  transform: rotate(90deg) scale(1.1);
 }
 
 /* ════════════════════════════════════════════════
-   LETTER SECTION — PREMIUM PAPER STATIONERY
+   SCENE 8 — LETTER SECTION
 ════════════════════════════════════════════════ */
 #letter-section {
   background: linear-gradient(160deg,
@@ -1428,226 +1548,596 @@
   padding: var(--s-16) var(--s-4);
   text-align: center;
   z-index: 2;
+  overflow: visible;
 }
 
-/* Premium envelope */
+/* HANDCRAFTED 3D LETTER ENVELOPE */
 .letter-envelope-wrap {
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
   position: relative;
+  width: 100%;
+  max-width: 580px;
+  margin: 170px auto 40px;
+  perspective: 1400px;
+  -webkit-perspective: 1400px;
   overflow: visible;
 }
 
 .letter-env-outer {
   position: relative;
   width: 100%;
-  height: 290px;
-  background: var(--card-secondary);
-  border: 1.5px solid rgba(189, 149, 107, 0.38);
-  box-shadow: var(--shadow-deep), inset 0 0 50px rgba(235, 216, 192, 0.25);
-  overflow: visible;  /* card must be visible above envelope */
+  height: 350px;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  user-select: none;
 }
 
-/* Envelope back panel */
+/* Ambient soft drop shadow under envelope */
+.env-ambient-shadow {
+  position: absolute;
+  bottom: -22px;
+  left: 5%;
+  right: 5%;
+  height: 38px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(73, 50, 36, 0.28) 0%, rgba(73, 50, 36, 0.08) 55%, transparent 75%);
+  filter: blur(10px);
+  pointer-events: none;
+  z-index: 0;
+  transition: transform 0.8s ease, opacity 0.8s ease;
+}
+
+/* ════════════════════════════════════════════════
+   ENVELOPE BACK & VINTAGE TOILE LINING
+════════════════════════════════════════════════ */
 .letter-env-back {
   position: absolute;
   inset: 0;
-  background: linear-gradient(160deg, var(--card-secondary) 0%, var(--card-vintage) 100%);
+  background: linear-gradient(160deg, #F8F1E7 0%, #EBDBC8 100%);
+  border-radius: 3px;
+  border: 1.5px solid rgba(189, 149, 107, 0.42);
+  box-shadow:
+    0 16px 40px rgba(73, 50, 36, 0.16),
+    0 2px 8px rgba(73, 50, 36, 0.08),
+    inset 0 0 50px rgba(189, 149, 107, 0.2);
+  overflow: hidden;
   z-index: 1;
 }
 
-/* Envelope flap */
+/* Delicate vintage gold star/damask lining pattern */
+.env-lining-pattern {
+  position: absolute;
+  inset: 0;
+  background-color: #FAF4E8;
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(189, 149, 107, 0.22) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 0 0, rgba(189, 149, 107, 0.14) 1.5px, transparent 1.5px);
+  background-size: 22px 22px;
+  opacity: 0.9;
+}
+.env-lining-pattern--flap {
+  opacity: 0.95;
+}
+
+/* ════════════════════════════════════════════════
+   THE 3D TOP FLAP
+   Hinged at top: 0, rotates around top crease
+════════════════════════════════════════════════ */
 .letter-env-flap {
   position: absolute;
-  top: 0; left: -1px; right: -1px;
-  z-index: 8;
-  height: 55%;
-  background: linear-gradient(155deg, var(--card-vintage) 0%, var(--antique-beige) 60%, var(--card-vintage) 100%);
-  border: 1.5px solid rgba(189, 149, 107, 0.35);
-  border-bottom: none;
-  clip-path: polygon(0 0, 50% 80%, 100% 0);
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 65%;
   transform-origin: top center;
-  transform: scaleY(1);
-  transition: transform 0.85s var(--ease-cinematic), opacity 0.5s;
-  box-shadow: 0 4px 16px rgba(73, 50, 36, 0.08);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transform: rotateX(0deg);
+  z-index: 30; /* In front of pocket when closed */
+  will-change: transform;
 }
-.letter-env-flap-crease {
+
+/* Front Face of Flap (visible when closed) */
+.flap-outer-face {
   position: absolute;
-  top: 72%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 55%;
-  height: 1px;
-  background: rgba(140, 98, 66, 0.12);
+  inset: 0;
+  background: linear-gradient(170deg, #FAF4E8 0%, #EFE1D0 55%, #E1CDBC 100%);
+  clip-path: polygon(0 0, 100% 0, 50% 72%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 50% 72%);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  filter: drop-shadow(0 5px 12px rgba(73, 50, 36, 0.2));
 }
 
-/* Open state */
-.letter-env-outer.open .letter-env-flap {
-  transform: scaleY(0);
-  opacity: 0;
+.flap-border-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
-/* Envelope seal */
+.flap-crease-shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(to bottom, rgba(140, 98, 66, 0.25), transparent);
+  pointer-events: none;
+}
+
+/* Inner Face of Flap (revealed lining when open) */
+.flap-inner-face {
+  position: absolute;
+  inset: 0;
+  background: #FAF4E8;
+  clip-path: polygon(0 0, 100% 0, 50% 72%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 50% 72%);
+  transform: rotateX(180deg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-bottom: 1.5px solid rgba(189, 149, 107, 0.35);
+  filter: drop-shadow(0 -3px 8px rgba(73, 50, 36, 0.12));
+}
+
+/* ════════════════════════════════════════════════
+   CHAMPAGNE 3D WAX SEAL
+════════════════════════════════════════════════ */
 .letter-env-seal {
   position: absolute;
-  top: 42%; left: 50%;
+  top: 46%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  width: 48px; height: 48px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
-  background: radial-gradient(circle at 38% 38%,
-    var(--champagne) 0%, var(--warm-caramel) 42%, var(--chestnut) 100%
+  background: radial-gradient(circle at 35% 35%,
+    #F7E9D3 0%,
+    #E2C49C 28%,
+    #C69B6A 65%,
+    #8C6242 100%
   );
   border: 2px solid rgba(140, 98, 66, 0.55);
-  box-shadow: 0 4px 14px rgba(73, 50, 36, 0.3), inset 0 1px 4px rgba(255,250,243,0.3);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-  color: var(--ivory);
-  z-index: 9;
-  transition: opacity 0.4s, transform 0.4s;
-  cursor: none;
-}
-.letter-env-outer.open .letter-env-seal {
-  opacity: 0; transform: translate(-50%, -50%) scale(0.5);
-}
-
-/* Postal stamp decoration */
-.letter-env-postal {
-  position: absolute;
-  top: var(--s-3); right: var(--s-3);
-  z-index: 6;
-}
-.letter-env-stamp {
-  display: block;
-  font-family: var(--font-nav);
-  font-size: 0.44rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--chestnut);
-  opacity: 0.55;
-  border: 1px solid rgba(189, 149, 107, 0.3);
-  padding: 0.35rem 0.6rem;
-  background: rgba(255, 249, 240, 0.5);
-}
-
-/* THE LETTER CARD — rises from inside envelope */
-.letter-card {
-  position: absolute;
-  /* anchored at bottom of envelope, extends upward */
-  bottom: 0; left: 8%; right: 8%;
-  background: var(--card-primary);
-  border: 1px solid rgba(189, 149, 107, 0.2);
-  border-top: 3px solid var(--champagne);
-  box-shadow: var(--shadow-deep);
-  padding: var(--s-6) var(--s-6) var(--s-8);
-  z-index: 6;   /* below flap (z-index 8) initially */
-  transform-origin: bottom center;
-  transform: translateY(90%) scale(0.96);
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    transform 0.95s var(--ease-cinematic) 0.3s,
-    opacity   0.55s var(--ease-out)       0.2s;
-  overflow: hidden;
-}
-.letter-card.open {
-  transform: translateY(-102%) scale(1);
-  opacity: 1;
-  z-index: 10;
-  pointer-events: all;
-}
-
-/* Premium stationery top row */
-.letter-stationery-top {
+  box-shadow:
+    0 8px 24px rgba(73, 50, 36, 0.42),
+    0 2px 6px rgba(73, 50, 36, 0.25),
+    inset 0 2px 4px rgba(255, 255, 255, 0.6),
+    inset 0 -2px 5px rgba(73, 50, 36, 0.45);
   display: flex;
   align-items: center;
-  gap: var(--s-3);
-  margin-bottom: var(--s-4);
+  justify-content: center;
+  cursor: pointer;
+  z-index: 35;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
 }
-.letter-deco-line {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--soft-caramel));
-  opacity: 0.3;
+
+.letter-env-seal:hover {
+  transform: translate(-50%, -50%) scale(1.09);
+  box-shadow:
+    0 10px 28px rgba(73, 50, 36, 0.5),
+    0 0 18px rgba(216, 185, 144, 0.7),
+    inset 0 2px 4px rgba(255, 255, 255, 0.7);
 }
-.letter-deco-line:last-child {
-  background: linear-gradient(270deg, transparent, var(--soft-caramel));
+
+.letter-env-seal:active {
+  transform: translate(-50%, -50%) scale(0.95);
 }
-.letter-monogram {
+
+.wax-seal-outer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wax-seal-inner {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(255, 250, 240, 0.6);
+  box-shadow: inset 0 1px 3px rgba(73, 50, 36, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wax-seal-icon {
+  font-size: 1.15rem;
+  color: #FFFDF8;
+  text-shadow: 0 1px 3px rgba(73, 50, 36, 0.65);
+  transform: translateY(-1px);
+}
+
+.wax-seal-tooltip {
+  position: absolute;
+  bottom: -32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(73, 50, 36, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #FAF4E8;
   font-family: var(--font-nav);
-  font-size: 0.5rem;
-  letter-spacing: 0.3em;
-  color: var(--soft-caramel);
-  opacity: 0.65;
+  font-size: 0.54rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.8rem;
+  border-radius: 20px;
   white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  box-shadow: 0 4px 14px rgba(73, 50, 36, 0.25);
 }
 
-.letter-heading {
-  font-family: var(--font-display);
-  font-size: 1.7rem;
-  font-weight: 400;
-  font-style: italic;
+.letter-env-seal:hover .wax-seal-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(3px);
+}
+
+/* ════════════════════════════════════════════════
+   VINTAGE POSTAL DETAILS & CORNER BRACKETS
+════════════════════════════════════════════════ */
+.letter-postal-decorations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 22;
+}
+
+.vintage-postage-stamp {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  width: 64px;
+  height: 76px;
+  background: #FFFDF8;
+  border: 1.5px dashed rgba(189, 149, 107, 0.65);
+  padding: 3px;
+  box-shadow: 0 3px 12px rgba(73, 50, 36, 0.14);
+  transform: rotate(2.5deg);
+}
+
+.stamp-inner {
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgba(189, 149, 107, 0.35);
+  background: linear-gradient(135deg, #FAF4E8 0%, #EEDDC9 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.stamp-star {
+  color: var(--warm-caramel);
+  font-size: 0.85rem;
+}
+
+.stamp-denom {
+  font-family: var(--font-heading);
+  font-size: 0.7rem;
+  font-weight: 600;
   color: var(--deep-espresso);
-  margin-bottom: var(--s-4);
-  text-align: center;
+  letter-spacing: 0.05em;
 }
 
-/* Subtle paper ruling lines */
+.stamp-label {
+  font-family: var(--font-nav);
+  font-size: 0.38rem;
+  letter-spacing: 0.18em;
+  color: var(--chestnut);
+  text-transform: uppercase;
+}
+
+/* Circular Postmark Cancellation */
+.vintage-postmark {
+  position: absolute;
+  top: 18px;
+  right: 52px;
+  width: 92px;
+  height: 92px;
+  opacity: 0.46;
+  color: #704D35;
+  pointer-events: none;
+  transform: rotate(-9deg);
+}
+
+.postmark-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Corner metal brackets */
+.env-corner {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-color: rgba(189, 149, 107, 0.6);
+  border-style: solid;
+  pointer-events: none;
+}
+.env-corner--tl { top: 7px; left: 7px; border-width: 1.5px 0 0 1.5px; border-top-left-radius: 3px; }
+.env-corner--tr { top: 7px; right: 7px; border-width: 1.5px 1.5px 0 0; border-top-right-radius: 3px; }
+.env-corner--bl { bottom: 7px; left: 7px; border-width: 0 0 1.5px 1.5px; border-bottom-left-radius: 3px; }
+.env-corner--br { bottom: 7px; right: 7px; border-width: 0 1.5px 1.5px 0; border-bottom-right-radius: 3px; }
+
+/* ════════════════════════════════════════════════
+   ENVELOPE POCKET (Triangular paper folds)
+════════════════════════════════════════════════ */
+.letter-env-pocket {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20; /* Between letter sheet slot (10) and closed flap (30) */
+}
+
+/* Left triangular fold */
+.pocket-fold--left {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 0 100%, 52% 52%);
+  -webkit-clip-path: polygon(0 0, 0 100%, 52% 52%);
+  background: linear-gradient(135deg, #FAF4E8 0%, #EBDEC9 70%, #DEC8B0 100%);
+  filter: drop-shadow(2px 2px 6px rgba(73, 50, 36, 0.08));
+  border-left: 1.5px solid rgba(189, 149, 107, 0.38);
+  border-bottom: 1.5px solid rgba(189, 149, 107, 0.38);
+}
+
+/* Right triangular fold */
+.pocket-fold--right {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(100% 0, 100% 100%, 48% 52%);
+  -webkit-clip-path: polygon(100% 0, 100% 100%, 48% 52%);
+  background: linear-gradient(225deg, #F6EEE2 0%, #E9D7C3 70%, #DEC8B0 100%);
+  filter: drop-shadow(-2px 2px 6px rgba(73, 50, 36, 0.08));
+  border-right: 1.5px solid rgba(189, 149, 107, 0.38);
+  border-bottom: 1.5px solid rgba(189, 149, 107, 0.38);
+}
+
+/* Bottom trapezoid fold */
+.pocket-fold--bottom {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 100%, 100% 100%, 50% 46%);
+  -webkit-clip-path: polygon(0 100%, 100% 100%, 50% 46%);
+  background: linear-gradient(0deg, #FCF6EC 0%, #EFE1D0 60%, #E3CEB8 100%);
+  filter: drop-shadow(0 -4px 10px rgba(73, 50, 36, 0.14));
+}
+
+.pocket-edge-highlight {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, rgba(189, 149, 107, 0.45), transparent);
+}
+
+/* ════════════════════════════════════════════════
+   THE STATIONERY SHEET
+════════════════════════════════════════════════ */
+.letter-card {
+  position: absolute;
+  top: 15px;
+  left: 5%;
+  right: 5%;
+  min-height: 520px;
+  max-height: 82vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: #FFFDF9;
+  border-radius: 2px;
+  box-shadow:
+    0 24px 60px rgba(73, 50, 36, 0.2),
+    0 4px 14px rgba(73, 50, 36, 0.08);
+  padding: 2.6rem 2.8rem;
+  box-sizing: border-box;
+  opacity: 0;
+  transform: translate3d(0, 0, 0) scale(0.96);
+  pointer-events: none;
+  will-change: transform, opacity;
+  z-index: 10;
+}
+
+.letter-card.is-active {
+  z-index: 50 !important;
+  pointer-events: auto;
+}
+
+.letter-card::-webkit-scrollbar {
+  width: 4px;
+}
+.letter-card::-webkit-scrollbar-thumb {
+  background: rgba(189, 149, 107, 0.4);
+  border-radius: 4px;
+}
+
+/* Paper textures & double-line border */
+.letter-paper-texture {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.9) 0%, rgba(250, 244, 232, 0.6) 100%);
+  pointer-events: none;
+}
+
+.letter-border-frame {
+  position: absolute;
+  inset: 12px;
+  border: 1px solid rgba(189, 149, 107, 0.45);
+  pointer-events: none;
+}
+
+.letter-border-inner {
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(189, 149, 107, 0.22);
+}
+
+.letter-corner-botanical {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+}
+.letter-corner--tl { top: 2px; left: 2px; }
+.letter-corner--tr { top: 2px; right: 2px; transform: scaleX(-1); }
+.letter-corner--bl { bottom: 2px; left: 2px; transform: scaleY(-1); }
+.letter-corner--br { bottom: 2px; right: 2px; transform: scale(-1); }
+
+/* Ruling lines */
 .letter-ruled-bg {
   position: absolute;
-  inset: var(--s-8) 0 0;
+  inset: 96px 26px 74px;
   pointer-events: none;
   background-image: repeating-linear-gradient(
     to bottom,
     transparent 0px,
-    transparent 28px,
-    rgba(189, 149, 107, 0.07) 28px,
-    rgba(189, 149, 107, 0.07) 29px
+    transparent 32px,
+    rgba(189, 149, 107, 0.08) 32px,
+    rgba(189, 149, 107, 0.08) 33px
   );
 }
 
-.letter-body {
-  font-family: var(--font-heading);
-  font-size: 1.02rem;
-  line-height: 1.98;
-  color: var(--deep-espresso);
-  white-space: pre-line;
-  opacity: 0.92;
+/* Header */
+.letter-header {
   position: relative;
-  z-index: 1;
+  text-align: center;
+  margin-bottom: 2rem;
+  z-index: 2;
+}
+
+.letter-botanical-sprig {
+  width: 56px;
+  height: 15px;
+  margin: 0 auto 0.45rem;
+  display: block;
+}
+
+.letter-monogram {
+  font-family: var(--font-nav);
+  font-size: 0.52rem;
+  letter-spacing: 0.32em;
+  color: var(--soft-caramel);
+  opacity: 0.88;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.letter-heading {
+  font-family: var(--font-display);
+  font-size: 1.95rem;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--deep-espresso);
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+/* Paragraphs */
+.letter-paragraphs-container {
+  position: relative;
+  z-index: 2;
   text-align: left;
 }
 
-/* Signature */
-.letter-signature-wrap {
-  margin-top: var(--s-6);
-  position: relative;
-  z-index: 1;
-}
-.letter-signature-line {
-  width: 80px;
-  height: 1px;
-  background: rgba(189, 149, 107, 0.35);
-  margin-bottom: var(--s-2);
-}
-.letter-signature {
-  color: var(--chestnut);
+.letter-para {
+  font-family: var(--font-heading);
   font-size: 1.1rem;
+  line-height: 2.05;
+  color: #523D2D;
+  margin-bottom: 1.15rem;
+  opacity: 0.95;
 }
 
+.letter-para--greeting {
+  font-size: 1.25rem;
+  font-style: italic;
+  color: #422B1A;
+  font-weight: 500;
+  margin-bottom: 0.85rem;
+}
+
+/* Footer & Signature */
+.letter-footer {
+  position: relative;
+  z-index: 2;
+  margin-top: 1.8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.letter-footer-flourish {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  color: var(--soft-caramel);
+  opacity: 0.45;
+  font-size: 0.75rem;
+}
+.letter-footer-flourish::before,
+.letter-footer-flourish::after {
+  content: '';
+  flex: 1;
+  max-width: 60px;
+  height: 1px;
+  background: rgba(189, 149, 107, 0.35);
+  margin: 0 10px;
+}
+
+.letter-signature-wrap {
+  text-align: right;
+  padding-right: 0.5rem;
+}
+
+.letter-signature-line {
+  width: 90px;
+  height: 1px;
+  background: rgba(189, 149, 107, 0.4);
+  margin: 0 0 0.5rem auto;
+}
+
+.letter-signature {
+  font-family: 'Dancing Script', cursive;
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #724E34;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+/* Ornate Close Button */
 .letter-close-btn {
   position: absolute;
-  top: var(--s-3); right: var(--s-3);
-  font-family: var(--font-nav);
-  font-size: 0.65rem;
-  letter-spacing: 0.15em;
+  top: 18px;
+  right: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(189, 149, 107, 0.4);
+  background: rgba(255, 253, 248, 0.92);
   color: var(--chestnut);
-  opacity: 0.5;
-  background: none; border: none;
-  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  cursor: pointer;
   z-index: 10;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(73, 50, 36, 0.1);
 }
-.letter-close-btn:hover { opacity: 1; }
+.letter-close-btn:hover {
+  background: var(--card-primary);
+  border-color: var(--warm-caramel);
+  color: var(--deep-espresso);
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 4px 12px rgba(73, 50, 36, 0.2);
+}
 
 /* ════════════════════════════════════════════════
    LIGHTBOX
@@ -1929,12 +2419,32 @@
   .mosaic-tile { grid-column: span 1; grid-row: span 1; }
 
   /* Letter */
-  .letter-envelope-wrap { max-width: 100%; }
-  .letter-env-outer { height: 240px; }
-  .letter-card { left: 0; right: 0; padding: var(--s-4); }
+  .letter-envelope-wrap { max-width: 94vw; margin-top: 120px; margin-bottom: 30px; }
+  .letter-env-outer { height: 260px; }
+  .letter-card {
+    padding: 1.8rem 1.4rem;
+    min-height: 440px;
+    top: 10px;
+    left: 3%;
+    right: 3%;
+  }
+  .letter-heading { font-size: 1.55rem; }
+  .letter-para { font-size: 0.98rem; line-height: 1.95; }
+  .vintage-postage-stamp { width: 50px; height: 60px; top: 10px; right: 12px; }
+  .vintage-postmark { width: 72px; height: 72px; top: 14px; right: 38px; }
+  .letter-env-seal { width: 50px; height: 50px; }
+  .wax-seal-inner { width: 34px; height: 34px; }
 
   /* Secret */
-  .secret-envelope { width: 240px; height: 168px; }
+  .secret-envelope-wrap { max-width: 90vw; margin-top: 80px; margin-bottom: 24px; }
+  .secret-env-outer { height: 210px; }
+  .secret-card {
+    min-height: 220px;
+    top: 8px;
+    left: 4%;
+    right: 4%;
+    padding: 1.4rem 1.2rem;
+  }
 
   /* Final */
   .final-photo-frame { max-width: 320px; }

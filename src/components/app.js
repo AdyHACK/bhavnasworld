@@ -790,87 +790,527 @@ function hexToRgb(hex) {
 }
 
 /* ────────────────────────────────────────────────────────────────
-   SECRET SECTION
+   SECRET SECTION — HANDCRAFTED 3D SURPRISE ENVELOPE
 ──────────────────────────────────────────────────────────────── */
 function initSecret(content) {
   const revealBtn = document.getElementById('secret-reveal-btn');
-  const envelope  = document.getElementById('secret-envelope');
-  const reveal    = document.getElementById('secret-reveal');
+  const envOuter  = document.getElementById('secret-envelope');
+  const flap      = document.getElementById('secret-flap');
+  const seal      = document.getElementById('secret-seal');
+  const card      = document.getElementById('secret-card');
+  const closeBtn  = document.getElementById('secret-close-btn');
   const msgText   = document.getElementById('secret-message-text');
-  if (!revealBtn || !envelope) return;
+
+  if (!envOuter || !card) return;
 
   if (msgText && content?.secret?.message) {
     msgText.innerHTML = content.secret.message;
   }
 
-  revealBtn.addEventListener('click', e => {
-    particleBurst(e.clientX, e.clientY, '#AE8157', 18);
-    envelope.classList.add('opened');
-    revealBtn.disabled        = true;
-    revealBtn.style.opacity   = '0.4';
-    revealBtn.style.transform = 'scale(0.98)';
-    setTimeout(() => {
-      if (reveal) reveal.classList.add('visible');
-    }, 680);
+  let isOpen = false;
+  let isAnim = false;
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (seal && typeof gsap !== 'undefined') {
+    gsap.set(seal, { xPercent: -50, yPercent: -50, transformOrigin: 'center center' });
+  }
+
+  function openSecret(e) {
+    if (isOpen || isAnim) return;
+    isAnim = true;
+
+    if (seal) seal.style.transition = 'none';
+
+    if (e && e.clientX) {
+      particleBurst(e.clientX, e.clientY, '#D8B990', 16);
+    } else if (seal) {
+      const rect = seal.getBoundingClientRect();
+      particleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, '#D8B990', 16);
+    }
+
+    const isMobile = window.innerWidth <= 768;
+    const riseDist = isMobile ? -130 : -160;
+
+    if (typeof gsap !== 'undefined' && !reduced) {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          isOpen = true;
+          isAnim = false;
+          card.classList.add('is-active');
+          if (revealBtn) {
+            revealBtn.innerHTML = 'Fold &amp; Close <span aria-hidden="true">✦</span>';
+          }
+        }
+      });
+
+      // 1. Wax seal compression and pop
+      if (seal) {
+        tl.to(seal, { scale: 0.9, duration: 0.14, ease: 'power2.in' })
+          .to(seal, { scale: 1.15, opacity: 0, duration: 0.3, ease: 'power2.out', pointerEvents: 'none' }, '+=0.02');
+      }
+
+      // 2. 3D flap rotation backward (0 -> -180deg)
+      if (flap) {
+        tl.to(flap, {
+          rotateX: -180,
+          duration: 0.85,
+          ease: 'power2.inOut',
+          onUpdate: function() {
+            if (this.progress() >= 0.5) {
+              flap.style.zIndex = '2';
+            } else {
+              flap.style.zIndex = '30';
+            }
+          }
+        }, '-=0.2');
+      }
+
+      // 3. Card emerges cleanly in front of pocket (zIndex: 50) and slides up
+      tl.set(card, { zIndex: 50 }, '-=0.4')
+        .fromTo(card,
+          { y: 0, scale: 0.96, opacity: 0 },
+          {
+            y: riseDist,
+            scale: 1,
+            opacity: 1,
+            duration: 0.9,
+            ease: 'power3.out',
+            boxShadow: '0 24px 60px rgba(73, 50, 36, 0.22)'
+          },
+          '-=0.4'
+        );
+
+    } else {
+      // Fallback
+      if (flap) { flap.style.transform = 'rotateX(-180deg)'; flap.style.zIndex = '2'; }
+      if (seal) { seal.style.opacity = '0'; seal.style.pointerEvents = 'none'; }
+      card.style.transform = `translate3d(0, ${riseDist}px, 0) scale(1)`;
+      card.style.opacity = '1';
+      card.style.zIndex = '50';
+      card.classList.add('is-active');
+      isOpen = true;
+      isAnim = false;
+      if (revealBtn) revealBtn.innerHTML = 'Fold &amp; Close <span aria-hidden="true">✦</span>';
+    }
+  }
+
+  function closeSecret() {
+    if (!isOpen || isAnim) return;
+    isAnim = true;
+
+    card.classList.remove('is-active');
+
+    if (typeof gsap !== 'undefined' && !reduced) {
+      const closeTl = gsap.timeline({
+        onComplete: () => {
+          isOpen = false;
+          isAnim = false;
+          if (revealBtn) {
+            revealBtn.innerHTML = 'Take a Look <span aria-hidden="true">✦</span>';
+          }
+          if (seal) seal.style.transition = '';
+          gsap.set(card, { y: 0, scale: 0.96, opacity: 0, zIndex: 10 });
+          gsap.set(envOuter, { y: 0 });
+          if (flap) gsap.set(flap, { rotateX: 0, zIndex: 30 });
+          if (seal) gsap.set(seal, { scale: 1, opacity: 1, xPercent: -50, yPercent: -50, pointerEvents: 'auto' });
+        }
+      });
+
+      // 1. Card slides back into pocket
+      closeTl.to(card, {
+        y: 0,
+        scale: 0.96,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power3.in',
+        onComplete: () => { card.style.zIndex = '10'; }
+      })
+
+      // 2. Flap folds back down
+      .to(flap, {
+        rotateX: 0,
+        duration: 0.75,
+        ease: 'power2.inOut',
+        onUpdate: function() {
+          if (this.progress() >= 0.5) {
+            flap.style.zIndex = '30';
+          } else {
+            flap.style.zIndex = '2';
+          }
+        }
+      }, '-=0.2')
+
+      // 3. Wax seal returns
+      .to(seal, {
+        scale: 1,
+        opacity: 1,
+        pointerEvents: 'auto',
+        duration: 0.38,
+        ease: 'back.out(1.8)'
+      }, '-=0.15');
+
+    } else {
+      // Fallback
+      card.style.transform = 'translate3d(0, 0, 0) scale(0.96)';
+      card.style.opacity = '0';
+      card.style.zIndex = '10';
+      envOuter.style.transform = 'none';
+      if (flap) { flap.style.transform = 'rotateX(0deg)'; flap.style.zIndex = '30'; }
+      if (seal) { seal.style.opacity = '1'; seal.style.pointerEvents = 'auto'; }
+      isOpen = false;
+      isAnim = false;
+      if (revealBtn) revealBtn.innerHTML = 'Take a Look <span aria-hidden="true">✦</span>';
+    }
+  }
+
+  // Event handlers
+  if (seal) {
+    seal.addEventListener('click', openSecret);
+    seal.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openSecret(e);
+      }
+    });
+  }
+
+  if (revealBtn) {
+    revealBtn.addEventListener('click', e => {
+      if (!isOpen) {
+        openSecret(e);
+      } else {
+        closeSecret();
+      }
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      closeSecret();
+    });
+  }
+
+  envOuter.addEventListener('click', e => {
+    if (!isOpen && !isAnim && !e.target.closest('#secret-close-btn') && !e.target.closest('#secret-card')) {
+      openSecret(e);
+    }
   });
 }
 
 /* ────────────────────────────────────────────────────────────────
-   LETTER SECTION
+   LETTER SECTION — HANDCRAFTED 3D ENVELOPE & VINTAGE STATIONERY
 ──────────────────────────────────────────────────────────────── */
 function initLetter(content) {
-  const openBtn    = document.getElementById('letter-open-btn');
-  const envOuter   = document.getElementById('letter-env');
-  const letterCard = document.getElementById('letter-card');
-  const closeBtn   = document.getElementById('letter-close-btn');
-  const bodyEl     = document.getElementById('letter-body');
-  const sigEl      = document.getElementById('letter-signature');
-  if (!openBtn || !envOuter) return;
+  const openBtn     = document.getElementById('letter-open-btn');
+  const envOuter    = document.getElementById('letter-env');
+  const flap        = document.getElementById('letter-flap');
+  const seal        = document.getElementById('letter-seal');
+  const letterCard  = document.getElementById('letter-card');
+  const closeBtn    = document.getElementById('letter-close-btn');
+  const headingEl   = document.getElementById('letter-heading');
+  const container   = document.getElementById('letter-paragraphs-container');
+  const bodyEl      = document.getElementById('letter-body');
+  const sigEl       = document.getElementById('letter-signature');
+  const sigWrap     = document.getElementById('letter-signature-wrap');
 
-  if (bodyEl && content?.letter?.body) {
-    bodyEl.textContent = content.letter.body;
+  if (!envOuter || !letterCard) return;
+
+  // 1. Populate Typography & Content
+  if (headingEl && content?.letter?.heading) {
+    headingEl.textContent = content.letter.heading;
   }
 
-  let isOpen  = false;
-  let isAnim  = false;
+  const sigText = content?.closing?.signature || content?.letter?.signature || '— Aadi ✦';
+  if (sigEl) {
+    sigEl.textContent = sigText;
+  }
+
+  let paragraphs = [];
+  const letterBodyText = content?.letter?.body || (bodyEl ? bodyEl.textContent : '');
+
+  if (container && letterBodyText) {
+    container.innerHTML = '';
+    const rawParas = letterBodyText
+      .split(/\n\s*\n/)
+      .map(p => p.trim())
+      .filter(Boolean);
+
+    rawParas.forEach((pText, i) => {
+      const p = document.createElement('p');
+      p.className = `letter-para ${i === 0 ? 'letter-para--greeting' : ''}`;
+      if (i === 0) p.id = 'letter-body';
+      p.textContent = pText;
+      container.appendChild(p);
+      paragraphs.push(p);
+    });
+  } else if (bodyEl) {
+    paragraphs = [bodyEl];
+  }
+
+  let isOpen = false;
+  let isAnim = false;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  openBtn.addEventListener('click', e => {
+  if (seal && typeof gsap !== 'undefined') {
+    gsap.set(seal, { xPercent: -50, yPercent: -50, transformOrigin: 'center center' });
+  }
+
+  function openLetter(e) {
     if (isOpen || isAnim) return;
     isAnim = true;
-    particleBurst(e.clientX, e.clientY, '#AE8157', 14);
 
-    /* Step 1: open envelope flap */
-    envOuter.classList.add('open');
+    if (seal) seal.style.transition = 'none';
 
-    /* Step 2: reveal card */
-    setTimeout(() => {
-      if (letterCard) {
-        letterCard.classList.add('open');
-        isOpen = true;
-        isAnim = false;
+    if (e && e.clientX) {
+      particleBurst(e.clientX, e.clientY, '#D8B990', 16);
+    } else if (seal) {
+      const rect = seal.getBoundingClientRect();
+      particleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, '#D8B990', 16);
+    }
+
+    const isMobile = window.innerWidth <= 768;
+    const riseDistance = isMobile ? -170 : -230;
+
+    if (typeof gsap !== 'undefined' && !reduced) {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          isOpen = true;
+          isAnim = false;
+          letterCard.classList.add('is-active');
+          if (openBtn) {
+            openBtn.innerHTML = 'Fold &amp; Close Note <span aria-hidden="true">✦</span>';
+            openBtn.disabled = false;
+            openBtn.style.opacity = '1';
+          }
+        }
+      });
+
+      // Step 2: Wax seal responds to click (press then pop)
+      if (seal) {
+        tl.to(seal, { scale: 0.9, duration: 0.14, ease: 'power2.in' })
+          .to(seal, {
+            scale: 1.15,
+            opacity: 0,
+            duration: 0.32,
+            ease: 'power2.out',
+            pointerEvents: 'none'
+          }, '+=0.03');
       }
-      openBtn.style.opacity = '0.3';
-      openBtn.disabled      = true;
-    }, reduced ? 50 : 700);
-  });
 
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      if (!isOpen || isAnim) return;
-      isAnim = true;
+      // Step 3: Flap opens realistically in 3D around top crease (0 -> -180deg)
+      if (flap) {
+        tl.to(flap, {
+          rotateX: -180,
+          duration: 0.95,
+          ease: 'power2.inOut',
+          onUpdate: function() {
+            if (this.progress() >= 0.5) {
+              flap.style.zIndex = '2';
+            } else {
+              flap.style.zIndex = '30';
+            }
+          }
+        }, '-=0.22');
+      }
 
-      if (letterCard) letterCard.classList.remove('open');
+      // Step 4: Letter emerges cleanly in front of pocket (zIndex: 50) and slides out smoothly
+      tl.set(letterCard, { zIndex: 50 }, '-=0.4')
+        .fromTo(letterCard,
+          { y: 0, scale: 0.96, opacity: 0 },
+          {
+            y: riseDistance,
+            scale: 1,
+            opacity: 1,
+            duration: 0.95,
+            ease: 'power3.out',
+            boxShadow: '0 26px 64px rgba(73, 50, 36, 0.22), 0 6px 18px rgba(73, 50, 36, 0.1)'
+          },
+          '-=0.4'
+        )
 
-      setTimeout(() => {
-        envOuter.classList.remove('open');
+      // Step 6: Heading reveals itself
+      .fromTo(headingEl,
+        { opacity: 0, y: 14 },
+        { opacity: 1, y: 0, duration: 0.52, ease: 'power2.out' },
+        '-=0.15'
+      )
+
+      // Step 7: Paragraphs appear sequentially
+      .fromTo(paragraphs,
+        { opacity: 0, y: 12 },
+        { opacity: 1, y: 0, stagger: 0.16, duration: 0.62, ease: 'power2.out' },
+        '-=0.22'
+      )
+
+      // Step 8: Signature appears last
+      .fromTo(sigWrap || sigEl,
+        { opacity: 0, scale: 0.92, y: 10 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.72, ease: 'back.out(1.4)' },
+        '-=0.15'
+      );
+
+    } else {
+      // Graceful fallback for reduced motion or fallback
+      if (flap) {
+        flap.style.transform = 'rotateX(-180deg)';
+        flap.style.zIndex = '2';
+      }
+      if (seal) {
+        seal.style.opacity = '0';
+        seal.style.pointerEvents = 'none';
+      }
+      if (letterCard) {
+        letterCard.style.transform = `translate3d(0, ${riseDistance}px, 0) scale(1)`;
+        letterCard.style.opacity = '1';
+        letterCard.style.zIndex = '50';
+        letterCard.classList.add('is-active');
+      }
+      if (headingEl) headingEl.style.opacity = '1';
+      paragraphs.forEach(p => p.style.opacity = '1');
+      if (sigWrap) sigWrap.style.opacity = '1';
+      if (sigEl) sigEl.style.opacity = '1';
+      isOpen = true;
+      isAnim = false;
+      if (openBtn) {
+        openBtn.innerHTML = 'Fold &amp; Close Note <span aria-hidden="true">✦</span>';
+        openBtn.disabled = false;
         openBtn.style.opacity = '1';
-        openBtn.disabled      = false;
-        isOpen = false;
-        isAnim = false;
-      }, reduced ? 50 : 700);
+      }
+    }
+  }
+
+  function closeLetter() {
+    if (!isOpen || isAnim) return;
+    isAnim = true;
+
+    letterCard.classList.remove('is-active');
+
+    if (typeof gsap !== 'undefined' && !reduced) {
+      const closeTl = gsap.timeline({
+        onComplete: () => {
+          isOpen = false;
+          isAnim = false;
+          if (openBtn) {
+            openBtn.innerHTML = 'Open the Note <span aria-hidden="true">✉</span>';
+            openBtn.style.opacity = '1';
+            openBtn.disabled = false;
+          }
+          if (seal) seal.style.transition = '';
+          // Reset pristine state
+          gsap.set(letterCard, { y: 0, scale: 0.96, opacity: 0, zIndex: 10 });
+          gsap.set(envOuter, { y: 0 });
+          if (flap) gsap.set(flap, { rotateX: 0, zIndex: 30 });
+          if (seal) gsap.set(seal, { scale: 1, opacity: 1, xPercent: -50, yPercent: -50, pointerEvents: 'auto' });
+          gsap.set([headingEl, ...paragraphs, sigWrap || sigEl], { opacity: 0, y: 0 });
+        }
+      });
+
+      // 1. Text elements fade out gracefully
+      closeTl.to([sigWrap || sigEl, ...paragraphs.slice().reverse(), headingEl], {
+        opacity: 0,
+        y: 8,
+        duration: 0.28,
+        stagger: 0.04,
+        ease: 'power2.in'
+      })
+
+      // 2. Letter slides back down inside envelope pocket
+      .to(letterCard, {
+        y: 0,
+        scale: 0.96,
+        opacity: 0,
+        duration: 0.65,
+        ease: 'power3.in',
+        onComplete: () => {
+          letterCard.style.zIndex = '10';
+        }
+      }, '-=0.08')
+
+      // 3. Flap folds back down in 3D (rotateX: -180 -> 0deg)
+      .to(flap, {
+        rotateX: 0,
+        duration: 0.78,
+        ease: 'power2.inOut',
+        onUpdate: function() {
+          if (this.progress() >= 0.5) {
+            flap.style.zIndex = '30';
+          } else {
+            flap.style.zIndex = '2';
+          }
+        }
+      }, '-=0.22')
+
+      // 4. Wax seal returns and locks back into place
+      .to(seal, {
+        scale: 1,
+        opacity: 1,
+        pointerEvents: 'auto',
+        duration: 0.42,
+        ease: 'back.out(1.8)'
+      }, '-=0.18');
+
+    } else {
+      // Graceful fallback
+      if (letterCard) {
+        letterCard.style.transform = 'translate3d(0, 0, 0) scale(0.96)';
+        letterCard.style.opacity = '0';
+        letterCard.style.zIndex = '10';
+      }
+      envOuter.style.transform = 'none';
+      if (flap) {
+        flap.style.transform = 'rotateX(0deg)';
+        flap.style.zIndex = '30';
+      }
+      if (seal) {
+        seal.style.opacity = '1';
+        seal.style.pointerEvents = 'auto';
+        seal.style.transition = '';
+      }
+      isOpen = false;
+      isAnim = false;
+      if (openBtn) {
+        openBtn.innerHTML = 'Open the Note <span aria-hidden="true">✉</span>';
+        openBtn.style.opacity = '1';
+        openBtn.disabled = false;
+      }
+    }
+  }
+
+  // Event Listeners
+  if (seal) {
+    seal.addEventListener('click', openLetter);
+    seal.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openLetter(e);
+      }
     });
   }
+
+  if (openBtn) {
+    openBtn.addEventListener('click', () => {
+      if (!isOpen) {
+        openLetter();
+      } else {
+        closeLetter();
+      }
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      closeLetter();
+    });
+  }
+
+  // Clicking closed envelope triggers opening
+  envOuter.addEventListener('click', e => {
+    if (!isOpen && !isAnim && !e.target.closest('#letter-close-btn') && !e.target.closest('#letter-card')) {
+      openLetter(e);
+    }
+  });
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -906,17 +1346,47 @@ function initAudio() {
   const audioBtn = document.getElementById('audio-btn');
   if (!audioEl || !audioBtn) return;
   let playing = false;
+  let synthTimer = null;
+  let audioCtx = null;
+
+  function playSynthChime() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const notes = [261.63, 329.63, 392.00, 523.25, 659.25]; // Warm C-major pentatonic
+      const freq = notes[Math.floor(Math.random() * notes.length)];
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.06, audioCtx.currentTime + 1.2);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 4.5);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 4.6);
+    } catch (_) {}
+  }
+
   audioBtn.addEventListener('click', () => {
     if (playing) {
-      audioEl.pause();
+      if (audioEl) audioEl.pause();
+      if (synthTimer) { clearInterval(synthTimer); synthTimer = null; }
       audioBtn.textContent = '♪';
       audioBtn.setAttribute('aria-label', 'Play ambient music');
       audioBtn.classList.remove('playing');
     } else {
-      audioEl.play().catch(() => {});
       audioBtn.textContent = '⏸';
       audioBtn.setAttribute('aria-label', 'Pause ambient music');
       audioBtn.classList.add('playing');
+      const p = audioEl ? audioEl.play() : Promise.reject();
+      p.catch(() => {
+        playSynthChime();
+        if (!synthTimer) {
+          synthTimer = setInterval(playSynthChime, 3200);
+        }
+      });
     }
     playing = !playing;
   });
@@ -998,7 +1468,7 @@ function applyContent(content) {
   /* Universe name */
   const univName = document.getElementById('universe-name');
   if (univName && content.siteTitle) {
-    const name = content.siteTitle.replace("Her Little Universe", "Bhavna's");
+    const name = content.siteTitle.replace(/\s*(little\s*universe|her\s*little\s*universe)/i, '').trim() || "Bhavna's";
     univName.textContent = name;
   }
 

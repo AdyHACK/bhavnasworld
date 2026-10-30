@@ -17,8 +17,8 @@
 const siteContent = {
 
   // ── Site Meta ──────────────────────────────────────────────────
-  siteTitle: "Her Little Universe",
-  siteDescription: "A tiny corner of the internet, made just for you.",
+  siteTitle: "Bhavna's Little Universe",
+  siteDescription: "A tiny corner of the internet, made just for Bhavna.",
 
   // ── Introduction Screen ────────────────────────────────────────
   introduction: {
@@ -108,15 +108,6 @@ const siteContent = {
       featured: true,
     },
     {
-      id: "photo-08",
-      src: "public/images/photo-08.png",
-      alt: "Personal photograph",
-      title: "The Hidden One",
-      caption: "Found it.",
-      section: "secret",
-      featured: false,
-    },
-    {
       id: "photo-final",
       src: "public/images/photo-final.png",
       alt: "Personal photograph — closing scene",
@@ -171,10 +162,10 @@ That's the whole idea behind it. Some things are simply nice to make.`,
 
   // ── Final Scene ────────────────────────────────────────────────
   closing: {
-    heading: "And that's your little world.",
+    heading: "And that's your little world bittu.",
     body: "Made with care, a little creativity, and the hope of making you smile.",
     // ↓ Change this to your preferred sign-off
-    signature: "— from a friend ✨",
+    signature: "— Aadi ✦",
     buttonText: "Explore Again",
   },
 
