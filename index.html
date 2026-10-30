@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A tiny corner of the internet, made just for you — Her Little Universe." />
+  <meta name="theme-color" content="#F3E7D6" />
+  <title>Her Little Universe</title>
+
+  <!-- Preconnect fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=Manrope:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="src/styles/globals.css" />
+  <link rel="stylesheet" href="src/styles/animations.css" />
+  <link rel="stylesheet" href="src/styles/responsive.css" />
+
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    /* ── Critical inline CSS — prevents FOUC ── */
+    html { background: #F3E7D6; }
+
+    @media (max-width: 768px) {
+      .lightbox-btn { touch-action: manipulation; }
+    }
+
+    /* Section label flanked by mocha lines */
+    .eyebrow-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.4rem;
+      margin-bottom: 1.2rem;
+    }
+    .eyebrow-row::before,
+    .eyebrow-row::after {
+      content: '';
+      flex: 1;
+      max-width: 80px;
+      height: 1px;
+      background: rgba(189, 149, 107, 0.35);
+    }
+
+    /* Fine dot separator */
+    .dot-sep {
+      display: inline-block;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: 0.35;
+      vertical-align: middle;
+      margin: 0 0.4rem;
+    }
+
+    /* Section number — small tracked label */
+    .section-num {
+      font-family: 'Manrope', sans-serif;
+      font-size: 0.52rem;
+      letter-spacing: 0.32em;
+      color: #916F4C;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 0.9rem;
+      text-align: center;
+      opacity: 0; /* revealed by JS observer */
+    }
+
+    /* Universe central ambient glow */
+    .universe-glow-center {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60vmax; height: 60vmax;
+      border-radius: 50%;
+      background: radial-gradient(circle,
+        rgba(216, 185, 144, 0.18) 0%,
+        rgba(189, 149, 107, 0.07) 40%,
+        transparent 70%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Scrapbook torn-paper edge */
+    .scrapbook-edge {
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 56px;
+      background: linear-gradient(180deg, #EBD8C0 0%, #F3E7D6 100%);
+      clip-path: polygon(
+        0% 100%,  2% 42%,  4% 72%,  6% 28%,  9% 58%,
+        12% 18%, 15% 52%, 18% 14%, 21% 48%, 24% 22%,
+        27% 58%, 30% 28%, 33% 62%, 36% 18%, 40% 52%,
+        43% 16%, 46% 50%, 50% 20%, 54% 55%, 57% 22%,
+        60% 58%, 63% 18%, 66% 52%, 69% 25%, 72% 60%,
+        75% 20%, 78% 52%, 81% 28%, 84% 62%, 87% 22%,
+        90% 55%, 93% 28%, 96% 60%, 98% 32%, 100% 48%,
+        100% 100%
+      );
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Gallery → mosaic fade */
+    .section-fade-bottom {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 140px;
+      background: linear-gradient(to bottom, transparent, #EBD8C0);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* Corner ornament inline SVG */
+    .corner-ornament-svg {
+      position: absolute;
+      width: 44px; height: 44px;
+      opacity: 0.22;
+      pointer-events: none;
+      color: #8C6242;
+    }
+    .corner-ornament-svg--tl { top: 1.5rem; left: 1.5rem; }
+    .corner-ornament-svg--tr { top: 1.5rem; right: 1.5rem; transform: scaleX(-1); }
+    .corner-ornament-svg--bl { bottom: 1.5rem; left: 1.5rem; transform: scaleY(-1); }
+    .corner-ornament-svg--br { bottom: 1.5rem; right: 1.5rem; transform: scale(-1); }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ CURSOR ══════════════════════════════════════════════════ -->
+  <div id="cursor-dot"  aria-hidden="true"></div>
+  <div id="cursor-ring" aria-hidden="true"></div>
+
+  <!-- ══ LIGHTBOX ════════════════════════════════════════════════ -->
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" tabindex="-1">
+    <div class="lightbox-inner">
+      <button id="lb-close" class="lightbox-close" aria-label="Close photo viewer">
+        <span aria-hidden="true">✕</span> <span>Close</span>
+        <span class="dot-sep" aria-hidden="true"></span>
+        <span style="opacity:0.45">Esc</span>
+      </button>
+      <img id="lb-img" class="lightbox-img" src="" alt="" />
+      <p id="lb-caption" class="lightbox-caption"></p>
+      <span id="lb-counter" class="lightbox-counter" aria-live="polite" aria-atomic="true"></span>
+      <button id="lb-prev" class="lightbox-btn" aria-label="Previous photo">&#8592;</button>
+      <button id="lb-next" class="lightbox-btn" aria-label="Next photo">&#8594;</button>
+    </div>
+  </div>
+
+  <!-- ══ AUDIO ══════════════════════════════════════════════════ -->
+  <audio id="bg-audio" loop preload="none">
+    <source src="public/audio/ambient.mp3" type="audio/mpeg" />
+  </audio>
+  <button id="audio-btn" aria-label="Play ambient music" title="Toggle ambient music">♪</button>
+
+  <!-- ══ EASTER EGG MESSAGE ══════════════════════════════════════ -->
+  <div id="easter-msg" class="hidden" role="status" aria-live="polite">
+    ✨ You found it. Some tiny things are made just to be discovered.
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       SCENE 1 — CINEMATIC INTRODUCTION
+  ══════════════════════════════════════════════════════════════════ -->
+  <section id="intro" aria-label="Introduction">
+    <!-- Background layers -->
+    <canvas id="intro-canvas" aria-hidden="true"></canvas>
+
+    <!-- Corner ornaments -->
+    <svg class="corner-ornament-svg corner-ornament-svg--tl" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+      <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="currentColor" stroke-width="1" fill="none"/>
+      <path d="M2 22 Q12 12 22 2" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 3" fill="none"/>
+      <circle cx="2" cy="2" r="2" fill="currentColor" opacity="0.6"/>
+    </svg>
+    <svg class="corner-ornament-svg corner-ornament-svg--tr" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+      <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="currentColor" stroke-width="1" fill="none"/>
+      <path d="M2 22 Q12 12 22 2" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 3" fill="none"/>
+      <circle cx="2" cy="2" r="2" fill="currentColor" opacity="0.6"/>
+    </svg>
+    <svg class="corner-ornament-svg corner-ornament-svg--bl" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+      <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="currentColor" stroke-width="1" fill="none"/>
+      <path d="M2 22 Q12 12 22 2" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 3" fill="none"/>
+      <circle cx="2" cy="2" r="2" fill="currentColor" opacity="0.6"/>
+    </svg>
+    <svg class="corner-ornament-svg corner-ornament-svg--br" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+      <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="currentColor" stroke-width="1" fill="none"/>
+      <path d="M2 22 Q12 12 22 2" stroke="currentColor" stroke-width="0.6" stroke-dasharray="2 3" fill="none"/>
+      <circle cx="2" cy="2" r="2" fill="currentColor" opacity="0.6"/>
+    </svg>
+
+    <!-- Decorative central radial light -->
+    <div class="intro-light-orb" aria-hidden="true"></div>
+
+    <!-- Main content -->
+    <div class="intro-content">
+      <!-- Decorative top ornament -->
+      <div class="intro-ornament" aria-hidden="true">
+        <div class="intro-ornament-line"></div>
+        <span class="intro-ornament-star">✦</span>
+        <div class="intro-ornament-line"></div>
+      </div>
+
+      <div class="intro-star" aria-hidden="true"></div>
+
+      <p id="intro-line-1" class="intro-line">
+        A little corner of the internet...
+      </p>
+      <p id="intro-line-2" class="intro-line intro-line--italic">
+        ...made just for you.
+      </p>
+
+      <div class="intro-divider" aria-hidden="true"></div>
+
+      <div class="intro-btn-wrap">
+        <button id="enter-btn" aria-label="Enter Her Little Universe">
+          <span class="enter-btn-text">Enter Your Little World</span>
+          <span class="enter-arrow" aria-hidden="true">→</span>
+        </button>
+        <p class="intro-sub" aria-hidden="true">Your little world awaits ✦</p>
+      </div>
+    </div>
+
+    <button id="skip-intro" aria-label="Skip introduction and enter site">Skip</button>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════════════════════════════════════ -->
+  <div id="main-content" class="hidden">
+
+    <!-- ── NAVIGATION ─────────────────────────────────────────── -->
+    <nav id="nav" aria-label="Site navigation">
+      <div class="nav-brand">
+        <span class="nav-logo" aria-label="Her Little Universe">Her Little Universe</span>
+        <span class="nav-brand-ornament" aria-hidden="true">✦</span>
+      </div>
+
+      <button class="nav-menu-btn"
+              aria-label="Open navigation menu"
+              aria-expanded="false"
+              aria-controls="nav-link-list">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="nav-links" id="nav-link-list" role="list">
+        <li><a href="#hero" data-section="hero">Home</a></li>
+        <li><a href="#universe" data-section="universe">Universe</a></li>
+        <li><a href="#gallery" data-section="gallery">Gallery</a></li>
+        <li><a href="#scrapbook" data-section="scrapbook">Scrapbook</a></li>
+        <li><a href="#secret" data-section="secret">Surprise</a></li>
+        <li><a href="#letter-section" data-section="letter-section">Letter</a></li>
+      </ul>
+
+      <!-- Active section progress indicator -->
+      <div class="nav-progress" aria-hidden="true">
+        <div class="nav-progress-bar"></div>
+      </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SCENE 2 — HERO (Editorial Split Layout)
+    ══════════════════════════════════════════════════════════════ -->
+    <section id="hero" class="section" aria-label="Hero — Made of little moments"
+             style="padding:0; min-height:100vh; overflow:hidden;">
+
+      <div class="hero-layout">
+
+        <!-- LEFT SIDE — Editorial copy -->
+        <div class="hero-left">
+          <!-- Vertical section label -->
+          <div class="hero-vertical-label" aria-hidden="true">
+            <span class="vertical-label">Her Little Universe — 2024</span>
+          </div>
+
+          <div class="hero-copy">
+            <div class="hero-eyebrow reveal-up" data-delay="200" style="--reveal-delay:200ms">
+              <span class="t-eyebrow" id="hero-eyebrow">ONE LITTLE WORLD</span>
+            </div>
+
+            <!-- Decorative curved line -->
+            <svg class="hero-deco-line" viewBox="0 0 120 8" fill="none" aria-hidden="true">
+              <path d="M0 4 Q30 0 60 4 Q90 8 120 4" stroke="#BD956B" stroke-width="0.8" fill="none" opacity="0.5"/>
+            </svg>
+
+            <h1 id="hero-heading" class="hero-heading reveal-up" data-delay="360" style="--reveal-delay:360ms">
+              Made of<br><em>little moments.</em>
+            </h1>
+
+            <p id="hero-subheading" class="hero-sub reveal-up" data-delay="520" style="--reveal-delay:520ms">
+              A collection of photographs, tiny details,<br>
+              and a few unexpected things along the way.
+            </p>
+
+            <!-- Handwritten note -->
+            <p class="hero-note t-note reveal-up" data-delay="620" style="--reveal-delay:620ms" aria-hidden="true">
+              — all for you ✦
+            </p>
+
+            <div class="reveal-up" data-delay="720" style="--reveal-delay:720ms">
+              <a href="#universe" class="btn btn--primary" aria-label="Explore the world">
+                Explore the World <span aria-hidden="true">↓</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Small decorative numbered label -->
+          <div class="hero-num" aria-hidden="true">
+            <span class="t-section-num">01</span>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE — Photography -->
+        <div class="hero-right">
+          <!-- Photo frame wrapper -->
+          <div class="hero-photo-wrap">
+            <!-- Decorative double-border frame -->
+            <div class="hero-photo-frame photo-frame--mat">
+              <div id="hero-bg-wrap">
+                <img id="hero-bg" src="" alt="" aria-hidden="true" loading="eager" />
+              </div>
+              <!-- Inner border accent -->
+              <div class="hero-photo-inner-border" aria-hidden="true"></div>
+            </div>
+
+            <!-- Photo caption -->
+            <div class="hero-photo-caption" aria-hidden="true">
+              <span class="t-caption">A personal moment, beautifully kept.</span>
+            </div>
+
+            <!-- Decorative floating annotation -->
+            <div class="hero-annotation reveal-up" data-delay="850" style="--reveal-delay:850ms" aria-hidden="true">
+              <span class="deco-annotation">favourite ✦</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom fade -->
+      <div class="hero-fade-bottom" aria-hidden="true"></div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SCENE 3 — INTERACTIVE UNIVERSE
+    ══════════════════════════════════════════════════════════════ -->
+    <section id="universe" class="section"
+             style="padding:0;"
+             aria-label="Universe — choose a destination">
+      <canvas id="universe-canvas" aria-hidden="true"></canvas>
+
+      <!-- Ambient glow -->
+      <div class="universe-glow-center" aria-hidden="true"></div>
+
+      <!-- SVG constellation lines (drawn by JS) -->
+      <svg id="universe-constellation" class="universe-constellation-svg" aria-hidden="true"
+           viewBox="0 0 100 100" preserveAspectRatio="none">
+        <g id="constellation-paths" fill="none" stroke="rgba(189,149,107,0.22)" stroke-width="0.3">
+          <line x1="20" y1="35" x2="50" y2="78" />
+          <line x1="50" y1="78" x2="82" y2="62" />
+          <line x1="20" y1="35" x2="72" y2="22" />
+          <line x1="72" y1="22" x2="82" y2="62" />
+          <line x1="14" y1="70" x2="50" y2="78" />
+        </g>
+      </svg>
+
+      <!-- Central decorative motif -->
+      <div class="universe-center" aria-hidden="true">
+        <div class="universe-center-ring universe-center-ring--outer anim-rotate-gentle"></div>
+        <div class="universe-center-ring universe-center-ring--inner anim-orbit-reverse" style="--orbit-dur:38s;"></div>
+        <p class="universe-center-title">
+          <span class="universe-center-ornament">✦</span>
+          <span id="universe-name">Bhavna's</span>
+          <br>
+          <em>little universe</em>
+          <span class="universe-center-ornament">✦</span>
+        </p>
+      </div>
+
+      <!-- Heading area -->
+      <div class="universe-heading-area">
+        <p class="t-eyebrow reveal-up" data-delay="100" style="--reveal-delay:100ms;
+           color:var(--chestnut); display:block; text-align:center; opacity:0.85;">
+          EXPLORE
+        </p>
+        <h2 class="t-h2 reveal-up" data-delay="220" style="--reveal-delay:220ms;
+            color:var(--deep-espresso); font-weight:400; margin-top:0.6rem; text-align:center; opacity:0.9;">
+          Choose your destination
+        </h2>
+      </div>
+
+      <!-- Universe nodes (JS populated) -->
+      <div id="universe-nodes" aria-label="Navigation destinations"></div>
+
+      <!-- Scroll hint -->
+      <div class="universe-scroll-hint reveal-up" data-delay="1200" style="--reveal-delay:1200ms" aria-hidden="true">
+        <span>scroll to explore</span>
+        <div class="scroll-hint-line"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SCENE 4 — GALLERY (Photography Exhibition)
+    ══════════════════════════════════════════════════════════════ -->
+    <section id="gallery" class="section" aria-label="Gallery — A collection of little moments">
+
+      <!-- Corner ornaments -->
+      <svg class="corner-ornament-svg corner-ornament-svg--tl" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+        <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="currentColor" stroke-width="1" fill="none"/>
+        <circle cx="2" cy="2" r="1.5" fill="currentColor" opacity="0.6"/>
+      </svg>
+      <svg class="corner-ornament-svg corner-ornament-svg--tr" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+        <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="currentColor" stroke-width="1" fill="none"/>
+        <circle cx="2" cy="2" r="1.5" fill="currentColor" opacity="0.6"/>
+      </svg>
+
+      <div class="container">
+        <header class="section-header">
+          <span class="section-num">01</span>
+
+          <div class="eyebrow-row eyebrow-row--light">
+            <span class="t-eyebrow" id="gallery-eyebrow">A COLLECTION OF LITTLE MOMENTS</span>
+          </div>
+
+          <h2 class="t-h1 reveal-up" data-delay="100" style="--reveal-delay:100ms">
+            Some things are too nice<br>to leave in a folder.
+          </h2>
+
+          <!-- Decorative ornament below heading -->
+          <div class="deco-divider reveal-up" data-delay="200" style="--reveal-delay:200ms; margin:2rem auto; max-width:320px;">
+            <span>✦</span>
+          </div>
+        </header>
+
+        <!-- Gallery grid (JS populated) -->
+        <div id="gallery-grid" class="gallery-grid" role="list" aria-label="Photo gallery"></div>
+      </div>
+
+      <div class="section-fade-bottom" aria-hidden="true"></div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SCENE 5 — DIGITAL SCRAPBOOK
+    ══════════════════════════════════════════════════════════════ -->
+    <section id="scrapbook" class="section" aria-label="Scrapbook — Little things, beautifully kept">
+
+      <!-- Decorative botanical corner illustrations -->
+      <svg class="corner-ornament-svg corner-ornament-svg--tr" viewBox="0 0 60 60" fill="none" aria-hidden="true"
+           style="width:56px; height:56px; opacity:0.18; color:#704D35;">
+        <ellipse cx="38" cy="18" rx="14" ry="8" stroke="currentColor" stroke-width="0.8" transform="rotate(-35 38 18)"/>
+        <ellipse cx="48" cy="28" rx="11" ry="6" stroke="currentColor" stroke-width="0.8" transform="rotate(-10 48 28)"/>
+        <path d="M30 38 Q40 20 55 8" stroke="currentColor" stroke-width="0.8" fill="none"/>
+        <path d="M35 40 Q45 28 52 18" stroke="currentColor" stroke-width="0.6" stroke-dasharray="1.5 2" fill="none"/>
+      </svg>
+
+      <div class="scrapbook-inner container">
+        <header class="section-header" style="padding-bottom:var(--s-6);">
+          <span class="section-num" style="color:var(--chestnut); opacity:0.72;">02</span>
+
+          <div class="eyebrow-row eyebrow-row--dark">
+            <span class="t-eyebrow" style="color:var(--chestnut); opacity:0.82;">LITTLE THINGS, BEAUTIFULLY KEPT</span>
+          </div>
+
+          <h2 class="t-h1 reveal-up" style="color:var(--deep-espresso); font-style:italic;" data-delay="100" style="--reveal-delay:100ms">
+            A few pictures,
+            <span style="font-style:normal; display:block;">a little imagination.</span>
+          </h2>
+
+          <p class="t-script reveal-up" style="color:var(--cocoa); margin-top:1.2rem; opacity:0.88;" data-delay="200" style="--reveal-delay:200ms">
+            — all the little things worth keeping
+          </p>
+
+          <!-- Vintage stamp decoration -->
+          <div class="scrapbook-stamp-row reveal-up" data-delay="320" style="--reveal-delay:320ms;" aria-hidden="true">
+            <div class="scrap-stamp">
+              <span>✦</span>
+              <small>BEAUTIFULLY KEPT</small>
+            </div>
+          </div>
+        </header>
+
+        <!-- Scrapbook grid (JS populated) -->
+        <div id="scrapbook-grid" class="scrapbook-grid" role="list" aria-label="Scrapbook photos"></div>
+      </div>
+
+      <!-- Torn-paper bottom edge transition -->
+      <div class="scrapbook-edge" aria-hidden="true"></div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SCENE 6 — PHOTO MOSAIC (Exhibition Wall)
+    ══════════════════════════════════════════════════════════════ -->
+    <section id="mosaic" class="section" aria-label="Mosaic — Every frame has its place">
+      <div class="container">
+        <div class="mosaic-heading-wrap">
+          <span class="section-num">03</span>
+
+          <p class="t-eyebrow reveal-up" data-delay="0" style="--reveal-delay:0ms">EVERY FRAME</p>
+
+          <h2 class="t-h1 reveal-up" style="margin-top:0.8rem;" data-delay="140" style="--reveal-delay:140ms">
+            Every little frame<br>has its place.
+          </h2>
+
+          <!-- Ornamental separator -->
+          <div class="deco-dots reveal-up" data-delay="240" style="--reveal-delay:240ms; margin-top:1.5rem;" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+
+        <div id="mosaic-grid" class="mosaic-grid" role="list" aria-label="Photo mosaic"></div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SCENE 7 — THE HIDDEN SURPRISE
+    ══════════════════════════════════════════════════════════════ -->
+    <section id="secret" class="section" style="padding:0;" aria-label="A little secret">
+      <canvas id="secret-canvas" aria-hidden="true"></canvas>
+
+      <!-- Botanical corner decorations -->
+      <svg class="corner-ornament-svg corner-ornament-svg--bl" viewBox="0 0 60 60" fill="none" aria-hidden="true"
+           style="width:64px; height:64px; opacity:0.18; color:#704D35;">
+        <ellipse cx="22" cy="42" rx="14" ry="8" stroke="currentColor" stroke-width="0.8" transform="rotate(35 22 42)"/>
+        <ellipse cx="12" cy="32" rx="11" ry="6" stroke="currentColor" stroke-width="0.8" transform="rotate(10 12 32)"/>
+        <path d="M30 22 Q20 40 5 52" stroke="currentColor" stroke-width="0.8" fill="none"/>
+      </svg>
+      <svg class="corner-ornament-svg corner-ornament-svg--tr" viewBox="0 0 60 60" fill="none" aria-hidden="true"
+           style="width:64px; height:64px; opacity:0.18; color:#704D35;">
+        <ellipse cx="38" cy="18" rx="14" ry="8" stroke="currentColor" stroke-width="0.8" transform="rotate(-35 38 18)"/>
+        <path d="M30 38 Q42 22 55 10" stroke="currentColor" stroke-width="0.8" fill="none"/>
+      </svg>
+
+      <div class="secret-inner">
+        <span class="section-num">04</span>
+
+        <!-- Editorial label -->
+        <p class="secret-editorial-label t-eyebrow reveal-up"
+           style="color:var(--soft-caramel); letter-spacing:0.4em; margin-bottom:0.5rem; opacity:0.6;" data-delay="0">
+          PRIVATE LITTLE DISCOVERY
+        </p>
+
+        <p class="t-eyebrow reveal-up"
+           style="color:var(--chestnut); opacity:0.82;" data-delay="60" style="--reveal-delay:60ms">
+          A LITTLE SECRET
+        </p>
+
+        <h2 id="secret-teaser" class="t-h2 reveal-up"
+            style="color:var(--deep-espresso); margin-top:1.2rem; font-style:italic;"
+            data-delay="160" style="--reveal-delay:160ms">
+          Hmm... there's something here.
+        </h2>
+
+        <!-- Premium envelope -->
+        <div id="secret-envelope" class="secret-envelope" aria-hidden="true">
+          <!-- Postal detail strip -->
+          <div class="envelope-postal-strip" aria-hidden="true">
+            <span>✉</span>
+            <span>PRIVATE</span>
+            <span>✦</span>
+          </div>
+          <div class="envelope-body">
+            <!-- Flap -->
+            <div class="envelope-flap" aria-hidden="true">
+              <div class="envelope-flap-crease"></div>
+            </div>
+            <!-- Wax seal -->
+            <div class="envelope-seal" aria-label="Wax seal">
+              <span>✦</span>
+            </div>
+            <!-- Corner decorations -->
+            <div class="envelope-corner envelope-corner--tl" aria-hidden="true"></div>
+            <div class="envelope-corner envelope-corner--tr" aria-hidden="true"></div>
+            <div class="envelope-corner envelope-corner--bl" aria-hidden="true"></div>
+            <div class="envelope-corner envelope-corner--br" aria-hidden="true"></div>
+          </div>
+          <!-- Envelope shadow -->
+          <div class="envelope-shadow" aria-hidden="true"></div>
+        </div>
+
+        <div class="reveal-up" data-delay="400" style="--reveal-delay:400ms">
+          <button id="secret-reveal-btn" class="btn btn--primary" aria-label="Reveal the hidden surprise">
+            Take a Look <span aria-hidden="true">✦</span>
+          </button>
+        </div>
+
+        <!-- Revealed content -->
+        <div id="secret-reveal" class="secret-reveal" aria-live="polite" aria-atomic="true">
+          <div class="deco-divider" aria-hidden="true"><span>✦</span></div>
+          <p id="secret-message-text"
+             class="t-body"
+             style="max-width:440px; text-align:center; color:var(--deep-espresso); font-family:var(--font-heading); font-size:1.12rem; line-height:1.9;">
+            You found the little secret. ✨<br>
+            Some things are made to be discovered.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SCENE 8 — THE ENVELOPE & LETTER
+    ══════════════════════════════════════════════════════════════ -->
+    <section id="letter-section" class="section" style="padding:0;" aria-label="A letter for you">
+      <div class="letter-inner">
+        <span class="section-num">05</span>
+
+        <p id="letter-teaser" class="t-eyebrow reveal-up"
+           style="color:var(--chestnut); opacity:0.82;" data-delay="0" style="--reveal-delay:0ms">
+          ONE LAST THING...
+        </p>
+
+        <p id="letter-sub-teaser" class="t-h3 reveal-up"
+           style="color:var(--deep-espresso); margin-top:0.9rem; font-weight:300; font-style:italic; opacity:0.88;"
+           data-delay="160" style="--reveal-delay:160ms">
+          There's a little note for you.
+        </p>
+
+        <!-- Decorative divider -->
+        <div class="deco-divider reveal-up" data-delay="260" style="--reveal-delay:260ms; max-width:280px; margin:1.5rem auto;" aria-hidden="true">
+          <span>✦</span>
+        </div>
+
+        <!-- Premium letter envelope -->
+        <div class="letter-envelope-wrap reveal-scale" data-delay="320" style="--reveal-delay:320ms">
+          <div id="letter-env" class="letter-env-outer">
+            <!-- Envelope back panel -->
+            <div class="letter-env-back" aria-hidden="true"></div>
+            <!-- Envelope flap -->
+            <div class="letter-env-flap" aria-hidden="true">
+              <div class="letter-env-flap-crease" aria-hidden="true"></div>
+            </div>
+            <!-- Seal -->
+            <div class="letter-env-seal" aria-hidden="true">✉</div>
+            <!-- Postal decoration -->
+            <div class="letter-env-postal" aria-hidden="true">
+              <span class="letter-env-stamp">✦ HER LITTLE UNIVERSE ✦</span>
+            </div>
+
+            <!-- Letter card (shown after opening) -->
+            <article id="letter-card" class="letter-card" aria-label="Personal note">
+              <button id="letter-close-btn" class="letter-close-btn" aria-label="Close letter">✕</button>
+
+              <!-- Premium stationery header -->
+              <div class="letter-stationery-top" aria-hidden="true">
+                <div class="letter-deco-line"></div>
+                <span class="letter-monogram">✦ H.L.U. ✦</span>
+                <div class="letter-deco-line"></div>
+              </div>
+
+              <h3 id="letter-heading" class="letter-heading">A Little Note</h3>
+
+              <!-- Ruling lines background (decorative) -->
+              <div class="letter-ruled-bg" aria-hidden="true"></div>
+
+              <p id="letter-body" class="letter-body"></p>
+
+              <div class="letter-signature-wrap">
+                <div class="letter-signature-line" aria-hidden="true"></div>
+                <p class="letter-signature t-note" id="letter-signature">— with love ✦</p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <div class="reveal-up" data-delay="480" style="--reveal-delay:480ms; margin-top:2rem;">
+          <button id="letter-open-btn" class="btn btn--ghost" aria-label="Open the note">
+            Open the Note <span aria-hidden="true">✉</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════
+         SCENE 9 — FINAL CINEMATIC CLOSING
+    ══════════════════════════════════════════════════════════════ -->
+    <section id="final-scene" class="section" style="padding:0;" aria-label="And that's your little world">
+      <canvas id="final-canvas" aria-hidden="true"></canvas>
+
+      <!-- Ambient glow -->
+      <div class="final-glow-orb" aria-hidden="true"></div>
+
+      <!-- Corner ornaments -->
+      <svg class="corner-ornament-svg corner-ornament-svg--tl" viewBox="0 0 44 44" fill="none" aria-hidden="true"
+           style="color:#8C6242;">
+        <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="currentColor" stroke-width="1" fill="none"/>
+        <circle cx="2" cy="2" r="1.5" fill="currentColor" opacity="0.6"/>
+      </svg>
+      <svg class="corner-ornament-svg corner-ornament-svg--br" viewBox="0 0 44 44" fill="none" aria-hidden="true"
+           style="color:#8C6242;">
+        <path d="M2 42 L2 8 Q2 2 8 2 L42 2" stroke="currentColor" stroke-width="1" fill="none"/>
+        <circle cx="2" cy="2" r="1.5" fill="currentColor" opacity="0.6"/>
+      </svg>
+
+      <div class="final-content container container--narrow">
+
+        <!-- Large framed photograph -->
+        <div class="final-photo-frame reveal-scale" data-delay="100" style="--reveal-delay:100ms">
+          <!-- Double-border frame treatment -->
+          <div class="final-frame-outer">
+            <div class="final-frame-inner">
+              <div class="photo-placeholder" id="final-photo-placeholder">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" aria-hidden="true">
+                  <rect x="3" y="3" width="18" height="18" rx="1"/>
+                  <circle cx="8.5" cy="8.5" r="1.5"/>
+                  <path d="M21 15l-5-5L5 21"/>
+                </svg>
+                <span>Your closing photograph</span>
+              </div>
+              <img id="final-photo" src="" alt="" class="img-cover"
+                   style="position:absolute; inset:0; opacity:0; transition:opacity 1.4s;" />
+            </div>
+          </div>
+
+          <!-- Ornamental frame caption -->
+          <p class="final-frame-caption t-caption" aria-hidden="true">Her Little Universe</p>
+        </div>
+
+        <!-- Ornamental separator -->
+        <div class="deco-divider reveal-up" data-delay="220" style="--reveal-delay:220ms; max-width:300px; margin:2.5rem auto;" aria-hidden="true">
+          <span>✦</span>
+        </div>
+
+        <!-- Text sequence -->
+        <p class="t-eyebrow reveal-up" data-delay="280" style="--reveal-delay:280ms;
+           color:var(--chestnut); opacity:0.82; margin-top:0;">
+          THE END
+        </p>
+
+        <h2 id="final-heading" class="t-h1 reveal-up" data-delay="400" style="--reveal-delay:400ms;
+            margin-top:0.9rem; font-style:italic;">
+          And that's your little world.
+        </h2>
+
+        <p id="final-body" class="t-body reveal-up" data-delay="560" style="--reveal-delay:560ms;
+           max-width:420px; margin:1.6rem auto 0; text-align:center;">
+          Made with care, a little creativity, and the hope of making you smile.
+        </p>
+
+        <p id="final-signature" class="final-signature reveal-up" data-delay="700" style="--reveal-delay:700ms">
+          — from a friend ✦
+        </p>
+
+        <div class="reveal-up" data-delay="860" style="--reveal-delay:860ms; margin-top:var(--s-8);">
+          <button id="explore-again-btn" class="btn btn--ghost" aria-label="Return to the beginning and explore again">
+            Explore Again <span aria-hidden="true">↑</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FOOTER ─────────────────────────────────────────────── -->
+    <footer aria-label="Site footer" style="background:var(--ivory); padding:var(--s-6) var(--s-4);
+                   border-top:1px solid rgba(189,149,107,0.18); text-align:center;">
+      <div class="deco-dots" aria-hidden="true" style="margin-bottom:1.2rem;">
+        <span></span><span></span><span></span>
+      </div>
+      <p class="t-caption" style="color:var(--chestnut); opacity:0.68; letter-spacing:0.38em;">
+        ✦ &nbsp; HER LITTLE UNIVERSE &nbsp; ✦
+      </p>
+      <p class="t-caption" style="color:var(--soft-caramel); opacity:0.42; letter-spacing:0.2em; margin-top:0.6rem; font-size:0.62rem;">
+        Made with love &amp; a little imagination
+      </p>
+    </footer>
+
+  </div><!-- /main-content -->
+
+  <!-- ══ SCRIPTS ══════════════════════════════════════════════════ -->
+  <!-- 1. Content config -->
+  <script src="src/data/siteContent.js"></script>
+
+  <!-- 2. Skip intro & mobile nav -->
+  <script>
+    document.getElementById('skip-intro')?.addEventListener('click', () => {
+      document.getElementById('enter-btn')?.click();
+    });
+    document.querySelector('.nav-menu-btn')?.addEventListener('click', function() {
+      const expanded = this.getAttribute('aria-expanded') === 'true';
+      this.setAttribute('aria-expanded', String(!expanded));
+      this.classList.toggle('open');
+      document.getElementById('nav-link-list')?.classList.toggle('open');
+    });
+    document.querySelectorAll('#nav-link-list a').forEach(a => {
+      a.addEventListener('click', () => {
+        document.querySelector('.nav-menu-btn')?.classList.remove('open');
+        document.querySelector('.nav-menu-btn')?.setAttribute('aria-expanded','false');
+        document.getElementById('nav-link-list')?.classList.remove('open');
+      });
+    });
+  </script>
+
+  <!-- 3. GSAP — cinematic choreography for every section -->
+  <script>
+    window.addEventListener('load', () => {
+      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+      gsap.registerPlugin(ScrollTrigger);
+
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced) return;
+
+      /* Wait for main content to become visible */
+      const waitForMain = setInterval(() => {
+        const main = document.getElementById('main-content');
+        if (!main || main.classList.contains('hidden')) return;
+        clearInterval(waitForMain);
+        setTimeout(initGSAP, 150);
+      }, 200);
+
+      function initGSAP() {
+
+        /* ── 1. HERO — Blur-to-sharp + split editorial reveal ── */
+        const heroBg = document.getElementById('hero-bg');
+        if (heroBg && heroBg.classList.contains('loaded')) {
+          gsap.fromTo(heroBg,
+            { scale: 1.1, filter: 'blur(8px) saturate(0.75)' },
+            { scale: 1,   filter: 'blur(0px) saturate(1.02)',
+              duration: 2.2, ease: 'power4.out' });
+        }
+
+        /* Hero left/right entrance */
+        const heroLeft  = document.querySelector('.hero-left');
+        const heroRight = document.querySelector('.hero-right');
+        if (heroLeft) gsap.fromTo(heroLeft,
+          { opacity: 0, x: -50 },
+          { opacity: 1, x: 0, duration: 1.4, ease: 'expo.out', delay: 0.3 });
+        if (heroRight) gsap.fromTo(heroRight,
+          { opacity: 0, x: 50, clipPath: 'inset(0 30% 0 0)' },
+          { opacity: 1, x: 0,  clipPath: 'inset(0 0% 0 0)',
+            duration: 1.6, ease: 'expo.out', delay: 0.5 });
+
+        /* Hero decorative line draw */
+        const heroDeco = document.querySelector('.hero-deco-line path');
+        if (heroDeco) {
+          const len = heroDeco.getTotalLength?.() || 120;
+          gsap.set(heroDeco, { strokeDasharray: len, strokeDashoffset: len });
+          gsap.to(heroDeco, { strokeDashoffset: 0, duration: 1.2, delay: 0.8, ease: 'expo.out' });
+        }
+
+        /* ── 2. HERO PARALLAX ── */
+        if (heroBg) {
+          gsap.to(heroBg, {
+            y: '25%', ease: 'none',
+            scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom top', scrub: true },
+          });
+        }
+
+        /* ── 3. SECTION HEADINGS — clip-path wipe reveal ── */
+        document.querySelectorAll('.section-header h2, .mosaic-heading-wrap h2').forEach(el => {
+          gsap.fromTo(el,
+            { opacity: 0, y: 36, clipPath: 'inset(0 0 85% 0)' },
+            { opacity: 1, y: 0,  clipPath: 'inset(0 0 0% 0)',
+              duration: 1.1, ease: 'expo.out',
+              scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+            }
+          );
+        });
+
+        /* ── 4. UNIVERSE — SVG constellation draw + node stagger ── */
+        const constPaths = document.querySelectorAll('#constellation-paths line');
+        constPaths.forEach((line, i) => {
+          const len = line.getTotalLength?.() || 200;
+          gsap.set(line, { strokeDasharray: len, strokeDashoffset: len, opacity: 0 });
+          gsap.to(line, {
+            strokeDashoffset: 0, opacity: 1,
+            duration: 1.8, delay: 0.4 + i * 0.3, ease: 'expo.out',
+            scrollTrigger: { trigger: '#universe', start: 'top 80%', once: true },
+          });
+        });
+
+        const universeNodes = document.querySelectorAll('.universe-node');
+        if (universeNodes.length) {
+          gsap.set(universeNodes, { opacity: 0, scale: 0.4, y: 20 });
+          ScrollTrigger.create({
+            trigger: '#universe', start: 'top 75%', once: true,
+            onEnter: () => {
+              gsap.to(universeNodes, {
+                opacity: 1, scale: 1, y: 0,
+                duration: 1.0, ease: 'back.out(1.6)',
+                stagger: { each: 0.18, from: 'random' },
+              });
+            },
+          });
+        }
+
+        /* Universe mouse parallax */
+        const universeSection = document.getElementById('universe');
+        if (universeSection) {
+          let ux = 0, uy = 0;
+          universeSection.addEventListener('mousemove', e => {
+            const rect = universeSection.getBoundingClientRect();
+            ux = (e.clientX - rect.left) / rect.width - 0.5;
+            uy = (e.clientY - rect.top)  / rect.height - 0.5;
+            universeNodes.forEach((node, i) => {
+              const depth = 0.8 + i * 0.3;
+              gsap.to(node, {
+                x: ux * 22 * depth, y: uy * 14 * depth,
+                duration: 1.6, ease: 'power2.out', overwrite: 'auto',
+              });
+            });
+          });
+          universeSection.addEventListener('mouseleave', () => {
+            universeNodes.forEach(node => {
+              gsap.to(node, { x: 0, y: 0, duration: 1.8, ease: 'power2.out', overwrite: 'auto' });
+            });
+          });
+        }
+
+        /* ── 5. GALLERY — Directional clip-path reveals ── */
+        const galleryItems = document.querySelectorAll('#gallery-grid .gallery-item');
+        const origins = ['inset(100% 0 0 0)','inset(0 100% 0 0)','inset(0 0 100% 0)','inset(0 0 0 100%)'];
+        galleryItems.forEach((el, i) => {
+          el.classList.remove('reveal-scale');
+          gsap.fromTo(el,
+            { clipPath: origins[i % origins.length], scale: 1.05, opacity: 0.8 },
+            {
+              clipPath: 'inset(0 0 0 0)', scale: 1, opacity: 1,
+              duration: 1.15, ease: 'expo.out',
+              delay: (i % 3) * 0.1,
+              scrollTrigger: { trigger: el, start: 'top 92%', once: true },
+            }
+          );
+        });
+
+        /* ── 6. SCRAPBOOK — 4-direction card entrances + rotation ── */
+        const scrapCards = document.querySelectorAll('#scrapbook-grid .scrap-card');
+        scrapCards.forEach((card, i) => {
+          card.classList.remove('reveal-up');
+          const fromX = i % 3 === 0 ? -55 : i % 3 === 2 ? 55 : 0;
+          const fromY = i % 3 === 1 ? 65 : 32;
+          const rots  = [-2.4, 1.8, -1.0, 2.6, -1.6];
+          const rot   = rots[i % rots.length];
+          gsap.fromTo(card,
+            { opacity: 0, x: fromX, y: fromY, scale: 0.9, rotate: rot > 0 ? rot + 5 : rot - 5 },
+            {
+              opacity: 1, x: 0, y: 0, scale: 1, rotate: rot,
+              duration: 1.1, ease: 'power3.out', delay: (i % 2) * 0.12,
+              scrollTrigger: { trigger: card, start: 'top 90%', once: true },
+            }
+          );
+        });
+
+        /* ── 7. MOSAIC — Center-outward cascade ── */
+        const mosaicTiles = document.querySelectorAll('#mosaic-grid .mosaic-tile');
+        mosaicTiles.forEach(t => t.classList.remove('reveal-scale'));
+        gsap.set(mosaicTiles, { opacity: 0, scale: 0.86 });
+        ScrollTrigger.create({
+          trigger: '#mosaic-grid', start: 'top 80%', once: true,
+          onEnter: () => gsap.to(mosaicTiles, {
+            opacity: 1, scale: 1, duration: 0.72, ease: 'back.out(1.3)',
+            stagger: { each: 0.065, from: 'center' },
+          }),
+        });
+
+        /* Mosaic hover depth effect */
+        mosaicTiles.forEach(tile => {
+          tile.addEventListener('mouseenter', () => {
+            const others = [...mosaicTiles].filter(t => t !== tile);
+            gsap.to(tile,   { scale: 1.03, zIndex: 5, duration: 0.4, ease: 'power2.out' });
+            gsap.to(others, { scale: 0.97, opacity: 0.78, duration: 0.4, ease: 'power2.out' });
+          });
+          tile.addEventListener('mouseleave', () => {
+            gsap.to(mosaicTiles, { scale: 1, opacity: 1, zIndex: 1, duration: 0.5, ease: 'power2.inOut' });
+          });
+        });
+
+        /* ── 8. SECRET — Envelope rise ── */
+        const secretEnv = document.querySelector('.secret-envelope');
+        if (secretEnv) {
+          gsap.fromTo(secretEnv,
+            { opacity: 0, y: 55, scale: 0.88, rotate: -2 },
+            {
+              opacity: 1, y: 0, scale: 1, rotate: 0,
+              duration: 1.4, ease: 'expo.out',
+              scrollTrigger: { trigger: '#secret', start: 'top 72%', once: true },
+            }
+          );
+        }
+
+        /* ── 9. LETTER — Envelope wrapper rise ── */
+        const letterWrap = document.querySelector('.letter-envelope-wrap');
+        if (letterWrap) {
+          letterWrap.classList.remove('reveal-scale');
+          gsap.fromTo(letterWrap,
+            { opacity: 0, y: 60, scale: 0.92 },
+            {
+              opacity: 1, y: 0, scale: 1,
+              duration: 1.35, ease: 'power4.out',
+              scrollTrigger: { trigger: '#letter-section', start: 'top 72%', once: true },
+            }
+          );
+        }
+
+        /* ── 10. FINAL — 9-step cinematic timeline ── */
+        const finalFrame = document.querySelector('#final-scene .final-photo-frame');
+        if (finalFrame) {
+          finalFrame.classList.remove('reveal-scale');
+          const tl = gsap.timeline({
+            scrollTrigger: { trigger: '#final-scene', start: 'top 72%', once: true },
+          });
+          tl.fromTo(finalFrame,
+              { clipPath: 'inset(18% 12% 18% 12%)', scale: 1.08, opacity: 0.55 },
+              { clipPath: 'inset(0% 0% 0% 0%)',     scale: 1,    opacity: 1,
+                duration: 1.55, ease: 'expo.out' })
+            .fromTo('.final-glow-orb',
+              { opacity: 0, scale: 0.6 },
+              { opacity: 1, scale: 1, duration: 1.2, ease: 'power3.out' }, '-=1.0')
+            .fromTo('#final-scene .t-eyebrow',
+              { opacity: 0, y: 16 },
+              { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '-=0.5')
+            .fromTo('#final-heading',
+              { opacity: 0, y: 28, clipPath: 'inset(0 0 65% 0)' },
+              { opacity: 1, y: 0,  clipPath: 'inset(0 0 0% 0)',
+                duration: 1.0, ease: 'expo.out' }, '-=0.3')
+            .fromTo('#final-body',
+              { opacity: 0, y: 18 },
+              { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.35')
+            .fromTo('#final-signature',
+              { opacity: 0, y: 16, scale: 0.94 },
+              { opacity: 1, y: 0,  scale: 1, duration: 0.7, ease: 'back.out(1.4)' }, '-=0.3')
+            .fromTo('#explore-again-btn',
+              { opacity: 0, y: 14 },
+              { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, '-=0.25');
+        }
+
+        /* ── 11. NAV PROGRESS BAR ── */
+        const progressBar = document.querySelector('.nav-progress-bar');
+        if (progressBar) {
+          gsap.to(progressBar, {
+            scaleX: 1,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: 'body', start: 'top top', end: 'bottom bottom', scrub: true,
+            },
+          });
+        }
+
+      } /* end initGSAP */
+    });
+  </script>
+
+  <!-- 4. Main application logic -->
+  <script src="src/components/app.js"></script>
+
+</body>
+</html>

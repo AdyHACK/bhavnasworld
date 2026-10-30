@@ -1,0 +1,516 @@
+/* ═══════════════════════════════════════════════════════════════════
+   HER LITTLE UNIVERSE — Global Design System v4
+   Luxury Editorial × Cinematic × Warm Cream/Brown
+   ═══════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=Manrope:wght@300;400;500;600;700&family=Dancing+Script:wght@500;600;700&display=swap');
+
+/* ── Design Tokens ─────────────────────────────────────────────── */
+:root {
+
+  /* ── Background Palette (45% cream/ivory, 20% antique beige, 15% champagne/sand) ── */
+  --ivory:          #F8F1E7;   /* warm ivory — lightest */
+  --cream:          #F3E7D6;   /* vintage cream — main bg */
+  --antique-beige:  #EBD8C0;   /* antique beige — section accents */
+  --warm-sand:      #E2CBAE;   /* warm sand — deeper bg panels */
+  --champagne:      #D8B990;   /* rich champagne — strongest bg accent */
+
+  /* Backwards compat aliases */
+  --vanilla:   var(--ivory);
+  --warm-beige: var(--antique-beige);
+  --beige:     var(--antique-beige);
+
+  /* ── Accent Palette (12% caramel, 8% deep brown) ── */
+  --soft-caramel:   #BD956B;   /* soft caramel — borders, labels */
+  --warm-caramel:   #AE8157;   /* warm caramel — interactive accents */
+  --chestnut:       #8C6242;   /* chestnut — secondary text, active */
+  --cocoa:          #704D35;   /* cocoa — body text */
+  --deep-espresso:  #493224;   /* deep espresso — primary headings */
+  --antique-gold:   #B28A59;   /* antique gold — decorative highlights */
+
+  /* Backwards compat aliases */
+  --caramel:        var(--warm-caramel);
+  --cinnamon:       var(--chestnut);
+  --espresso:       var(--deep-espresso);
+  --mocha:          var(--soft-caramel);
+
+  /* ── Card Surfaces ── */
+  --card-primary:   #FFFAF3;   /* porcelain cream — lightest card */
+  --card-secondary: #F5E9D8;   /* soft parchment — secondary card */
+  --card-vintage:   #EBDDCA;   /* vintage paper — deepest card */
+
+  /* ── Semantic Text ── */
+  --text-heading:    var(--deep-espresso);   /* #493224 — main headings */
+  --text-sub:        #654832;                /* subheadings */
+  --text-body:       var(--cocoa);           /* #70543D — body */
+  --text-caption:    #85694D;               /* captions */
+  --text-label:      #916F4C;               /* labels */
+  --text-primary:    var(--deep-espresso);
+  --text-secondary:  var(--cocoa);
+  --text-muted:      var(--chestnut);
+  --text-faint:      var(--soft-caramel);
+
+  /* ── Borders ── */
+  --border-faint:   rgba(174, 129, 87, 0.15);
+  --border-soft:    rgba(174, 129, 87, 0.28);
+  --border-mid:     rgba(140, 98, 66, 0.42);
+  --border-strong:  rgba(73, 50, 36, 0.55);
+  --border-color:   #C9A882;  /* mocha — general border */
+
+  /* ── Glows ── */
+  --glow-gold:      rgba(178, 138, 89, 0.3);
+  --glow-warm:      rgba(189, 149, 107, 0.25);
+  --glow-champagne: rgba(216, 185, 144, 0.5);
+
+  /* ── Shadows ── */
+  --shadow-xs:    0 2px 8px  rgba(73, 50, 36, 0.07);
+  --shadow-soft:  0 4px 20px rgba(73, 50, 36, 0.10);
+  --shadow-mid:   0 8px 36px rgba(73, 50, 36, 0.16);
+  --shadow-deep:  0 20px 60px rgba(73, 50, 36, 0.22);
+  --shadow-card:  3px 8px 30px rgba(73, 50, 36, 0.13), 0 1px 4px rgba(73, 50, 36, 0.07);
+  --shadow-hover: 8px 20px 55px rgba(73, 50, 36, 0.22), 0 3px 10px rgba(73, 50, 36, 0.10);
+  --shadow-photo: 6px 14px 40px rgba(73, 50, 36, 0.22), 2px 4px 12px rgba(73, 50, 36, 0.12);
+
+  /* ── Typography ── */
+  --font-heading: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-display: 'Playfair Display', 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'DM Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-nav:     'Manrope', 'DM Sans', sans-serif;
+  --font-script:  'Dancing Script', cursive;
+
+  /* ── Spacing (8pt grid) ── */
+  --s-1:  0.5rem;
+  --s-2:  1rem;
+  --s-3:  1.5rem;
+  --s-4:  2rem;
+  --s-6:  3rem;
+  --s-8:  4rem;
+  --s-12: 6rem;
+  --s-16: 8rem;
+  --s-24: 12rem;
+
+  /* Legacy aliases */
+  --space-xs: var(--s-1); --space-sm: var(--s-2);
+  --space-md: var(--s-4); --space-lg: var(--s-8);
+  --space-xl: var(--s-16); --space-2xl: var(--s-24);
+
+  /* ── Easing ── */
+  --ease-out:       cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth:    cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce:    cubic-bezier(0.34, 1.3, 0.64, 1);
+  --ease-cinematic: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-expo:      cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft:      cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* ── Z-index scale ── */
+  --z-base:    1;
+  --z-float:   10;
+  --z-sticky:  50;
+  --z-nav:     100;
+  --z-overlay: 200;
+  --z-modal:   300;
+  --z-cursor:  400;
+
+  /* ── Border radius ── */
+  --r-xs: 1px; --r-sm: 2px; --r-md: 4px; --r-lg: 8px; --r-pill: 100px;
+}
+
+/* ── Reset ─────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  background: var(--cream);
+}
+body {
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--text-body);
+  overflow-x: hidden;
+  cursor: none;
+  line-height: 1;
+}
+img { display: block; max-width: 100%; height: auto; }
+button { cursor: none; border: none; background: none; font-family: inherit; }
+a { color: inherit; text-decoration: none; cursor: none; }
+ul { list-style: none; }
+
+/* ── Typography System ─────────────────────────────────────────── */
+
+/* Eyebrow — tracked uppercase editorial label */
+.t-eyebrow {
+  font-family: var(--font-nav);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--text-label);
+  opacity: 0.88;
+}
+
+/* Cinematic hero display — very large */
+.t-display {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 9vw, 8.5rem);
+  font-weight: 400;
+  line-height: 0.93;
+  letter-spacing: -0.025em;
+  color: var(--text-heading);
+}
+
+/* Major section heading */
+.t-h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(2.6rem, 5.5vw, 5.5rem);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -0.018em;
+  color: var(--text-heading);
+}
+
+/* Section subheading */
+.t-h2 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 3.5vw, 3.2rem);
+  font-weight: 400;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+  color: var(--text-sub);
+}
+
+/* Card / item heading */
+.t-h3 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.2rem, 2.4vw, 2rem);
+  font-weight: 400;
+  line-height: 1.22;
+  color: var(--text-sub);
+}
+
+/* Body text */
+.t-body {
+  font-family: var(--font-body);
+  font-size: clamp(0.875rem, 1.4vw, 1.0rem);
+  font-weight: 300;
+  line-height: 1.88;
+  color: var(--text-body);
+  letter-spacing: 0.01em;
+}
+
+/* Editorial caption */
+.t-caption {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--text-caption);
+  line-height: 1.55;
+}
+
+/* Handwritten annotation */
+.t-script {
+  font-family: var(--font-script);
+  font-size: clamp(1.4rem, 3vw, 2.4rem);
+  font-weight: 500;
+  line-height: 1.32;
+  color: var(--chestnut);
+}
+
+/* Delicate handwritten note — small */
+.t-note {
+  font-family: var(--font-script);
+  font-size: clamp(0.85rem, 1.5vw, 1.05rem);
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--chestnut);
+  opacity: 0.82;
+}
+
+/* Section number — large decorative */
+.t-section-num {
+  font-family: var(--font-heading);
+  font-size: clamp(4rem, 8vw, 7rem);
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  color: var(--soft-caramel);
+  opacity: 0.12;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────── */
+.section { position: relative; width: 100%; overflow: hidden; }
+.container { width: 100%; max-width: 1360px; margin: 0 auto; padding: 0 var(--s-4); }
+.container--narrow { max-width: 880px; }
+.container--wide   { max-width: 1600px; }
+
+/* ── Buttons ─────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 1.1rem 2.8rem;
+  font-family: var(--font-nav);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  border: 1px solid;
+  position: relative;
+  overflow: hidden;
+  transition:
+    color        0.4s var(--ease-smooth),
+    background   0.4s var(--ease-smooth),
+    border-color 0.4s var(--ease-smooth),
+    box-shadow   0.4s var(--ease-smooth),
+    transform    0.35s var(--ease-out);
+  white-space: nowrap;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+
+/* Sweep fill */
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s var(--ease-cinematic);
+}
+.btn:hover::after { transform: scaleX(1); }
+
+/* Primary */
+.btn--primary {
+  background: var(--champagne);
+  color: var(--deep-espresso);
+  border-color: var(--soft-caramel);
+  box-shadow: 0 2px 14px rgba(73, 50, 36, 0.12);
+}
+.btn--primary::after { background: rgba(73, 50, 36, 0.06); }
+.btn--primary:hover {
+  background: var(--warm-sand);
+  border-color: var(--chestnut);
+  box-shadow: var(--shadow-mid);
+}
+
+/* Ghost */
+.btn--ghost {
+  background: transparent;
+  color: var(--cocoa);
+  border-color: var(--border-mid);
+}
+.btn--ghost::after { background: rgba(140, 98, 66, 0.07); }
+.btn--ghost:hover {
+  color: var(--deep-espresso);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ── Decorative Design System ────────────────────────────────────── */
+
+/* Ornamental divider — flanked by lines */
+.deco-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  margin: var(--s-4) auto;
+}
+.deco-divider::before,
+.deco-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--soft-caramel));
+  opacity: 0.35;
+}
+.deco-divider::after {
+  background: linear-gradient(270deg, transparent, var(--soft-caramel));
+}
+.deco-divider span {
+  font-family: var(--font-heading);
+  font-size: 0.65rem;
+  letter-spacing: 0.4em;
+  color: var(--soft-caramel);
+  opacity: 0.55;
+  white-space: nowrap;
+}
+
+/* Corner ornament — placed absolute */
+.corner-ornament {
+  position: absolute;
+  width: 38px;
+  height: 38px;
+  opacity: 0.28;
+  pointer-events: none;
+}
+.corner-ornament--tl { top: var(--s-4); left: var(--s-4); }
+.corner-ornament--tr { top: var(--s-4); right: var(--s-4); transform: scaleX(-1); }
+.corner-ornament--bl { bottom: var(--s-4); left: var(--s-4); transform: scaleY(-1); }
+.corner-ornament--br { bottom: var(--s-4); right: var(--s-4); transform: scale(-1); }
+
+/* Photo frame treatment */
+.photo-frame {
+  position: relative;
+  overflow: hidden;
+}
+.photo-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid rgba(178, 138, 89, 0.3);
+  z-index: 3;
+  pointer-events: none;
+}
+.photo-frame::after {
+  content: '';
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(178, 138, 89, 0.12);
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Photo frame with vintage mat */
+.photo-frame--mat {
+  padding: 10px;
+  background: var(--card-primary);
+  border: 1.5px solid var(--border-soft);
+  box-shadow: var(--shadow-photo);
+}
+.photo-frame--mat img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Inline section label — rotated vertical */
+.vertical-label {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-family: var(--font-nav);
+  font-size: 0.55rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-caption);
+  opacity: 0.55;
+  user-select: none;
+}
+
+/* Stamp decorative element */
+.deco-stamp {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1.5px solid var(--border-soft);
+  padding: 0.5rem 0.65rem;
+  background: var(--card-vintage);
+  position: relative;
+  font-family: var(--font-nav);
+  font-size: 0.48rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-label);
+  /* Perforated edge */
+  -webkit-mask: radial-gradient(circle at 0 50%, transparent 5px, white 5px),
+                radial-gradient(circle at 100% 50%, transparent 5px, white 5px),
+                radial-gradient(circle at 50% 0, transparent 5px, white 5px),
+                radial-gradient(circle at 50% 100%, transparent 5px, white 5px);
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
+/* Fine dotted separator */
+.deco-dots {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+  margin: var(--s-3) auto;
+}
+.deco-dots span {
+  width: 2px; height: 2px;
+  border-radius: 50%;
+  background: var(--soft-caramel);
+  opacity: 0.45;
+}
+.deco-dots span:nth-child(2) { opacity: 0.28; }
+.deco-dots span:nth-child(3) { opacity: 0.15; }
+
+/* Tape strip */
+.deco-tape {
+  display: block;
+  height: 22px;
+  background: rgba(216, 185, 144, 0.75);
+  border-top: 1px solid rgba(140, 98, 66, 0.18);
+  border-bottom: 1px solid rgba(140, 98, 66, 0.18);
+  position: relative;
+  mix-blend-mode: multiply;
+}
+
+/* Fine handwritten annotation */
+.deco-annotation {
+  font-family: var(--font-script);
+  font-size: 0.9rem;
+  color: var(--chestnut);
+  opacity: 0.7;
+  transform: rotate(-2deg);
+  display: inline-block;
+}
+
+/* Eyebrow row with flanking lines */
+.eyebrow-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+}
+.eyebrow-row::before,
+.eyebrow-row::after {
+  content: '';
+  flex: 1;
+  max-width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--soft-caramel));
+  opacity: 0.35;
+}
+.eyebrow-row::after {
+  background: linear-gradient(270deg, transparent, var(--soft-caramel));
+}
+
+/* Section header block */
+.section-header {
+  text-align: center;
+  padding: var(--s-16) 0 var(--s-8);
+}
+
+/* ── Visibility ──────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+.invisible { visibility: hidden; opacity: 0; }
+
+/* ── Images ──────────────────────────────────────────────────────── */
+.img-cover { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+
+/* ── Scrollbar ──────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-track { background: var(--cream); }
+::-webkit-scrollbar-thumb { background: var(--soft-caramel); border-radius: 2px; opacity: 0.5; }
+
+/* ── Focus ──────────────────────────────────────────────────────── */
+:focus-visible { outline: 1.5px solid var(--warm-caramel); outline-offset: 4px; }
+
+/* ── Selection ──────────────────────────────────────────────────── */
+::selection { background: rgba(178, 138, 89, 0.2); color: var(--deep-espresso); }
+
+/* ── Grain texture utility ───────────────────────────────────────── */
+.texture-grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.048'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: multiply;
+}
